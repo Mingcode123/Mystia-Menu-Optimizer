@@ -45,6 +45,25 @@
 
 ## 使用自己的数据
 
+<a id="workbook-schema"></a>
+
+### 工作簿结构
+
+工作簿包含以下四张表，首行为英文表头。每条命名数据行映射为 [demo.json](../data/demo.json) 中 `sheets` 对应表的一个对象。`Name` 在各表内唯一，跨表关联和配方引用须保持名称一致。
+
+| 表名 | 规划核心字段 | 可选字段示例 |
+| --- | --- | --- |
+| `食材` | `Name`、`Tags`（可空） | `Level` |
+| `料理` | `Name`、`Cookware`、`Sell Price`、`Required Ingredients` | `Tags`、`Forbidden Ingredients`、`Owned`（建议显式填 0／1） |
+| `稀客` | `Name`、`Preferred Tags`（可空，无喜好时无方案） | `Disliked Tags`、`Budget` |
+| `食材merchant_data` | `Name`、`Total Daily Quantity` | `Average Buy Price`（可空） |
+
+“核心”说明字段用途，不表示所有字段均不可空；其余可保留字段见导入器的 [`FIELDS`](../tools/prepare_data.py#L15)。每种食材须有同名商贩行，日供给为有限非负数。
+
+标签与配方可用顿号、中英文逗号或分号、斜线、竖线、换行或制表符分隔，普通空格不分隔。两份同种食材写作 `豆腐、豆腐`，重复项保留为用量。
+
+公式须先在电子表格软件中重算并保存缓存；导入器只读缓存、不计算公式。缺失供给缓存会阻止导入，未知均价保留 `null`。
+
 浏览器可用 SheetJS 在本地读取真实游戏工作簿。若要为 Python 规划器准备 JSON，同时修正上述价格关联并查看导入记录，可运行：
 
 ```bash

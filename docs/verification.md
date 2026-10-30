@@ -20,4 +20,6 @@
 
 CI 使用官方 [checkout](https://github.com/actions/checkout)、[setup-python](https://github.com/actions/setup-python) 和 [setup-node](https://github.com/actions/setup-node) 执行同一组检查，并检查示例重建是否产生文件差异。
 
-文档展示另作核对：2026-10-30 使用 GitHub Markdown 接口检查 README、数学建模说明与需求复盘中的 118 个公式，均被识别，HTML 实体解码后 TeX 内容保持一致。该检查验证 Markdown 解析；公式最终排版仍由页面渲染器完成。公开架构页的图例与四张视图也已在内置浏览器中实际加载，未见 Mermaid 语法报错。
+文档展示另作核对：2026-10-30 重写 README 后，使用 GitHub Markdown 接口检查 README 的 48 个公式、数学建模说明的 65 个公式和需求复盘的 9 个公式，共 122 个，均被识别，HTML 实体解码后 TeX 内容保持一致。该检查验证 Markdown 解析；公式最终排版仍由页面渲染器完成。公开架构页的图例与四张视图此前已在内置浏览器中实际加载，未见 Mermaid 语法报错。
+
+本轮 README 改写还检查了中英章节、公式、运行命令和文档链接的一致性，并通过独立读者审阅校对问题定义、目标演进、求解方法与贡献边界。改动仅涉及文档，未更改或重新运行求解代码；软件检查结果沿用上表所列验证记录。
