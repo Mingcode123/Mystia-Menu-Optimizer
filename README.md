@@ -8,9 +8,9 @@
 
 在[《东方夜雀食堂》](https://store.steampowered.com/app/1584090/)中，玩家通过料理与加料满足顾客偏好。**标签**是“甜”“饱腹”等料理属性，与顾客喜好重合的标签计为命中。本项目比较喜好覆盖、食材件数与供给余量，寻找给定条件下的优先方案。
 
-![灵梦饭团加料示例：饭团1件命中2项，加蜂蜜后2件命中3项，再加猪肉后3件仍命中3项；肉覆盖素。](docs/images/tag-example.png)
+![图标流程示例：饭团1件命中2项，加蜂蜜后2件命中3项，再加猪肉后3件仍命中3项；肉覆盖素。](docs/images/tag-example.png)
 
-*AI 绘制的规则示意，非游戏截图。* 图中均无厌恶命中，门槛为 3 项。基础配方使用料理预设标签；加料带入食材标签，同名只计一次。依据[原工作簿](东方夜雀食堂.xlsx)，**同覆盖先比较件数，件数相同再比较供给余量**。完整规则与求解范围见[模型说明](docs/design.md)。
+*参考游戏图标生成的规则示意，非游戏截图。* 图中均无厌恶命中，门槛为 3 项。基础配方使用料理预设标签；加料带入食材标签，同名只计一次。依据[原工作簿](东方夜雀食堂.xlsx)，**同覆盖先比较件数，件数相同再比较供给余量**。完整规则与求解范围见[模型说明](docs/design.md)。
 
 项目以 Excel 为输入，提供网页查询与 Python 规划。第一章以 `singlePLAN_cover3_mixIng_nCookware.py`（简称 `nCookware`）为例定义数学模型。
 
@@ -274,9 +274,9 @@ python Python/singlePLAN_cover3_mixIng_nCookware.py --help
 
 In [*Touhou Mystia's Izakaya*](https://store.steampowered.com/app/1584090/), players choose dishes and additions to satisfy guest preferences. **Tags** are dish attributes such as sweet or filling; an attribute shared with a guest's likes counts as a match. This project compares preference coverage, ingredient units, and supply slack to rank plans under given conditions.
 
-![Reimu recipe example: a rice ball uses 1 unit for 2 matches; honey raises this to 2 units and 3 matches; adding pork uses 3 units but still matches 3 tags, with meat overriding vegetarian.](docs/images/tag-example.png)
+![Icon-based example flow: a rice ball uses 1 unit for 2 matches; honey raises this to 2 units and 3 matches; adding pork uses 3 units but still matches 3 tags, with meat overriding vegetarian.](docs/images/tag-example.png)
 
-*AI-generated rule illustration, not a game screenshot.* These cases have no disliked matches and use a threshold of 3. Base recipes use preset dish tags; additions contribute ingredient tags, with each distinct tag counted once. Based on the [original workbook](东方夜雀食堂.xlsx), **at equal coverage, minimize ingredient units; when units also tie, compare supply slack**. See the [model documentation](docs/design.md) for full rules and solution scope.
+*Rule illustration generated with game icons as references, not a game screenshot.* These cases have no disliked matches and use a threshold of 3. Base recipes use preset dish tags; additions contribute ingredient tags, with each distinct tag counted once. Based on the [original workbook](东方夜雀食堂.xlsx), **at equal coverage, minimize ingredient units; when units also tie, compare supply slack**. See the [model documentation](docs/design.md) for full rules and solution scope.
 
 The project takes Excel input and provides browser queries and Python planning. Chapter 1 defines the mathematical model using `singlePLAN_cover3_mixIng_nCookware.py` (`nCookware` for short).
 
