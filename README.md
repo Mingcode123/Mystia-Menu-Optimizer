@@ -75,16 +75,16 @@
 
 早期我考虑枚举多套料理如何覆盖标签、承担不同标签的订单，先比较总食材数期望，再比较供给最紧张的食材。随后讨论将这个过程改写为“每个标签保留最少食材候选，再组合求余量”，要求简化计算而保持目标和结果一致。
 
-将这一按标签版本的需求结合旧代码整理成数学形式：假设该顾客日订单量为 $K$，在 $m>0$ 个参与规划的标签方案之间均分；$u_i$ 是这些方案中食材 $i$ 的累计用量，$q_i$ 是其日供给估计，则：
+将这一按标签版本的需求结合旧代码整理成数学形式：假设该顾客日订单量为 $`K`$，在 $`m>0`$ 个参与规划的标签方案之间均分；$`u_i`$ 是这些方案中食材 $`i`$ 的累计用量，$`q_i`$ 是其日供给估计，则：
 
-$$
+```math
 E_{\mathrm{old}}=\frac{K}{m}\sum_i u_i,\qquad
 R_{\mathrm{old}}=\min_{i:u_i>0}\left(q_i-\frac{K}{m}u_i\right)
-$$
+```
 
-当时的两阶段要求是：**先最小化预期食材件数 $E_{\mathrm{old}}$，再在这些最少件数方案中最大化最低余量 $R_{\mathrm{old}}$**。每个标签保留所有并列最少候选，供第二阶段组合选择。我还讨论了把第二阶段改写为“能否让最低余量至少达到 $\lambda$”：较高门槛可行，较低门槛也可行，因此可以用可行性判定配合二分搜索。二分减少的是门槛搜索次数，内部的组合可行性判定仍有计算成本。
+当时的两阶段要求是：**先最小化预期食材件数 $`E_{\mathrm{old}}`$，再在这些最少件数方案中最大化最低余量 $`R_{\mathrm{old}}`$**。每个标签保留所有并列最少候选，供第二阶段组合选择。我还讨论了把第二阶段改写为“能否让最低余量至少达到 $`\lambda`$”：较高门槛可行，较低门槛也可行，因此可以用可行性判定配合二分搜索。二分减少的是门槛搜索次数，内部的组合可行性判定仍有计算成本。
 
-这里的均分是建模假设，并非实测订单概率；旧代码实际将 $m$ 取为有可行候选的标签数。没有任何可行标签时直接返回无方案结果，不计算 $K/m$。该多方案模型属于历史分支，当前主流程已经改为每客单方案。两阶段公式与 $\lambda$ 推导见[数学建模说明](docs/design.md#数学建模从历史多方案到当前单方案)。
+这里的均分是建模假设，并非实测订单概率；旧代码实际将 $`m`$ 取为有可行候选的标签数。没有任何可行标签时直接返回无方案结果，不计算 $`K/m`$。该多方案模型属于历史分支，当前主流程已经改为每客单方案。两阶段公式与 $`\lambda`$ 推导见[数学建模说明](docs/design.md#数学建模从历史多方案到当前单方案)。
 
 价格记录和历史利润表是相关的数据工作；最终规划目标中的“少用食材”指件数，不能解释为最低采购金额。
 
@@ -129,19 +129,19 @@ Python 默认最低标签分为 `3`，每客假设日订单量 `K=5`，最终命
 3. 最大化所用食材中的最低日供给余量。
 4. 用售价、名称等固定次序处理平局，保持结果可复现。
 
-用数学表达，设 $p$ 为一份料理与加料方案，$h_g(p)$ 为它命中顾客 $g$ 的喜好数，$c_i(p)$ 为食材 $i$ 的用量（包括基础配方与加料）。$q_i$ 是日供给估计，$K$ 是为这位顾客假设的日订单量。总食材件数和最低供给余量分别为：
+用数学表达，设 $`p`$ 为一份料理与加料方案，$`h_g(p)`$ 为它命中顾客 $`g`$ 的喜好数，$`c_i(p)`$ 为食材 $`i`$ 的用量（包括基础配方与加料）。$`q_i`$ 是日供给估计，$`K`$ 是为这位顾客假设的日订单量。总食材件数和最低供给余量分别为：
 
-$$
+```math
 L(p)=\sum_i c_i(p),\qquad
 R(p)=\min_{i:c_i(p)>0}\left(q_i-Kc_i(p)\right)
-$$
+```
 
-令 $\mathcal F_g$ 为该顾客的可行候选集：使用已拥有料理和可用厨具，满足五格、加料禁忌与标签门槛，并且最终没有厌恶标签。当前单客目标是：
+令 $`\mathcal F_g`$ 为该顾客的可行候选集：使用已拥有料理和可用厨具，满足五格、加料禁忌与标签门槛，并且最终没有厌恶标签。当前单客目标是：
 
-$$
-\underset{p\in\mathcal F_g}{\operatorname{lex\,max}}
+```math
+\max_{p\in\mathcal{F}_g}^{\mathrm{lex}}
 \left(\min(h_g(p),3),\;-L(p),\;R(p)\right)
-$$
+```
 
 **词典序**就是依次比较：前一项相同，才比较后一项。在覆盖收益相同的前提下，余量再高也不能抵消多用一份食材；三项都相同才使用售价与名称处理平局。这与把指标乘权重后加总不同。
 
@@ -149,7 +149,7 @@ $$
 
 默认门槛下，各合格方案的封顶覆盖均为三。因此厨具组合首先争取让更多顾客有方案，再减少件数、改善余量。若降低最低分，这一解释应改为比较覆盖总量。
 
-**余量是逐客比较指标，可以为负。**不同顾客没有共同扣减同一份库存，因此它不能保证整晚所有方案同时可供给。网页的采购推荐使用 TDQ（日供给量）排序，和这里的需求扣减模型不同。
+**余量是逐客比较指标，可以为负。** 不同顾客没有共同扣减同一份库存，因此它不能保证整晚所有方案同时可供给。网页的采购推荐使用 TDQ（日供给量）排序，和这里的需求扣减模型不同。
 
 ## 用参数变化检查设计
 
@@ -229,7 +229,7 @@ node --test tests/web-regression.cjs
 
 本地已通过 31 项 Python 测试和 11 项网页测试。Python 测试包括 90 组固定种子小输入与独立具体食材穷举的对照；网页测试执行实际 Worker，覆盖禁忌、停止计算、零阈值与空筛选导出等边界。Node.js 仅用于测试。
 
-另外完成了本地真实数据的 58 位顾客默认参数规划与逐条规则复核。该原始数据不随公开包分发；公开可复现部分以合成样例为准。GitHub CI 配置已准备，尚未在远程运行。详见[验证记录](docs/verification.md)。
+另外完成了本地真实数据的 58 位顾客默认参数规划与逐条规则复核。该原始数据不随公开包分发；公开可复现部分以合成样例为准。首次公开提交 `fb8371c` 的 [GitHub Actions 检查已通过](https://github.com/Mingcode123/Mystia-Menu-Optimizer/actions/runs/41001697587)；后续提交状态以 [Actions](https://github.com/Mingcode123/Mystia-Menu-Optimizer/actions) 为准。详见[验证记录](docs/verification.md)。
 
 当前边界：预算仅展示；未联合优化酒水、完整满意度、现金利润、订单概率或跨顾客共享库存。期望值缺少完整原始采样记录，不据此报告统计显著性或游戏收益提升。
 
@@ -328,16 +328,16 @@ I manually recorded prices, daily supply, commission-related data, and other inf
 
 Early on, I considered enumerating how several dishes could cover tags and handle orders associated with different tags, comparing expected total ingredient use first and the most constrained ingredient's supply second. I then discussed reformulating this as “retain the minimum-ingredient candidates for each tag, then combine them to optimize slack,” with the requirement that the simpler computation preserve the objectives and results.
 
-The following mathematical form reconstructs that tag-based version from its requirements and old code. Assume the guest has $K$ daily orders, divided equally among $m>0$ participating tag-specific plans. Let $u_i$ be the total use of ingredient $i$ across those plans, and $q_i$ its estimated daily supply:
+The following mathematical form reconstructs that tag-based version from its requirements and old code. Assume the guest has $`K`$ daily orders, divided equally among $`m>0`$ participating tag-specific plans. Let $`u_i`$ be the total use of ingredient $`i`$ across those plans, and $`q_i`$ its estimated daily supply:
 
-$$
+```math
 E_{\mathrm{old}}=\frac{K}{m}\sum_i u_i,\qquad
 R_{\mathrm{old}}=\min_{i:u_i>0}\left(q_i-\frac{K}{m}u_i\right)
-$$
+```
 
-The two-stage requirement was to **first minimize expected ingredient units $E_{\mathrm{old}}$, then maximize the minimum slack $R_{\mathrm{old}}$ among those minimum-ingredient solutions**. All candidates tied for the fewest ingredient units were retained for each tag, allowing the second stage to choose among combinations. I also discussed reformulating the second stage as “can the minimum slack reach at least $\lambda$?” If a higher threshold is feasible, a lower threshold is feasible too, allowing feasibility checks to be combined with binary search. Binary search reduces the number of threshold probes; the combinatorial feasibility check within each probe still has a computational cost.
+The two-stage requirement was to **first minimize expected ingredient units $`E_{\mathrm{old}}`$, then maximize the minimum slack $`R_{\mathrm{old}}`$ among those minimum-ingredient solutions**. All candidates tied for the fewest ingredient units were retained for each tag, allowing the second stage to choose among combinations. I also discussed reformulating the second stage as “can the minimum slack reach at least $`\lambda`$?” If a higher threshold is feasible, a lower threshold is feasible too, allowing feasibility checks to be combined with binary search. Binary search reduces the number of threshold probes; the combinatorial feasibility check within each probe still has a computational cost.
 
-The equal split is a modeling assumption, not a measured order probability. The old code set $m$ to the number of tags with feasible candidates. If no tag had a feasible candidate, it returned no plan without calculating $K/m$. This multiple-plan model is a historical branch; the current main workflow uses one plan per guest. See the [mathematical model notes (Chinese)](docs/design.md#数学建模从历史多方案到当前单方案) for the two-stage formulas and the $\lambda$ derivation.
+The equal split is a modeling assumption, not a measured order probability. The old code set $`m`$ to the number of tags with feasible candidates. If no tag had a feasible candidate, it returned no plan without calculating $`K/m`$. This multiple-plan model is a historical branch; the current main workflow uses one plan per guest. See the [mathematical model notes (Chinese)](docs/design.md#数学建模从历史多方案到当前单方案) for the two-stage formulas and the $`\lambda`$ derivation.
 
 Price records and historical profit tables are related data work. In the final planning objectives, “fewer ingredients” means fewer units, not the lowest purchase cost.
 
@@ -382,19 +382,19 @@ Python defaults to a minimum tag score of `3` and an assumed daily order volume 
 3. Maximize the minimum daily supply slack among the ingredients used.
 4. Break ties using fixed ordering by selling price, name, and other fields, keeping results reproducible.
 
-Formally, let $p$ be a dish-and-additions plan, $h_g(p)$ the number of liked tags it matches for guest $g$, and $c_i(p)$ the use of ingredient $i$, including both the base recipe and additions. Let $q_i$ be estimated daily supply and $K$ the assumed daily order volume for this guest. Total ingredient units and minimum supply slack are:
+Formally, let $`p`$ be a dish-and-additions plan, $`h_g(p)`$ the number of liked tags it matches for guest $`g`$, and $`c_i(p)`$ the use of ingredient $`i`$, including both the base recipe and additions. Let $`q_i`$ be estimated daily supply and $`K`$ the assumed daily order volume for this guest. Total ingredient units and minimum supply slack are:
 
-$$
+```math
 L(p)=\sum_i c_i(p),\qquad
 R(p)=\min_{i:c_i(p)>0}\left(q_i-Kc_i(p)\right)
-$$
+```
 
-Let $\mathcal F_g$ be the guest's feasible candidate set: plans using owned recipes and available cookware, satisfying the five-slot limit, added-ingredient restrictions, and tag threshold, with no disliked final tags. The current single-guest objective is:
+Let $`\mathcal F_g`$ be the guest's feasible candidate set: plans using owned recipes and available cookware, satisfying the five-slot limit, added-ingredient restrictions, and tag threshold, with no disliked final tags. The current single-guest objective is:
 
-$$
-\underset{p\in\mathcal F_g}{\operatorname{lex\,max}}
+```math
+\max_{p\in\mathcal{F}_g}^{\mathrm{lex}}
 \left(\min(h_g(p),3),\;-L(p),\;R(p)\right)
-$$
+```
 
 **Lexicographic order** means comparing the criteria in sequence: only a tie on an earlier criterion allows the next one to decide. At equal coverage benefit, no amount of extra supply slack can compensate for using one additional ingredient unit. Selling price and name break ties only when all three criteria are equal. This differs from a weighted sum of the metrics.
 
@@ -482,7 +482,7 @@ node --test tests/web-regression.cjs
 
 Local checks passed 31 Python tests and 11 web tests. The Python tests include comparisons on 90 fixed-seed small inputs against an independent exhaustive search over individual ingredients. The web tests execute the actual Worker and cover edge cases such as ingredient restrictions, stopping computation, a zero threshold, and exporting an empty filtered result. Node.js is used only for testing.
 
-Planning with default parameters and a rule-by-rule review were also completed locally for 58 guests using real game data. That source data is not distributed with the public package; the publicly reproducible evidence is the synthetic sample. GitHub CI configuration is prepared but has not yet run remotely. See the [verification record (Chinese)](docs/verification.md).
+Planning with default parameters and a rule-by-rule review were also completed locally for 58 guests using real game data. That source data is not distributed with the public package; the publicly reproducible evidence is the synthetic sample. The [GitHub Actions checks passed](https://github.com/Mingcode123/Mystia-Menu-Optimizer/actions/runs/41001697587) for the first public commit, `fb8371c`; see [Actions](https://github.com/Mingcode123/Mystia-Menu-Optimizer/actions) for subsequent runs. See the [verification record (Chinese)](docs/verification.md).
 
 Current limits: the budget is displayed only. The planner does not jointly optimize drinks, overall satisfaction, cash profit, order probabilities, or inventory shared across guests. Complete original sampling records are unavailable for the empirical expectations, so they are not used to claim statistical significance or improved in-game returns.
 

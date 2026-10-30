@@ -1,6 +1,6 @@
 # 验证记录
 
-本次整理在 Windows、Python 3.12.14、Node.js 24.19.0 环境下执行以下验证。所有结果是本地验证；GitHub Actions 配置已经准备，但尚未在远程仓库运行。
+下表记录本次整理在 Windows、Python 3.12.14、Node.js 24.19.0 环境下完成的本地验证。首次公开提交 `fb8371c` 的 [GitHub Actions 检查](https://github.com/Mingcode123/Mystia-Menu-Optimizer/actions/runs/41001697587) 也已于 2026-10-30 通过，Python 检查、网页回归和示例复现检查均成功；后续提交状态以 [Actions](https://github.com/Mingcode123/Mystia-Menu-Optimizer/actions) 为准。
 
 | 范围 | 方法 | 结果 |
 | --- | --- | --- |
@@ -16,6 +16,8 @@
 
 重点回归包括：禁忌标签与名称分别处理、等价成员替换仍合法、重复基础配方占格、覆盖后触发流行、零阈值、停止时终止全部 Worker、忽略过期消息、空筛选不导出隐藏结果、采购价跨表错位、组内分配考虑基础用量及无解显式报告。
 
-没有完成或不作推断的事项：所有浏览器和设备兼容性、任意参数组合的性能保证、全游戏版本准确性、实际游戏收益对照、联合库存最优、采样显著性，以及远程 CI 和 Pages 部署。测试通过说明这些软件规则与用例一致，不替代游戏内验证。
+没有完成或不作推断的事项：所有浏览器和设备兼容性、任意参数组合的性能保证、全游戏版本准确性、实际游戏收益对照、联合库存最优、采样显著性，以及 Pages 部署。测试通过说明这些软件规则与用例一致，不替代游戏内验证。
 
 CI 使用官方 [checkout](https://github.com/actions/checkout)、[setup-python](https://github.com/actions/setup-python) 和 [setup-node](https://github.com/actions/setup-node) 执行同一组检查，并检查示例重建是否产生文件差异。
+
+文档展示另作核对：2026-10-30 使用 GitHub Markdown 接口检查 README、数学建模说明与需求复盘中的 118 个公式，均被识别，HTML 实体解码后 TeX 内容保持一致。该检查验证 Markdown 解析；公式最终排版仍由页面渲染器完成。公开架构页的图例与四张视图也已在内置浏览器中实际加载，未见 Mermaid 语法报错。

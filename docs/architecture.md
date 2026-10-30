@@ -460,7 +460,8 @@ supply_margin = min_i(q_i - K × c_i)    （只考察方案实际使用的食材
 四张架构视图使用 Mermaid `flowchart TB` 表达 C4 的系统、运行单元与组件层，图例使用规范规定的 `LR`。图中元素首先出现在其所属层级，跨图保持名称与标识符一致；边的方向按发起方到依赖方校核。当前各视图没有需要置于底部的外部运行服务，因此省略空的底部布局带。
 
 - **Source validation：Passed。** 已检查图例一致性、Markdown 标签、元素形状与分类、边界样式、已声明标识符、调用依据及静态层级约束。静态分析中使用者位于 rank 0；上下文和运行单元位于 rank 1，Python 组件位于 rank 1–4，网页组件位于 rank 1–3，均满足上下分带。
-- **Mermaid CLI render validation：Not run。** 整理环境未安装 Mermaid CLI，未执行图像渲染与视觉布局验收。Markdown 宿主的实际排版仍取决于其 Mermaid 版本。
+- **GitHub render check：Passed。** 2026-10-30 已通过内置浏览器检查公开仓库：展开图例并逐一加载四张架构视图，节点与标签均成功显示，未见 Mermaid 语法报错。
+- **Mermaid CLI render validation：Not run。** 整理环境未安装 Mermaid CLI，未执行 CLI 导出验证。其他 Markdown 宿主的排版仍取决于其 Mermaid 版本。
 
 图源保存在 [`docs/diagrams/`](diagrams/) 并与本页代码块保持一致。新增程序依赖、文件协议或调用关系时，应同时更新对应视图和职责表。本仓库的 [GitHub workflow](../.github/workflows/checks.yml) 只执行回归与复现检查，本页不据此推导部署拓扑。
 
