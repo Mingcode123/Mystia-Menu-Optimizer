@@ -1,3 +1,34 @@
+const ICON_BASE = "./web/icons";
+const ICON_MAP = window.IZAKAYA_ICON_MAP || {};
+const ICON_RARE = ICON_MAP.customer_rare || Object.create(null);
+const ICON_RECIPE = ICON_MAP.recipe || Object.create(null);
+
+function joinIconPath(rel){
+  return rel ? ICON_BASE + "/" + rel : "";
+}
+
+function iconRecipe(name){
+  return joinIconPath(ICON_RECIPE[normName(name)]);
+}
+
+function rareIconCandidates(name){
+  const rel = ICON_RARE[normName(name)];
+  return rel ? [joinIconPath(rel)] : [];
+}
+
+function setImgWithCandidates(img, candidates, onAllFail){
+  let i = 0;
+  function tryNext(){
+    if (i >= candidates.length){
+      if (onAllFail) onAllFail();
+      return;
+    }
+    img.src = candidates[i++];
+  }
+  img.onerror = tryNext;
+  tryNext();
+}
+
 /* -------------------------
    Helpers (main thread)
 ------------------------- */
@@ -15,6 +46,7 @@ function stopCalculation(label = "已停止；本次未完成结果已清空"){
 
 function setImportEnabled(enabled){
   $("fileInput").disabled = !enabled;
+  $("btnLoadGame").disabled = !enabled;
   $("btnLoadDemo").disabled = !enabled;
 }
 
@@ -560,7 +592,18 @@ function setCurrentGuest(g){
   $("guestNameText").textContent = g ? g.name : "未选择";
 
   const av = $("guestAvatar");
-  av.textContent = (g?.name || "客").slice(0, 1);
+  av.innerHTML = "";
+  const cands = g ? rareIconCandidates(g.name) : [];
+  if (cands.length){
+    const img = document.createElement("img");
+    img.alt = g.name;
+    setImgWithCandidates(img, cands, function(){
+      av.textContent = (g.name || "客").slice(0, 1);
+    });
+    av.appendChild(img);
+  }else{
+    av.textContent = (g?.name || "客").slice(0, 1);
+  }
 
   // guest info
   const fav = (g && g.preferredTags) ? g.preferredTags : [];
@@ -616,7 +659,17 @@ function renderGuestGrid(query){
 
     const av = document.createElement("div");
     av.className = "avatar";
-    av.textContent = g.name.slice(0, 1);
+    const cands = rareIconCandidates(g.name);
+    if (cands.length){
+      const img = document.createElement("img");
+      img.alt = g.name;
+      setImgWithCandidates(img, cands, function(){
+        av.textContent = g.name.slice(0, 1);
+      });
+      av.appendChild(img);
+    }else{
+      av.textContent = g.name.slice(0, 1);
+    }
 
     const nm = document.createElement("div");
     nm.className = "gName";
@@ -660,7 +713,12 @@ function renderTable(rows){
     const r = rows[i];
     const tr = document.createElement("tr");
 
-    const recipeCell = escapeHTML(r["料理"]);
+    const recipeIcon = iconRecipe(r["料理"]);
+    const recipeCell =
+      '<div class="cellWithIcon">' +
+        (recipeIcon ? '<img src="'+escapeAttr(recipeIcon)+'" alt="" loading="lazy" onerror="this.style.display=\'none\'">' : '') +
+        '<div>'+escapeHTML(r["料理"])+'</div>' +
+      '</div>';
 
     tr.innerHTML =
       '<td class="num">'+Number(r["售价"]||0).toFixed(2)+'</td>' +
@@ -869,13 +927,19 @@ function closeHdrPop(){
 /* -------------------------
    Wire UI
 ------------------------- */
-function afterDataLoaded(fromAuto){
+function afterDataLoaded(){
   $("dataState").textContent = "数据已加载";
   $("dataState").style.color = "#111827";
 
   $("btnRun").disabled = false;
   $("searchBox").disabled = false;
 
+  closeGuestPopover();
+  closeAllComboPops();
+  closeHdrPop();
+  for (const id of ["trendLikeInput", "trendHateInput", "excludedTagInput"]){
+    $(id).value = "";
+  }
   initTrendCombos();
   initExcludedCombo();
 // Tab 自动补全：全 tag
@@ -886,7 +950,7 @@ function afterDataLoaded(fromAuto){
 
   setCurrentGuest(DATA.guests[0]);
 
-  setStatus(fromAuto ? "示例已加载，准备就绪" : "已加载数据，准备就绪", 0);
+  setStatus("已加载数据，准备就绪", 0);
 }
 
 function resetResults(){
@@ -902,21 +966,30 @@ function resetResults(){
   updateFilterBtnUI();
 }
 
-function loadDemo(){
+function loadBundledData(kind){
   clearWarn();
+  const isGame = kind === "game";
+  const label = isGame ? "游戏数据" : "合成示例";
   try{
-    const demo = window.MYSTIA_DEMO_DATA;
-    DATA = parseJSONData(demo);
+    const bundled = isGame ? window.MYSTIA_GAME_DATA : window.MYSTIA_DEMO_DATA;
+    DATA = parseJSONData(bundled);
     resetResults();
-    afterDataLoaded(true);
-    $("dataSource").textContent = "合成示例数据：用于展示规则与交互，不代表游戏实测结果。";
-    $("dataState").textContent = "合成示例";
-    setStatus("示例已加载：选择参数后点击开始计算", 0);
+    afterDataLoaded();
+    $("dataSource").textContent = isGame
+      ? "游戏数据：作者工作簿的数据快照，含 " + bundled.sheets["食材"].length + " 条食材记录（参与规划 " + DATA.ingredients.length + " 种）、" + DATA.foods.length + " 条料理记录、" + DATA.guests.length + " 位稀客。来源与范围见下方说明。"
+      : "合成示例数据：人物、配方、价格与供给均为虚构，仅用于规则演示与回归案例。";
+    $("dataState").textContent = label;
+    setStatus(label + "已加载：选择稀客与参数后点击开始计算", 0);
   }catch(err){
-    warn("示例加载失败：" + err.message + " 请手动导入 data/demo.json 或自己的游戏数据表。");
+    warn(label + "加载失败：" + err.message + " 请手动导入 data/" + (isGame ? "game" : "demo") + ".json 或自己的游戏数据表。");
+    setStatus(DATA ? label + "加载失败，保留原有数据" : "加载失败", 0);
   }
 }
 
+function loadGame(){ loadBundledData("game"); }
+function loadDemo(){ loadBundledData("demo"); }
+
+$("btnLoadGame").addEventListener("click", loadGame);
 $("btnLoadDemo").addEventListener("click", loadDemo);
 $("fileInput").addEventListener("change", async function(ev){
   clearWarn();
@@ -930,7 +1003,7 @@ $("fileInput").addEventListener("change", async function(ev){
     const parsed = isJSON ? parseJSONData(JSON.parse(await f.text())) : parseExcel(await f.arrayBuffer());
     DATA = parsed;
     resetResults();
-    afterDataLoaded(false);
+    afterDataLoaded();
     $("dataSource").textContent = "当前导入：" + f.name + "（仅在本机浏览器处理）";
   }catch(err){
     warn("加载失败：" + err.message);
@@ -1097,7 +1170,7 @@ $("hdrPopApply").addEventListener("click", function(){
 
 $("btnRun").addEventListener("click", function(){
   clearWarn();
-  if (!DATA){ warn("请先载入示例或导入 XLSX / JSON 数据"); return; }
+  if (!DATA){ warn("请先载入游戏数据、合成示例或导入 XLSX / JSON 数据"); return; }
   if (!CURRENT_GUEST){ warn("请先选择稀客"); return; }
   const minScore = readMinScore($("scoreMin").value);
   if (minScore === null){ warn("得分阈值请输入 -10 到 10 之间的整数。"); return; }
@@ -2271,4 +2344,4 @@ for (const c of keep){
   }
   return new Worker(WORKER_URL);
 }
-loadDemo();
+loadGame();

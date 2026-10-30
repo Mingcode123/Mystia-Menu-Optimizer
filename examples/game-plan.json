@@ -1,0 +1,3179 @@
+{
+  "format": "mystia-planner-result/v1",
+  "source_metadata": {
+    "title": "东方夜雀食堂 · 作者游戏数据快照",
+    "kind": "game-data",
+    "description": "62 种食材、164 条料理记录、58 位真实稀客；来自作者历史工作簿，不代表游戏最新版本。",
+    "source_workbook": "东方夜雀食堂.xlsx",
+    "source_sha256": "5c1a1ef52ce6594a2ca6cc90c8e10aff2d4dd40ac32928789dee9ea9a027a16f",
+    "snapshot_published_on": "2026-10-30",
+    "game_version": null,
+    "provenance": [
+      {
+        "component": "Ingredient, recipe, and guest tags",
+        "source": "https://github.com/AnYiEE/touhou-mystia-izakaya-assistant",
+        "attribution": "AnYiEE; tag source confirmed by the project author. Exact imported revision not recorded.",
+        "upstream_license": "AGPL-3.0-only",
+        "license_notice": "licenses/AnYiEE-AGPL-3.0.txt"
+      },
+      {
+        "component": "Price, daily supply, and commission estimates",
+        "source": "Author gameplay records and workbook calculations",
+        "sampling": "Historical empirical estimates; original observation dates and sample counts are unavailable."
+      },
+      {
+        "component": "Other recipe and workbook fields",
+        "source": "Author-provided historical workbook",
+        "scope": "Field-by-field origins are not fully reconstructed; no claim that all fields are original or from one upstream repository."
+      }
+    ],
+    "normalization": "Cached Excel values; ingredient purchase prices joined to merchant Average Buy Price by Name. 61 price corrections; 3 unknown prices remain null; 1 non-plannable recipe disabled for Python.",
+    "data_notes": "docs/data-provenance.md",
+    "third_party_notices": "THIRD_PARTY_NOTICES.md"
+  },
+  "settings": {
+    "min_score": 3,
+    "orders_per_day": 5,
+    "coverage_cap": 3,
+    "trend_like": [],
+    "trend_hate": [],
+    "cookware_count": 3,
+    "exclude_cookware": []
+  },
+  "selected_cookware": [
+    "料理台",
+    "油锅",
+    "煮锅"
+  ],
+  "summary": {
+    "guest_count": 58,
+    "planned_count": 58,
+    "unplanned_count": 0,
+    "coverage_sum": 174,
+    "total_ingredients_sum": 106,
+    "supply_margin_sum": 1459.0,
+    "comparison_total_with_missing_penalty": 106,
+    "comparison_margin_with_missing_penalty": 1459.0
+  },
+  "model_scope": {
+    "budget_is_constraint": false,
+    "negative_supply_margin_allowed": true,
+    "inventory_shared_across_guests": false,
+    "ingredient_cost_unit": "count, not purchase price",
+    "missing_plan_ingredient_penalty": 1000000000,
+    "missing_plan_margin_penalty": 1000000000000000000
+  },
+  "guests": [
+    {
+      "guest": "莉格露",
+      "budget_display_only": "200－400",
+      "preferred_tags": [
+        "肉",
+        "甜",
+        "生",
+        "猎奇"
+      ],
+      "disliked_tags": [
+        "凉爽",
+        "清淡",
+        "素"
+      ],
+      "status": "planned",
+      "plan": {
+        "dish": "狮子头",
+        "cookware": "煮锅",
+        "sell_price": 28.0,
+        "base_ingredients": [
+          "牛肉"
+        ],
+        "added_ingredients": [
+          "葡萄",
+          "鸡蛋"
+        ],
+        "final_tags": [
+          "下酒",
+          "招牌",
+          "果味",
+          "煮锅",
+          "特产",
+          "甜",
+          "生",
+          "肉",
+          "鲜"
+        ],
+        "covered_tags": [
+          "肉",
+          "甜",
+          "生"
+        ],
+        "score": 3,
+        "coverage_capped": 3,
+        "total_ingredients": 3,
+        "supply_margin": 25.0,
+        "ingredient_counts": {
+          "牛肉": 1,
+          "葡萄": 1,
+          "鸡蛋": 1
+        },
+        "remaining_supply": {
+          "牛肉": 25.0,
+          "葡萄": 26.0,
+          "鸡蛋": 25.0
+        }
+      }
+    },
+    {
+      "guest": "露米娅",
+      "budget_display_only": "150－350",
+      "preferred_tags": [
+        "肉",
+        "饱腹",
+        "生",
+        "招牌",
+        "猎奇"
+      ],
+      "disliked_tags": [
+        "下酒",
+        "昂贵"
+      ],
+      "status": "planned",
+      "plan": {
+        "dish": "牛肉盖浇饭",
+        "cookware": "煮锅",
+        "sell_price": 20.0,
+        "base_ingredients": [
+          "牛肉"
+        ],
+        "added_ingredients": [
+          "八目鳗"
+        ],
+        "final_tags": [
+          "家常",
+          "招牌",
+          "水产",
+          "煮锅",
+          "肉",
+          "饱腹",
+          "鲜"
+        ],
+        "covered_tags": [
+          "肉",
+          "饱腹",
+          "招牌"
+        ],
+        "score": 3,
+        "coverage_capped": 3,
+        "total_ingredients": 2,
+        "supply_margin": 25.0,
+        "ingredient_counts": {
+          "八目鳗": 1,
+          "牛肉": 1
+        },
+        "remaining_supply": {
+          "八目鳗": 33.0,
+          "牛肉": 25.0
+        }
+      }
+    },
+    {
+      "guest": "橙",
+      "budget_display_only": "400－600",
+      "preferred_tags": [
+        "肉",
+        "水产",
+        "重油",
+        "甜",
+        "烧烤"
+      ],
+      "disliked_tags": [
+        "灼热",
+        "猎奇",
+        "素"
+      ],
+      "status": "planned",
+      "plan": {
+        "dish": "炸八目鳗",
+        "cookware": "油锅",
+        "sell_price": 27.0,
+        "base_ingredients": [
+          "八目鳗"
+        ],
+        "added_ingredients": [
+          "蜂蜜"
+        ],
+        "final_tags": [
+          "招牌",
+          "水产",
+          "油锅",
+          "甜",
+          "重油"
+        ],
+        "covered_tags": [
+          "水产",
+          "重油",
+          "甜"
+        ],
+        "score": 3,
+        "coverage_capped": 3,
+        "total_ingredients": 2,
+        "supply_margin": 33.0,
+        "ingredient_counts": {
+          "八目鳗": 1,
+          "蜂蜜": 1
+        },
+        "remaining_supply": {
+          "八目鳗": 33.0,
+          "蜂蜜": 63.0
+        }
+      }
+    },
+    {
+      "guest": "稗田阿求",
+      "budget_display_only": "500－800",
+      "preferred_tags": [
+        "高级",
+        "清淡",
+        "和风",
+        "甜",
+        "文化底蕴",
+        "汤羹"
+      ],
+      "disliked_tags": [
+        "咸",
+        "灼热",
+        "重油"
+      ],
+      "status": "planned",
+      "plan": {
+        "dish": "豆腐味噌",
+        "cookware": "煮锅",
+        "sell_price": 21.0,
+        "base_ingredients": [
+          "豆腐"
+        ],
+        "added_ingredients": [],
+        "final_tags": [
+          "和风",
+          "家常",
+          "汤羹",
+          "清淡",
+          "煮锅",
+          "素"
+        ],
+        "covered_tags": [
+          "清淡",
+          "和风",
+          "汤羹"
+        ],
+        "score": 3,
+        "coverage_capped": 3,
+        "total_ingredients": 1,
+        "supply_margin": 23.0,
+        "ingredient_counts": {
+          "豆腐": 1
+        },
+        "remaining_supply": {
+          "豆腐": 23.0
+        }
+      }
+    },
+    {
+      "guest": "上白泽慧音",
+      "budget_display_only": "400－800",
+      "preferred_tags": [
+        "素",
+        "家常",
+        "清淡",
+        "和风",
+        "中华",
+        "文化底蕴"
+      ],
+      "disliked_tags": [
+        "咸",
+        "大份",
+        "重油"
+      ],
+      "status": "planned",
+      "plan": {
+        "dish": "饭团",
+        "cookware": "料理台",
+        "sell_price": 6.0,
+        "base_ingredients": [
+          "海苔"
+        ],
+        "added_ingredients": [],
+        "final_tags": [
+          "和风",
+          "实惠",
+          "家常",
+          "料理台",
+          "素",
+          "饱腹"
+        ],
+        "covered_tags": [
+          "素",
+          "家常",
+          "和风"
+        ],
+        "score": 3,
+        "coverage_capped": 3,
+        "total_ingredients": 1,
+        "supply_margin": 42.0,
+        "ingredient_counts": {
+          "海苔": 1
+        },
+        "remaining_supply": {
+          "海苔": 42.0
+        }
+      }
+    },
+    {
+      "guest": "茨木华扇",
+      "budget_display_only": "400－600",
+      "preferred_tags": [
+        "家常",
+        "下酒",
+        "和风",
+        "文化底蕴"
+      ],
+      "disliked_tags": [
+        "实惠",
+        "生",
+        "辣"
+      ],
+      "status": "planned",
+      "plan": {
+        "dish": "豆腐味噌",
+        "cookware": "煮锅",
+        "sell_price": 21.0,
+        "base_ingredients": [
+          "豆腐"
+        ],
+        "added_ingredients": [
+          "萝卜"
+        ],
+        "final_tags": [
+          "下酒",
+          "和风",
+          "家常",
+          "汤羹",
+          "清淡",
+          "煮锅",
+          "素"
+        ],
+        "covered_tags": [
+          "家常",
+          "下酒",
+          "和风"
+        ],
+        "score": 3,
+        "coverage_capped": 3,
+        "total_ingredients": 2,
+        "supply_margin": 23.0,
+        "ingredient_counts": {
+          "萝卜": 1,
+          "豆腐": 1
+        },
+        "remaining_supply": {
+          "萝卜": 52.0,
+          "豆腐": 23.0
+        }
+      }
+    },
+    {
+      "guest": "博丽灵梦",
+      "budget_display_only": "150－300",
+      "preferred_tags": [
+        "高级",
+        "饱腹",
+        "甜",
+        "不可思议",
+        "实惠"
+      ],
+      "disliked_tags": [
+        "下酒",
+        "昂贵"
+      ],
+      "status": "planned",
+      "plan": {
+        "dish": "饭团",
+        "cookware": "料理台",
+        "sell_price": 6.0,
+        "base_ingredients": [
+          "海苔"
+        ],
+        "added_ingredients": [
+          "三文鱼"
+        ],
+        "final_tags": [
+          "和风",
+          "实惠",
+          "家常",
+          "料理台",
+          "水产",
+          "素",
+          "饱腹",
+          "高级",
+          "鲜"
+        ],
+        "covered_tags": [
+          "高级",
+          "饱腹",
+          "实惠"
+        ],
+        "score": 3,
+        "coverage_capped": 3,
+        "total_ingredients": 2,
+        "supply_margin": 42.0,
+        "ingredient_counts": {
+          "三文鱼": 1,
+          "海苔": 1
+        },
+        "remaining_supply": {
+          "三文鱼": 48.0,
+          "海苔": 42.0
+        }
+      }
+    },
+    {
+      "guest": "伊吹萃香",
+      "budget_display_only": "600－800",
+      "preferred_tags": [
+        "肉",
+        "下酒",
+        "和风",
+        "力量涌现",
+        "小巧"
+      ],
+      "disliked_tags": [
+        "重油"
+      ],
+      "status": "planned",
+      "plan": {
+        "dish": "麻薯",
+        "cookware": "料理台",
+        "sell_price": 30.0,
+        "base_ingredients": [
+          "糯米"
+        ],
+        "added_ingredients": [
+          "萝卜"
+        ],
+        "final_tags": [
+          "下酒",
+          "和风",
+          "小巧",
+          "料理台",
+          "甜",
+          "素"
+        ],
+        "covered_tags": [
+          "下酒",
+          "和风",
+          "小巧"
+        ],
+        "score": 3,
+        "coverage_capped": 3,
+        "total_ingredients": 2,
+        "supply_margin": 20.0,
+        "ingredient_counts": {
+          "糯米": 1,
+          "萝卜": 1
+        },
+        "remaining_supply": {
+          "糯米": 20.0,
+          "萝卜": 52.0
+        }
+      }
+    },
+    {
+      "guest": "比那名居天子",
+      "budget_display_only": "2000－3000",
+      "preferred_tags": [
+        "素",
+        "传说",
+        "清淡",
+        "甜",
+        "适合拍照",
+        "果味",
+        "昂贵"
+      ],
+      "disliked_tags": [
+        "家常",
+        "肉",
+        "重油"
+      ],
+      "status": "planned",
+      "plan": {
+        "dish": "凉菜雕花",
+        "cookware": "料理台",
+        "sell_price": 20.0,
+        "base_ingredients": [
+          "萝卜"
+        ],
+        "added_ingredients": [],
+        "final_tags": [
+          "凉爽",
+          "料理台",
+          "清淡",
+          "素",
+          "适合拍照"
+        ],
+        "covered_tags": [
+          "素",
+          "清淡",
+          "适合拍照"
+        ],
+        "score": 3,
+        "coverage_capped": 3,
+        "total_ingredients": 1,
+        "supply_margin": 52.0,
+        "ingredient_counts": {
+          "萝卜": 1
+        },
+        "remaining_supply": {
+          "萝卜": 52.0
+        }
+      }
+    },
+    {
+      "guest": "雾雨魔理沙",
+      "budget_display_only": "3000－5000",
+      "preferred_tags": [
+        "传说",
+        "重油",
+        "和风",
+        "灼热",
+        "菌类"
+      ],
+      "disliked_tags": [
+        "猎奇"
+      ],
+      "status": "planned",
+      "plan": {
+        "dish": "豆腐锅",
+        "cookware": "煮锅",
+        "sell_price": 19.0,
+        "base_ingredients": [
+          "豆腐"
+        ],
+        "added_ingredients": [
+          "蘑菇"
+        ],
+        "final_tags": [
+          "和风",
+          "实惠",
+          "清淡",
+          "灼热",
+          "煮锅",
+          "素",
+          "菌类",
+          "鲜"
+        ],
+        "covered_tags": [
+          "和风",
+          "灼热",
+          "菌类"
+        ],
+        "score": 3,
+        "coverage_capped": 3,
+        "total_ingredients": 2,
+        "supply_margin": 23.0,
+        "ingredient_counts": {
+          "蘑菇": 1,
+          "豆腐": 1
+        },
+        "remaining_supply": {
+          "蘑菇": 42.0,
+          "豆腐": 23.0
+        }
+      }
+    },
+    {
+      "guest": "红美铃",
+      "budget_display_only": "200－400",
+      "preferred_tags": [
+        "肉",
+        "饱腹",
+        "中华",
+        "力量涌现"
+      ],
+      "disliked_tags": [
+        "果味",
+        "猎奇",
+        "西式"
+      ],
+      "status": "planned",
+      "plan": {
+        "dish": "炒肉丝",
+        "cookware": "油锅",
+        "sell_price": 15.0,
+        "base_ingredients": [
+          "猪肉"
+        ],
+        "added_ingredients": [
+          "南瓜"
+        ],
+        "final_tags": [
+          "中华",
+          "实惠",
+          "家常",
+          "油锅",
+          "肉",
+          "重油",
+          "饱腹"
+        ],
+        "covered_tags": [
+          "肉",
+          "饱腹",
+          "中华"
+        ],
+        "score": 3,
+        "coverage_capped": 3,
+        "total_ingredients": 2,
+        "supply_margin": 10.0,
+        "ingredient_counts": {
+          "南瓜": 1,
+          "猪肉": 1
+        },
+        "remaining_supply": {
+          "南瓜": 33.0,
+          "猪肉": 10.0
+        }
+      }
+    },
+    {
+      "guest": "琪露诺",
+      "budget_display_only": "100－200",
+      "preferred_tags": [
+        "甜",
+        "适合拍照",
+        "凉爽",
+        "猎奇"
+      ],
+      "disliked_tags": [
+        "下酒",
+        "文化底蕴",
+        "昂贵"
+      ],
+      "status": "planned",
+      "plan": {
+        "dish": "凉菜雕花",
+        "cookware": "料理台",
+        "sell_price": 20.0,
+        "base_ingredients": [
+          "萝卜"
+        ],
+        "added_ingredients": [
+          "蜂蜜"
+        ],
+        "final_tags": [
+          "凉爽",
+          "料理台",
+          "清淡",
+          "甜",
+          "素",
+          "适合拍照"
+        ],
+        "covered_tags": [
+          "甜",
+          "适合拍照",
+          "凉爽"
+        ],
+        "score": 3,
+        "coverage_capped": 3,
+        "total_ingredients": 2,
+        "supply_margin": 52.0,
+        "ingredient_counts": {
+          "萝卜": 1,
+          "蜂蜜": 1
+        },
+        "remaining_supply": {
+          "萝卜": 52.0,
+          "蜂蜜": 63.0
+        }
+      }
+    },
+    {
+      "guest": "帕秋莉",
+      "budget_display_only": "600－1000",
+      "preferred_tags": [
+        "高级",
+        "西式",
+        "甜",
+        "适合拍照",
+        "梦幻"
+      ],
+      "disliked_tags": [
+        "咸",
+        "灼热",
+        "猎奇",
+        "生"
+      ],
+      "status": "planned",
+      "plan": {
+        "dish": "凉菜雕花",
+        "cookware": "料理台",
+        "sell_price": 20.0,
+        "base_ingredients": [
+          "萝卜"
+        ],
+        "added_ingredients": [
+          "奶油"
+        ],
+        "final_tags": [
+          "凉爽",
+          "家常",
+          "料理台",
+          "清淡",
+          "甜",
+          "素",
+          "西式",
+          "适合拍照"
+        ],
+        "covered_tags": [
+          "西式",
+          "甜",
+          "适合拍照"
+        ],
+        "score": 3,
+        "coverage_capped": 3,
+        "total_ingredients": 2,
+        "supply_margin": 12.0,
+        "ingredient_counts": {
+          "奶油": 1,
+          "萝卜": 1
+        },
+        "remaining_supply": {
+          "奶油": 12.0,
+          "萝卜": 52.0
+        }
+      }
+    },
+    {
+      "guest": "藤原妹红",
+      "budget_display_only": "300－600",
+      "preferred_tags": [
+        "灼热",
+        "果味",
+        "烧烤",
+        "燃起来了",
+        "辣"
+      ],
+      "disliked_tags": [
+        "不可思议",
+        "昂贵",
+        "高级"
+      ],
+      "status": "planned",
+      "plan": {
+        "dish": "胡辣汤",
+        "cookware": "油锅",
+        "sell_price": 60.0,
+        "base_ingredients": [
+          "辣椒",
+          "牛肉",
+          "豆腐"
+        ],
+        "added_ingredients": [],
+        "final_tags": [
+          "中华",
+          "家常",
+          "汤羹",
+          "油锅",
+          "灼热",
+          "燃起来了",
+          "辣"
+        ],
+        "covered_tags": [
+          "灼热",
+          "燃起来了",
+          "辣"
+        ],
+        "score": 3,
+        "coverage_capped": 3,
+        "total_ingredients": 3,
+        "supply_margin": 23.0,
+        "ingredient_counts": {
+          "牛肉": 1,
+          "豆腐": 1,
+          "辣椒": 1
+        },
+        "remaining_supply": {
+          "牛肉": 25.0,
+          "豆腐": 23.0,
+          "辣椒": 24.0
+        }
+      }
+    },
+    {
+      "guest": "蓬莱山辉夜",
+      "budget_display_only": "1000－1500",
+      "preferred_tags": [
+        "传说",
+        "和风",
+        "文化底蕴",
+        "不可思议"
+      ],
+      "disliked_tags": [
+        "大份",
+        "招牌",
+        "猎奇"
+      ],
+      "status": "planned",
+      "plan": {
+        "dish": "樱落雪",
+        "cookware": "料理台",
+        "sell_price": 50.0,
+        "base_ingredients": [
+          "极上金枪鱼"
+        ],
+        "added_ingredients": [
+          "并蒂莲"
+        ],
+        "final_tags": [
+          "传说",
+          "和风",
+          "小巧",
+          "文化底蕴",
+          "料理台",
+          "梦幻",
+          "水产",
+          "海味",
+          "清淡",
+          "生",
+          "适合拍照",
+          "高级"
+        ],
+        "covered_tags": [
+          "传说",
+          "和风",
+          "文化底蕴"
+        ],
+        "score": 3,
+        "coverage_capped": 3,
+        "total_ingredients": 2,
+        "supply_margin": 6.0,
+        "ingredient_counts": {
+          "并蒂莲": 1,
+          "极上金枪鱼": 1
+        },
+        "remaining_supply": {
+          "并蒂莲": 6.0,
+          "极上金枪鱼": 8.0
+        }
+      }
+    },
+    {
+      "guest": "因幡帝",
+      "budget_display_only": "200－400",
+      "preferred_tags": [
+        "传说",
+        "甜",
+        "凉爽",
+        "小巧",
+        "梦幻"
+      ],
+      "disliked_tags": [
+        "山珍",
+        "猎奇",
+        "重油"
+      ],
+      "status": "planned",
+      "plan": {
+        "dish": "麻薯",
+        "cookware": "料理台",
+        "sell_price": 30.0,
+        "base_ingredients": [
+          "糯米"
+        ],
+        "added_ingredients": [
+          "冰块"
+        ],
+        "final_tags": [
+          "凉爽",
+          "和风",
+          "小巧",
+          "料理台",
+          "甜"
+        ],
+        "covered_tags": [
+          "甜",
+          "凉爽",
+          "小巧"
+        ],
+        "score": 3,
+        "coverage_capped": 3,
+        "total_ingredients": 2,
+        "supply_margin": 10.0,
+        "ingredient_counts": {
+          "冰块": 1,
+          "糯米": 1
+        },
+        "remaining_supply": {
+          "冰块": 10.0,
+          "糯米": 20.0
+        }
+      }
+    },
+    {
+      "guest": "河城荷取",
+      "budget_display_only": "400－500",
+      "preferred_tags": [
+        "水产",
+        "高级",
+        "下酒",
+        "咸",
+        "招牌",
+        "猎奇"
+      ],
+      "disliked_tags": [
+        "山珍",
+        "文化底蕴",
+        "素"
+      ],
+      "status": "planned",
+      "plan": {
+        "dish": "炸八目鳗",
+        "cookware": "油锅",
+        "sell_price": 27.0,
+        "base_ingredients": [
+          "八目鳗"
+        ],
+        "added_ingredients": [
+          "三文鱼"
+        ],
+        "final_tags": [
+          "招牌",
+          "水产",
+          "油锅",
+          "重油",
+          "高级",
+          "鲜"
+        ],
+        "covered_tags": [
+          "水产",
+          "高级",
+          "招牌"
+        ],
+        "score": 3,
+        "coverage_capped": 3,
+        "total_ingredients": 2,
+        "supply_margin": 33.0,
+        "ingredient_counts": {
+          "三文鱼": 1,
+          "八目鳗": 1
+        },
+        "remaining_supply": {
+          "三文鱼": 48.0,
+          "八目鳗": 33.0
+        }
+      }
+    },
+    {
+      "guest": "犬走椛",
+      "budget_display_only": "300－400",
+      "preferred_tags": [
+        "肉",
+        "重油",
+        "下酒",
+        "山珍",
+        "大份"
+      ],
+      "disliked_tags": [
+        "清淡",
+        "猎奇",
+        "素"
+      ],
+      "status": "planned",
+      "plan": {
+        "dish": "炒肉丝",
+        "cookware": "油锅",
+        "sell_price": 15.0,
+        "base_ingredients": [
+          "猪肉"
+        ],
+        "added_ingredients": [],
+        "final_tags": [
+          "下酒",
+          "中华",
+          "实惠",
+          "家常",
+          "油锅",
+          "肉",
+          "重油"
+        ],
+        "covered_tags": [
+          "肉",
+          "重油",
+          "下酒"
+        ],
+        "score": 3,
+        "coverage_capped": 3,
+        "total_ingredients": 1,
+        "supply_margin": 10.0,
+        "ingredient_counts": {
+          "猪肉": 1
+        },
+        "remaining_supply": {
+          "猪肉": 10.0
+        }
+      }
+    },
+    {
+      "guest": "东风谷早苗",
+      "budget_display_only": "400－600",
+      "preferred_tags": [
+        "家常",
+        "和风",
+        "甜",
+        "适合拍照",
+        "梦幻"
+      ],
+      "disliked_tags": [
+        "灼热",
+        "猎奇",
+        "生",
+        "重油"
+      ],
+      "status": "planned",
+      "plan": {
+        "dish": "饭团",
+        "cookware": "料理台",
+        "sell_price": 6.0,
+        "base_ingredients": [
+          "海苔"
+        ],
+        "added_ingredients": [
+          "蜂蜜"
+        ],
+        "final_tags": [
+          "和风",
+          "实惠",
+          "家常",
+          "料理台",
+          "甜",
+          "素",
+          "饱腹"
+        ],
+        "covered_tags": [
+          "家常",
+          "和风",
+          "甜"
+        ],
+        "score": 3,
+        "coverage_capped": 3,
+        "total_ingredients": 2,
+        "supply_margin": 42.0,
+        "ingredient_counts": {
+          "海苔": 1,
+          "蜂蜜": 1
+        },
+        "remaining_supply": {
+          "海苔": 42.0,
+          "蜂蜜": 63.0
+        }
+      }
+    },
+    {
+      "guest": "爱丽丝",
+      "budget_display_only": "500－800",
+      "preferred_tags": [
+        "家常",
+        "高级",
+        "西式",
+        "甜",
+        "文化底蕴"
+      ],
+      "disliked_tags": [
+        "猎奇",
+        "肉",
+        "重油",
+        "饱腹"
+      ],
+      "status": "planned",
+      "plan": {
+        "dish": "汤圆",
+        "cookware": "煮锅",
+        "sell_price": 35.0,
+        "base_ingredients": [
+          "糯米"
+        ],
+        "added_ingredients": [
+          "三文鱼"
+        ],
+        "final_tags": [
+          "中华",
+          "家常",
+          "文化底蕴",
+          "水产",
+          "煮锅",
+          "素",
+          "高级",
+          "鲜"
+        ],
+        "covered_tags": [
+          "家常",
+          "高级",
+          "文化底蕴"
+        ],
+        "score": 3,
+        "coverage_capped": 3,
+        "total_ingredients": 2,
+        "supply_margin": 20.0,
+        "ingredient_counts": {
+          "三文鱼": 1,
+          "糯米": 1
+        },
+        "remaining_supply": {
+          "三文鱼": 48.0,
+          "糯米": 20.0
+        }
+      }
+    },
+    {
+      "guest": "矢田寺成美",
+      "budget_display_only": "300－600",
+      "preferred_tags": [
+        "清淡",
+        "山珍",
+        "和风",
+        "文化底蕴",
+        "特产"
+      ],
+      "disliked_tags": [
+        "重油",
+        "饱腹"
+      ],
+      "status": "planned",
+      "plan": {
+        "dish": "手握寿司",
+        "cookware": "料理台",
+        "sell_price": 28.0,
+        "base_ingredients": [
+          "三文鱼",
+          "金枪鱼"
+        ],
+        "added_ingredients": [],
+        "final_tags": [
+          "和风",
+          "文化底蕴",
+          "料理台",
+          "水产",
+          "清淡",
+          "生",
+          "鲜"
+        ],
+        "covered_tags": [
+          "清淡",
+          "和风",
+          "文化底蕴"
+        ],
+        "score": 3,
+        "coverage_capped": 3,
+        "total_ingredients": 2,
+        "supply_margin": 38.0,
+        "ingredient_counts": {
+          "三文鱼": 1,
+          "金枪鱼": 1
+        },
+        "remaining_supply": {
+          "三文鱼": 48.0,
+          "金枪鱼": 38.0
+        }
+      }
+    },
+    {
+      "guest": "黑谷山女",
+      "budget_display_only": "250－400",
+      "preferred_tags": [
+        "鲜",
+        "甜",
+        "生",
+        "适合拍照",
+        "猎奇"
+      ],
+      "disliked_tags": [
+        "咸",
+        "灼热",
+        "重油"
+      ],
+      "status": "planned",
+      "plan": {
+        "dish": "樱落雪",
+        "cookware": "料理台",
+        "sell_price": 50.0,
+        "base_ingredients": [
+          "极上金枪鱼"
+        ],
+        "added_ingredients": [
+          "三文鱼"
+        ],
+        "final_tags": [
+          "和风",
+          "小巧",
+          "料理台",
+          "水产",
+          "海味",
+          "生",
+          "适合拍照",
+          "高级",
+          "鲜"
+        ],
+        "covered_tags": [
+          "鲜",
+          "生",
+          "适合拍照"
+        ],
+        "score": 3,
+        "coverage_capped": 3,
+        "total_ingredients": 2,
+        "supply_margin": 8.0,
+        "ingredient_counts": {
+          "三文鱼": 1,
+          "极上金枪鱼": 1
+        },
+        "remaining_supply": {
+          "三文鱼": 48.0,
+          "极上金枪鱼": 8.0
+        }
+      }
+    },
+    {
+      "guest": "水桥帕露西",
+      "budget_display_only": "300－400",
+      "preferred_tags": [
+        "肉",
+        "咸",
+        "鲜",
+        "果味",
+        "辣",
+        "酸"
+      ],
+      "disliked_tags": [
+        "甜"
+      ],
+      "status": "planned",
+      "plan": {
+        "dish": "狮子头",
+        "cookware": "煮锅",
+        "sell_price": 28.0,
+        "base_ingredients": [
+          "牛肉"
+        ],
+        "added_ingredients": [
+          "辣椒"
+        ],
+        "final_tags": [
+          "下酒",
+          "招牌",
+          "煮锅",
+          "特产",
+          "肉",
+          "辣",
+          "鲜"
+        ],
+        "covered_tags": [
+          "肉",
+          "鲜",
+          "辣"
+        ],
+        "score": 3,
+        "coverage_capped": 3,
+        "total_ingredients": 2,
+        "supply_margin": 24.0,
+        "ingredient_counts": {
+          "牛肉": 1,
+          "辣椒": 1
+        },
+        "remaining_supply": {
+          "牛肉": 25.0,
+          "辣椒": 24.0
+        }
+      }
+    },
+    {
+      "guest": "星熊勇仪",
+      "budget_display_only": "600－1000",
+      "preferred_tags": [
+        "传说",
+        "下酒",
+        "和风",
+        "招牌",
+        "力量涌现",
+        "燃起来了",
+        "大份"
+      ],
+      "disliked_tags": [
+        "小巧",
+        "猎奇",
+        "素"
+      ],
+      "status": "planned",
+      "plan": {
+        "dish": "狮子头",
+        "cookware": "煮锅",
+        "sell_price": 28.0,
+        "base_ingredients": [
+          "牛肉"
+        ],
+        "added_ingredients": [
+          "和牛"
+        ],
+        "final_tags": [
+          "下酒",
+          "传说",
+          "招牌",
+          "煮锅",
+          "特产",
+          "肉",
+          "高级",
+          "鲜"
+        ],
+        "covered_tags": [
+          "传说",
+          "下酒",
+          "招牌"
+        ],
+        "score": 3,
+        "coverage_capped": 3,
+        "total_ingredients": 2,
+        "supply_margin": 17.0,
+        "ingredient_counts": {
+          "和牛": 1,
+          "牛肉": 1
+        },
+        "remaining_supply": {
+          "和牛": 17.0,
+          "牛肉": 25.0
+        }
+      }
+    },
+    {
+      "guest": "古明地觉",
+      "budget_display_only": "500－600",
+      "preferred_tags": [
+        "家常",
+        "甜",
+        "力量涌现",
+        "小巧",
+        "梦幻",
+        "特产"
+      ],
+      "disliked_tags": [
+        "大份",
+        "山珍",
+        "灼热",
+        "猎奇",
+        "肉"
+      ],
+      "status": "planned",
+      "plan": {
+        "dish": "麻薯",
+        "cookware": "料理台",
+        "sell_price": 30.0,
+        "base_ingredients": [
+          "糯米"
+        ],
+        "added_ingredients": [
+          "土豆"
+        ],
+        "final_tags": [
+          "和风",
+          "家常",
+          "小巧",
+          "料理台",
+          "甜",
+          "素"
+        ],
+        "covered_tags": [
+          "家常",
+          "甜",
+          "小巧"
+        ],
+        "score": 3,
+        "coverage_capped": 3,
+        "total_ingredients": 2,
+        "supply_margin": 20.0,
+        "ingredient_counts": {
+          "土豆": 1,
+          "糯米": 1
+        },
+        "remaining_supply": {
+          "土豆": 30.0,
+          "糯米": 20.0
+        }
+      }
+    },
+    {
+      "guest": "火焰猫燐",
+      "budget_display_only": "500－700",
+      "preferred_tags": [
+        "水产",
+        "海味",
+        "鲜",
+        "甜",
+        "猎奇",
+        "梦幻"
+      ],
+      "disliked_tags": [
+        "灼热",
+        "生"
+      ],
+      "status": "planned",
+      "plan": {
+        "dish": "香炸蝉蜕",
+        "cookware": "油锅",
+        "sell_price": 19.0,
+        "base_ingredients": [
+          "蝉蜕"
+        ],
+        "added_ingredients": [
+          "三文鱼"
+        ],
+        "final_tags": [
+          "实惠",
+          "水产",
+          "油锅",
+          "猎奇",
+          "重油",
+          "高级",
+          "鲜"
+        ],
+        "covered_tags": [
+          "水产",
+          "鲜",
+          "猎奇"
+        ],
+        "score": 3,
+        "coverage_capped": 3,
+        "total_ingredients": 2,
+        "supply_margin": 21.0,
+        "ingredient_counts": {
+          "三文鱼": 1,
+          "蝉蜕": 1
+        },
+        "remaining_supply": {
+          "三文鱼": 48.0,
+          "蝉蜕": 21.0
+        }
+      }
+    },
+    {
+      "guest": "灵乌路空",
+      "budget_display_only": "500－800",
+      "preferred_tags": [
+        "肉",
+        "重油",
+        "咸",
+        "灼热",
+        "力量涌现",
+        "辣"
+      ],
+      "disliked_tags": [
+        "清淡",
+        "菌类"
+      ],
+      "status": "planned",
+      "plan": {
+        "dish": "力量汤",
+        "cookware": "煮锅",
+        "sell_price": 34.0,
+        "base_ingredients": [
+          "海苔",
+          "野猪肉"
+        ],
+        "added_ingredients": [],
+        "final_tags": [
+          "力量涌现",
+          "山珍",
+          "汤羹",
+          "灼热",
+          "煮锅",
+          "肉"
+        ],
+        "covered_tags": [
+          "肉",
+          "灼热",
+          "力量涌现"
+        ],
+        "score": 3,
+        "coverage_capped": 3,
+        "total_ingredients": 2,
+        "supply_margin": 10.0,
+        "ingredient_counts": {
+          "海苔": 1,
+          "野猪肉": 1
+        },
+        "remaining_supply": {
+          "海苔": 42.0,
+          "野猪肉": 10.0
+        }
+      }
+    },
+    {
+      "guest": "多多良小伞",
+      "budget_display_only": "150－300",
+      "preferred_tags": [
+        "家常",
+        "饱腹",
+        "甜",
+        "适合拍照",
+        "力量涌现",
+        "猎奇",
+        "不可思议"
+      ],
+      "disliked_tags": [
+        "汤羹",
+        "灼热",
+        "辣"
+      ],
+      "status": "planned",
+      "plan": {
+        "dish": "饭团",
+        "cookware": "料理台",
+        "sell_price": 6.0,
+        "base_ingredients": [
+          "海苔"
+        ],
+        "added_ingredients": [
+          "蜂蜜"
+        ],
+        "final_tags": [
+          "和风",
+          "实惠",
+          "家常",
+          "料理台",
+          "甜",
+          "素",
+          "饱腹"
+        ],
+        "covered_tags": [
+          "家常",
+          "饱腹",
+          "甜"
+        ],
+        "score": 3,
+        "coverage_capped": 3,
+        "total_ingredients": 2,
+        "supply_margin": 42.0,
+        "ingredient_counts": {
+          "海苔": 1,
+          "蜂蜜": 1
+        },
+        "remaining_supply": {
+          "海苔": 42.0,
+          "蜂蜜": 63.0
+        }
+      }
+    },
+    {
+      "guest": "村纱水蜜",
+      "budget_display_only": "400－600",
+      "preferred_tags": [
+        "肉",
+        "高级",
+        "饱腹",
+        "咸",
+        "鲜",
+        "力量涌现",
+        "特产"
+      ],
+      "disliked_tags": [
+        "小巧",
+        "猎奇",
+        "素",
+        "酸"
+      ],
+      "status": "planned",
+      "plan": {
+        "dish": "狮子头",
+        "cookware": "煮锅",
+        "sell_price": 28.0,
+        "base_ingredients": [
+          "牛肉"
+        ],
+        "added_ingredients": [],
+        "final_tags": [
+          "下酒",
+          "招牌",
+          "煮锅",
+          "特产",
+          "肉",
+          "鲜"
+        ],
+        "covered_tags": [
+          "肉",
+          "鲜",
+          "特产"
+        ],
+        "score": 3,
+        "coverage_capped": 3,
+        "total_ingredients": 1,
+        "supply_margin": 25.0,
+        "ingredient_counts": {
+          "牛肉": 1
+        },
+        "remaining_supply": {
+          "牛肉": 25.0
+        }
+      }
+    },
+    {
+      "guest": "封兽鵺",
+      "budget_display_only": "300－500",
+      "preferred_tags": [
+        "肉",
+        "鲜",
+        "生",
+        "招牌",
+        "适合拍照",
+        "猎奇",
+        "不可思议",
+        "特产"
+      ],
+      "disliked_tags": [
+        "西式",
+        "酸"
+      ],
+      "status": "planned",
+      "plan": {
+        "dish": "狮子头",
+        "cookware": "煮锅",
+        "sell_price": 28.0,
+        "base_ingredients": [
+          "牛肉"
+        ],
+        "added_ingredients": [],
+        "final_tags": [
+          "下酒",
+          "招牌",
+          "煮锅",
+          "特产",
+          "肉",
+          "鲜"
+        ],
+        "covered_tags": [
+          "肉",
+          "鲜",
+          "招牌",
+          "特产"
+        ],
+        "score": 4,
+        "coverage_capped": 3,
+        "total_ingredients": 1,
+        "supply_margin": 25.0,
+        "ingredient_counts": {
+          "牛肉": 1
+        },
+        "remaining_supply": {
+          "牛肉": 25.0
+        }
+      }
+    },
+    {
+      "guest": "物部布都",
+      "budget_display_only": "600－900",
+      "preferred_tags": [
+        "高级",
+        "传说",
+        "清淡",
+        "山珍",
+        "和风",
+        "燃起来了"
+      ],
+      "disliked_tags": [
+        "生",
+        "西式"
+      ],
+      "status": "planned",
+      "plan": {
+        "dish": "豆腐味噌",
+        "cookware": "煮锅",
+        "sell_price": 21.0,
+        "base_ingredients": [
+          "豆腐"
+        ],
+        "added_ingredients": [
+          "三文鱼"
+        ],
+        "final_tags": [
+          "和风",
+          "家常",
+          "水产",
+          "汤羹",
+          "清淡",
+          "煮锅",
+          "素",
+          "高级",
+          "鲜"
+        ],
+        "covered_tags": [
+          "高级",
+          "清淡",
+          "和风"
+        ],
+        "score": 3,
+        "coverage_capped": 3,
+        "total_ingredients": 2,
+        "supply_margin": 23.0,
+        "ingredient_counts": {
+          "三文鱼": 1,
+          "豆腐": 1
+        },
+        "remaining_supply": {
+          "三文鱼": 48.0,
+          "豆腐": 23.0
+        }
+      }
+    },
+    {
+      "guest": "霍青娥",
+      "budget_display_only": "400－900",
+      "preferred_tags": [
+        "素",
+        "传说",
+        "中华",
+        "甜",
+        "不可思议",
+        "小巧",
+        "特产"
+      ],
+      "disliked_tags": [
+        "重油",
+        "饱腹"
+      ],
+      "status": "planned",
+      "plan": {
+        "dish": "汤圆",
+        "cookware": "煮锅",
+        "sell_price": 35.0,
+        "base_ingredients": [
+          "糯米"
+        ],
+        "added_ingredients": [
+          "葡萄"
+        ],
+        "final_tags": [
+          "中华",
+          "家常",
+          "文化底蕴",
+          "果味",
+          "煮锅",
+          "甜",
+          "素"
+        ],
+        "covered_tags": [
+          "素",
+          "中华",
+          "甜"
+        ],
+        "score": 3,
+        "coverage_capped": 3,
+        "total_ingredients": 2,
+        "supply_margin": 20.0,
+        "ingredient_counts": {
+          "糯米": 1,
+          "葡萄": 1
+        },
+        "remaining_supply": {
+          "糯米": 20.0,
+          "葡萄": 26.0
+        }
+      }
+    },
+    {
+      "guest": "苏我屠自古",
+      "budget_display_only": "500－600",
+      "preferred_tags": [
+        "家常",
+        "重油",
+        "饱腹",
+        "和风",
+        "招牌",
+        "力量涌现",
+        "烧烤"
+      ],
+      "disliked_tags": [
+        "凉爽",
+        "甜"
+      ],
+      "status": "planned",
+      "plan": {
+        "dish": "饭团",
+        "cookware": "料理台",
+        "sell_price": 6.0,
+        "base_ingredients": [
+          "海苔"
+        ],
+        "added_ingredients": [],
+        "final_tags": [
+          "和风",
+          "实惠",
+          "家常",
+          "料理台",
+          "素",
+          "饱腹"
+        ],
+        "covered_tags": [
+          "家常",
+          "饱腹",
+          "和风"
+        ],
+        "score": 3,
+        "coverage_capped": 3,
+        "total_ingredients": 1,
+        "supply_margin": 42.0,
+        "ingredient_counts": {
+          "海苔": 1
+        },
+        "remaining_supply": {
+          "海苔": 42.0
+        }
+      }
+    },
+    {
+      "guest": "射命丸文",
+      "budget_display_only": "500－600",
+      "preferred_tags": [
+        "肉",
+        "家常",
+        "下酒",
+        "和风",
+        "招牌",
+        "适合拍照"
+      ],
+      "disliked_tags": [
+        "西式"
+      ],
+      "status": "planned",
+      "plan": {
+        "dish": "狮子头",
+        "cookware": "煮锅",
+        "sell_price": 28.0,
+        "base_ingredients": [
+          "牛肉"
+        ],
+        "added_ingredients": [],
+        "final_tags": [
+          "下酒",
+          "招牌",
+          "煮锅",
+          "特产",
+          "肉",
+          "鲜"
+        ],
+        "covered_tags": [
+          "肉",
+          "下酒",
+          "招牌"
+        ],
+        "score": 3,
+        "coverage_capped": 3,
+        "total_ingredients": 1,
+        "supply_margin": 25.0,
+        "ingredient_counts": {
+          "牛肉": 1
+        },
+        "remaining_supply": {
+          "牛肉": 25.0
+        }
+      }
+    },
+    {
+      "guest": "梅蒂欣",
+      "budget_display_only": "200－400",
+      "preferred_tags": [
+        "甜",
+        "招牌",
+        "适合拍照",
+        "凉爽",
+        "菌类",
+        "小巧",
+        "梦幻",
+        "毒"
+      ],
+      "disliked_tags": [
+        "文化底蕴"
+      ],
+      "status": "planned",
+      "plan": {
+        "dish": "凉菜雕花",
+        "cookware": "料理台",
+        "sell_price": 20.0,
+        "base_ingredients": [
+          "萝卜"
+        ],
+        "added_ingredients": [
+          "蜂蜜"
+        ],
+        "final_tags": [
+          "凉爽",
+          "料理台",
+          "清淡",
+          "甜",
+          "素",
+          "适合拍照"
+        ],
+        "covered_tags": [
+          "甜",
+          "适合拍照",
+          "凉爽"
+        ],
+        "score": 3,
+        "coverage_capped": 3,
+        "total_ingredients": 2,
+        "supply_margin": 52.0,
+        "ingredient_counts": {
+          "萝卜": 1,
+          "蜂蜜": 1
+        },
+        "remaining_supply": {
+          "萝卜": 52.0,
+          "蜂蜜": 63.0
+        }
+      }
+    },
+    {
+      "guest": "风见幽香",
+      "budget_display_only": "1200－1800",
+      "preferred_tags": [
+        "高级",
+        "传说",
+        "清淡",
+        "西式",
+        "不可思议",
+        "梦幻",
+        "特产"
+      ],
+      "disliked_tags": [
+        "和风",
+        "咸",
+        "灼热",
+        "饱腹"
+      ],
+      "status": "planned",
+      "plan": {
+        "dish": "狮子头",
+        "cookware": "煮锅",
+        "sell_price": 28.0,
+        "base_ingredients": [
+          "牛肉"
+        ],
+        "added_ingredients": [
+          "和牛"
+        ],
+        "final_tags": [
+          "下酒",
+          "传说",
+          "招牌",
+          "煮锅",
+          "特产",
+          "肉",
+          "高级",
+          "鲜"
+        ],
+        "covered_tags": [
+          "高级",
+          "传说",
+          "特产"
+        ],
+        "score": 3,
+        "coverage_capped": 3,
+        "total_ingredients": 2,
+        "supply_margin": 17.0,
+        "ingredient_counts": {
+          "和牛": 1,
+          "牛肉": 1
+        },
+        "remaining_supply": {
+          "和牛": 17.0,
+          "牛肉": 25.0
+        }
+      }
+    },
+    {
+      "guest": "鬼人正邪",
+      "budget_display_only": "300－600",
+      "preferred_tags": [
+        "重油",
+        "下酒",
+        "灼热",
+        "力量涌现",
+        "猎奇",
+        "不可思议",
+        "燃起来了"
+      ],
+      "disliked_tags": [
+        "高级"
+      ],
+      "status": "planned",
+      "plan": {
+        "dish": "香炸蝉蜕",
+        "cookware": "油锅",
+        "sell_price": 19.0,
+        "base_ingredients": [
+          "蝉蜕"
+        ],
+        "added_ingredients": [
+          "萝卜"
+        ],
+        "final_tags": [
+          "下酒",
+          "实惠",
+          "油锅",
+          "猎奇",
+          "素",
+          "重油"
+        ],
+        "covered_tags": [
+          "重油",
+          "下酒",
+          "猎奇"
+        ],
+        "score": 3,
+        "coverage_capped": 3,
+        "total_ingredients": 2,
+        "supply_margin": 21.0,
+        "ingredient_counts": {
+          "萝卜": 1,
+          "蝉蜕": 1
+        },
+        "remaining_supply": {
+          "萝卜": 52.0,
+          "蝉蜕": 21.0
+        }
+      }
+    },
+    {
+      "guest": "少名针妙丸",
+      "budget_display_only": "600－1200",
+      "preferred_tags": [
+        "传说",
+        "和风",
+        "甜",
+        "适合拍照",
+        "文化底蕴",
+        "小巧",
+        "燃起来了"
+      ],
+      "disliked_tags": [
+        "大份",
+        "西式"
+      ],
+      "status": "planned",
+      "plan": {
+        "dish": "麻薯",
+        "cookware": "料理台",
+        "sell_price": 30.0,
+        "base_ingredients": [
+          "糯米"
+        ],
+        "added_ingredients": [],
+        "final_tags": [
+          "和风",
+          "小巧",
+          "料理台",
+          "甜"
+        ],
+        "covered_tags": [
+          "和风",
+          "甜",
+          "小巧"
+        ],
+        "score": 3,
+        "coverage_capped": 3,
+        "total_ingredients": 1,
+        "supply_margin": 20.0,
+        "ingredient_counts": {
+          "糯米": 1
+        },
+        "remaining_supply": {
+          "糯米": 20.0
+        }
+      }
+    },
+    {
+      "guest": "今泉影狼",
+      "budget_display_only": "300－600",
+      "preferred_tags": [
+        "肉",
+        "家常",
+        "山珍",
+        "和风",
+        "适合拍照",
+        "凉爽"
+      ],
+      "disliked_tags": [
+        "灼热"
+      ],
+      "status": "planned",
+      "plan": {
+        "dish": "炙猪肉饭团",
+        "cookware": "料理台",
+        "sell_price": 14.0,
+        "base_ingredients": [
+          "猪肉"
+        ],
+        "added_ingredients": [],
+        "final_tags": [
+          "和风",
+          "实惠",
+          "家常",
+          "料理台",
+          "肉",
+          "饱腹"
+        ],
+        "covered_tags": [
+          "肉",
+          "家常",
+          "和风"
+        ],
+        "score": 3,
+        "coverage_capped": 3,
+        "total_ingredients": 1,
+        "supply_margin": 10.0,
+        "ingredient_counts": {
+          "猪肉": 1
+        },
+        "remaining_supply": {
+          "猪肉": 10.0
+        }
+      }
+    },
+    {
+      "guest": "铃仙",
+      "budget_display_only": "200－350",
+      "preferred_tags": [
+        "家常",
+        "山珍",
+        "海味",
+        "中华",
+        "甜",
+        "小巧",
+        "特产"
+      ],
+      "disliked_tags": [
+        "不可思议",
+        "昂贵"
+      ],
+      "status": "planned",
+      "plan": {
+        "dish": "汤圆",
+        "cookware": "煮锅",
+        "sell_price": 35.0,
+        "base_ingredients": [
+          "糯米"
+        ],
+        "added_ingredients": [
+          "葡萄"
+        ],
+        "final_tags": [
+          "中华",
+          "家常",
+          "文化底蕴",
+          "果味",
+          "煮锅",
+          "甜",
+          "素"
+        ],
+        "covered_tags": [
+          "家常",
+          "中华",
+          "甜"
+        ],
+        "score": 3,
+        "coverage_capped": 3,
+        "total_ingredients": 2,
+        "supply_margin": 20.0,
+        "ingredient_counts": {
+          "糯米": 1,
+          "葡萄": 1
+        },
+        "remaining_supply": {
+          "糯米": 20.0,
+          "葡萄": 26.0
+        }
+      }
+    },
+    {
+      "guest": "绵月丰姬",
+      "budget_display_only": "1200－1500",
+      "preferred_tags": [
+        "素",
+        "高级",
+        "和风",
+        "甜",
+        "凉爽",
+        "文化底蕴",
+        "果味"
+      ],
+      "disliked_tags": [
+        "力量涌现",
+        "咸",
+        "山珍"
+      ],
+      "status": "planned",
+      "plan": {
+        "dish": "凉菜雕花",
+        "cookware": "料理台",
+        "sell_price": 20.0,
+        "base_ingredients": [
+          "萝卜"
+        ],
+        "added_ingredients": [
+          "蜂蜜"
+        ],
+        "final_tags": [
+          "凉爽",
+          "料理台",
+          "清淡",
+          "甜",
+          "素",
+          "适合拍照"
+        ],
+        "covered_tags": [
+          "素",
+          "甜",
+          "凉爽"
+        ],
+        "score": 3,
+        "coverage_capped": 3,
+        "total_ingredients": 2,
+        "supply_margin": 52.0,
+        "ingredient_counts": {
+          "萝卜": 1,
+          "蜂蜜": 1
+        },
+        "remaining_supply": {
+          "萝卜": 52.0,
+          "蜂蜜": 63.0
+        }
+      }
+    },
+    {
+      "guest": "绵月依姬",
+      "budget_display_only": "1000－1200",
+      "preferred_tags": [
+        "高级",
+        "传说",
+        "清淡",
+        "中华",
+        "灼热",
+        "力量涌现",
+        "文化底蕴",
+        "小巧"
+      ],
+      "disliked_tags": [
+        "山珍",
+        "菌类"
+      ],
+      "status": "planned",
+      "plan": {
+        "dish": "豆腐锅",
+        "cookware": "煮锅",
+        "sell_price": 19.0,
+        "base_ingredients": [
+          "豆腐"
+        ],
+        "added_ingredients": [
+          "三文鱼"
+        ],
+        "final_tags": [
+          "和风",
+          "实惠",
+          "水产",
+          "清淡",
+          "灼热",
+          "煮锅",
+          "素",
+          "高级",
+          "鲜"
+        ],
+        "covered_tags": [
+          "高级",
+          "清淡",
+          "灼热"
+        ],
+        "score": 3,
+        "coverage_capped": 3,
+        "total_ingredients": 2,
+        "supply_margin": 23.0,
+        "ingredient_counts": {
+          "三文鱼": 1,
+          "豆腐": 1
+        },
+        "remaining_supply": {
+          "三文鱼": 48.0,
+          "豆腐": 23.0
+        }
+      }
+    },
+    {
+      "guest": "爱莲",
+      "budget_display_only": "300－500",
+      "preferred_tags": [
+        "家常",
+        "饱腹",
+        "西式",
+        "甜",
+        "凉爽",
+        "梦幻"
+      ],
+      "disliked_tags": [
+        "水产",
+        "生",
+        "重油"
+      ],
+      "status": "planned",
+      "plan": {
+        "dish": "饭团",
+        "cookware": "料理台",
+        "sell_price": 6.0,
+        "base_ingredients": [
+          "海苔"
+        ],
+        "added_ingredients": [
+          "蜂蜜"
+        ],
+        "final_tags": [
+          "和风",
+          "实惠",
+          "家常",
+          "料理台",
+          "甜",
+          "素",
+          "饱腹"
+        ],
+        "covered_tags": [
+          "家常",
+          "饱腹",
+          "甜"
+        ],
+        "score": 3,
+        "coverage_capped": 3,
+        "total_ingredients": 2,
+        "supply_margin": 42.0,
+        "ingredient_counts": {
+          "海苔": 1,
+          "蜂蜜": 1
+        },
+        "remaining_supply": {
+          "海苔": 42.0,
+          "蜂蜜": 63.0
+        }
+      }
+    },
+    {
+      "guest": "魅魔",
+      "budget_display_only": "2000－3000",
+      "preferred_tags": [
+        "水产",
+        "山珍",
+        "鲜",
+        "生",
+        "力量涌现",
+        "猎奇",
+        "菌类"
+      ],
+      "disliked_tags": [
+        "清淡",
+        "高级"
+      ],
+      "status": "planned",
+      "plan": {
+        "dish": "炸八目鳗",
+        "cookware": "油锅",
+        "sell_price": 27.0,
+        "base_ingredients": [
+          "八目鳗"
+        ],
+        "added_ingredients": [
+          "蘑菇"
+        ],
+        "final_tags": [
+          "招牌",
+          "水产",
+          "油锅",
+          "素",
+          "菌类",
+          "重油",
+          "鲜"
+        ],
+        "covered_tags": [
+          "水产",
+          "鲜",
+          "菌类"
+        ],
+        "score": 3,
+        "coverage_capped": 3,
+        "total_ingredients": 2,
+        "supply_margin": 33.0,
+        "ingredient_counts": {
+          "八目鳗": 1,
+          "蘑菇": 1
+        },
+        "remaining_supply": {
+          "八目鳗": 33.0,
+          "蘑菇": 42.0
+        }
+      }
+    },
+    {
+      "guest": "露易兹",
+      "budget_display_only": "800－1000",
+      "preferred_tags": [
+        "水产",
+        "西式",
+        "甜",
+        "适合拍照",
+        "小巧",
+        "特产"
+      ],
+      "disliked_tags": [
+        "重油",
+        "饱腹"
+      ],
+      "status": "planned",
+      "plan": {
+        "dish": "樱落雪",
+        "cookware": "料理台",
+        "sell_price": 50.0,
+        "base_ingredients": [
+          "极上金枪鱼"
+        ],
+        "added_ingredients": [],
+        "final_tags": [
+          "和风",
+          "小巧",
+          "料理台",
+          "水产",
+          "海味",
+          "生",
+          "适合拍照",
+          "高级"
+        ],
+        "covered_tags": [
+          "水产",
+          "适合拍照",
+          "小巧"
+        ],
+        "score": 3,
+        "coverage_capped": 3,
+        "total_ingredients": 1,
+        "supply_margin": 8.0,
+        "ingredient_counts": {
+          "极上金枪鱼": 1
+        },
+        "remaining_supply": {
+          "极上金枪鱼": 8.0
+        }
+      }
+    },
+    {
+      "guest": "森近霖之助",
+      "budget_display_only": "250－400",
+      "preferred_tags": [
+        "家常",
+        "饱腹",
+        "鲜"
+      ],
+      "disliked_tags": [
+        "下酒",
+        "猎奇",
+        "重油"
+      ],
+      "status": "planned",
+      "plan": {
+        "dish": "饭团",
+        "cookware": "料理台",
+        "sell_price": 6.0,
+        "base_ingredients": [
+          "海苔"
+        ],
+        "added_ingredients": [
+          "三文鱼"
+        ],
+        "final_tags": [
+          "和风",
+          "实惠",
+          "家常",
+          "料理台",
+          "水产",
+          "素",
+          "饱腹",
+          "高级",
+          "鲜"
+        ],
+        "covered_tags": [
+          "家常",
+          "饱腹",
+          "鲜"
+        ],
+        "score": 3,
+        "coverage_capped": 3,
+        "total_ingredients": 2,
+        "supply_margin": 42.0,
+        "ingredient_counts": {
+          "三文鱼": 1,
+          "海苔": 1
+        },
+        "remaining_supply": {
+          "三文鱼": 48.0,
+          "海苔": 42.0
+        }
+      }
+    },
+    {
+      "guest": "蕾米莉亚",
+      "budget_display_only": "4950－5000",
+      "preferred_tags": [
+        "高级",
+        "传说",
+        "西式",
+        "甜",
+        "生"
+      ],
+      "disliked_tags": [
+        "咸",
+        "实惠",
+        "辣",
+        "酸"
+      ],
+      "status": "planned",
+      "plan": {
+        "dish": "樱落雪",
+        "cookware": "料理台",
+        "sell_price": 50.0,
+        "base_ingredients": [
+          "极上金枪鱼"
+        ],
+        "added_ingredients": [
+          "可可豆"
+        ],
+        "final_tags": [
+          "不可思议",
+          "和风",
+          "小巧",
+          "料理台",
+          "水产",
+          "海味",
+          "甜",
+          "生",
+          "适合拍照",
+          "高级"
+        ],
+        "covered_tags": [
+          "高级",
+          "甜",
+          "生"
+        ],
+        "score": 3,
+        "coverage_capped": 3,
+        "total_ingredients": 2,
+        "supply_margin": 8.0,
+        "ingredient_counts": {
+          "可可豆": 1,
+          "极上金枪鱼": 1
+        },
+        "remaining_supply": {
+          "可可豆": 10.0,
+          "极上金枪鱼": 8.0
+        }
+      }
+    },
+    {
+      "guest": "魂魄妖梦",
+      "budget_display_only": "300－400",
+      "preferred_tags": [
+        "家常",
+        "清淡",
+        "鲜",
+        "力量涌现"
+      ],
+      "disliked_tags": [
+        "咸",
+        "猎奇",
+        "重油"
+      ],
+      "status": "planned",
+      "plan": {
+        "dish": "狮子头",
+        "cookware": "煮锅",
+        "sell_price": 28.0,
+        "base_ingredients": [
+          "牛肉"
+        ],
+        "added_ingredients": [
+          "豆腐"
+        ],
+        "final_tags": [
+          "下酒",
+          "家常",
+          "招牌",
+          "清淡",
+          "煮锅",
+          "特产",
+          "肉",
+          "鲜"
+        ],
+        "covered_tags": [
+          "家常",
+          "清淡",
+          "鲜"
+        ],
+        "score": 3,
+        "coverage_capped": 3,
+        "total_ingredients": 2,
+        "supply_margin": 23.0,
+        "ingredient_counts": {
+          "牛肉": 1,
+          "豆腐": 1
+        },
+        "remaining_supply": {
+          "牛肉": 25.0,
+          "豆腐": 23.0
+        }
+      }
+    },
+    {
+      "guest": "西行寺幽幽子",
+      "budget_display_only": "1500－2000",
+      "preferred_tags": [
+        "肉",
+        "水产",
+        "高级",
+        "传说",
+        "饱腹",
+        "和风",
+        "中华",
+        "大份"
+      ],
+      "disliked_tags": [
+        "小巧",
+        "清淡",
+        "素"
+      ],
+      "status": "planned",
+      "plan": {
+        "dish": "炙猪肉饭团",
+        "cookware": "料理台",
+        "sell_price": 14.0,
+        "base_ingredients": [
+          "猪肉"
+        ],
+        "added_ingredients": [],
+        "final_tags": [
+          "和风",
+          "实惠",
+          "家常",
+          "料理台",
+          "肉",
+          "饱腹"
+        ],
+        "covered_tags": [
+          "肉",
+          "饱腹",
+          "和风"
+        ],
+        "score": 3,
+        "coverage_capped": 3,
+        "total_ingredients": 1,
+        "supply_margin": 10.0,
+        "ingredient_counts": {
+          "猪肉": 1
+        },
+        "remaining_supply": {
+          "猪肉": 10.0
+        }
+      }
+    },
+    {
+      "guest": "萌澄果",
+      "budget_display_only": "1200－1600",
+      "preferred_tags": [
+        "肉",
+        "水产",
+        "甜",
+        "梦幻"
+      ],
+      "disliked_tags": [
+        "灼热",
+        "猎奇"
+      ],
+      "status": "planned",
+      "plan": {
+        "dish": "炸八目鳗",
+        "cookware": "油锅",
+        "sell_price": 27.0,
+        "base_ingredients": [
+          "八目鳗"
+        ],
+        "added_ingredients": [
+          "牛肉",
+          "葡萄"
+        ],
+        "final_tags": [
+          "招牌",
+          "果味",
+          "水产",
+          "油锅",
+          "甜",
+          "肉",
+          "重油"
+        ],
+        "covered_tags": [
+          "肉",
+          "水产",
+          "甜"
+        ],
+        "score": 3,
+        "coverage_capped": 3,
+        "total_ingredients": 3,
+        "supply_margin": 25.0,
+        "ingredient_counts": {
+          "八目鳗": 1,
+          "牛肉": 1,
+          "葡萄": 1
+        },
+        "remaining_supply": {
+          "八目鳗": 33.0,
+          "牛肉": 25.0,
+          "葡萄": 26.0
+        }
+      }
+    },
+    {
+      "guest": "蹦蹦跳跳的三妖精",
+      "budget_display_only": "300－400",
+      "preferred_tags": [
+        "家常",
+        "甜",
+        "凉爽",
+        "菌类",
+        "小巧",
+        "梦幻"
+      ],
+      "disliked_tags": [
+        "灼热",
+        "猎奇",
+        "生"
+      ],
+      "status": "planned",
+      "plan": {
+        "dish": "麻薯",
+        "cookware": "料理台",
+        "sell_price": 30.0,
+        "base_ingredients": [
+          "糯米"
+        ],
+        "added_ingredients": [
+          "土豆"
+        ],
+        "final_tags": [
+          "和风",
+          "家常",
+          "小巧",
+          "料理台",
+          "甜",
+          "素"
+        ],
+        "covered_tags": [
+          "家常",
+          "甜",
+          "小巧"
+        ],
+        "score": 3,
+        "coverage_capped": 3,
+        "total_ingredients": 2,
+        "supply_margin": 20.0,
+        "ingredient_counts": {
+          "土豆": 1,
+          "糯米": 1
+        },
+        "remaining_supply": {
+          "土豆": 30.0,
+          "糯米": 20.0
+        }
+      }
+    },
+    {
+      "guest": "冴月麟",
+      "budget_display_only": "400－600",
+      "preferred_tags": [
+        "水产",
+        "家常",
+        "中华",
+        "辣"
+      ],
+      "disliked_tags": [
+        "下酒",
+        "生",
+        "重油"
+      ],
+      "status": "planned",
+      "plan": {
+        "dish": "汤圆",
+        "cookware": "煮锅",
+        "sell_price": 35.0,
+        "base_ingredients": [
+          "糯米"
+        ],
+        "added_ingredients": [
+          "三文鱼"
+        ],
+        "final_tags": [
+          "中华",
+          "家常",
+          "文化底蕴",
+          "水产",
+          "煮锅",
+          "素",
+          "高级",
+          "鲜"
+        ],
+        "covered_tags": [
+          "水产",
+          "家常",
+          "中华"
+        ],
+        "score": 3,
+        "coverage_capped": 3,
+        "total_ingredients": 2,
+        "supply_margin": 20.0,
+        "ingredient_counts": {
+          "三文鱼": 1,
+          "糯米": 1
+        },
+        "remaining_supply": {
+          "三文鱼": 48.0,
+          "糯米": 20.0
+        }
+      }
+    },
+    {
+      "guest": "立空汐",
+      "budget_display_only": "500－800",
+      "preferred_tags": [
+        "肉",
+        "下酒",
+        "山珍",
+        "和风",
+        "力量涌现",
+        "昂贵"
+      ],
+      "disliked_tags": [
+        "清淡",
+        "素"
+      ],
+      "status": "planned",
+      "plan": {
+        "dish": "狮子头",
+        "cookware": "煮锅",
+        "sell_price": 28.0,
+        "base_ingredients": [
+          "牛肉"
+        ],
+        "added_ingredients": [
+          "松露"
+        ],
+        "final_tags": [
+          "下酒",
+          "传说",
+          "山珍",
+          "招牌",
+          "煮锅",
+          "特产",
+          "肉",
+          "菌类",
+          "高级",
+          "鲜"
+        ],
+        "covered_tags": [
+          "肉",
+          "下酒",
+          "山珍"
+        ],
+        "score": 3,
+        "coverage_capped": 3,
+        "total_ingredients": 2,
+        "supply_margin": 17.0,
+        "ingredient_counts": {
+          "松露": 1,
+          "牛肉": 1
+        },
+        "remaining_supply": {
+          "松露": 17.0,
+          "牛肉": 25.0
+        }
+      }
+    },
+    {
+      "guest": "时焉侑",
+      "budget_display_only": "1300－1800",
+      "preferred_tags": [
+        "传说",
+        "下酒",
+        "西式",
+        "中华",
+        "文化底蕴",
+        "特产"
+      ],
+      "disliked_tags": [
+        "水产",
+        "重油",
+        "饱腹"
+      ],
+      "status": "planned",
+      "plan": {
+        "dish": "汤圆",
+        "cookware": "煮锅",
+        "sell_price": 35.0,
+        "base_ingredients": [
+          "糯米"
+        ],
+        "added_ingredients": [
+          "萝卜"
+        ],
+        "final_tags": [
+          "下酒",
+          "中华",
+          "家常",
+          "文化底蕴",
+          "煮锅",
+          "素"
+        ],
+        "covered_tags": [
+          "下酒",
+          "中华",
+          "文化底蕴"
+        ],
+        "score": 3,
+        "coverage_capped": 3,
+        "total_ingredients": 2,
+        "supply_margin": 20.0,
+        "ingredient_counts": {
+          "糯米": 1,
+          "萝卜": 1
+        },
+        "remaining_supply": {
+          "糯米": 20.0,
+          "萝卜": 52.0
+        }
+      }
+    },
+    {
+      "guest": "饕餮尤魔",
+      "budget_display_only": "9999－9999",
+      "preferred_tags": [
+        "肉",
+        "高级",
+        "传说",
+        "饱腹",
+        "鲜",
+        "生",
+        "力量涌现",
+        "不可思议",
+        "大份"
+      ],
+      "disliked_tags": [],
+      "status": "planned",
+      "plan": {
+        "dish": "饭团",
+        "cookware": "料理台",
+        "sell_price": 6.0,
+        "base_ingredients": [
+          "海苔"
+        ],
+        "added_ingredients": [
+          "三文鱼"
+        ],
+        "final_tags": [
+          "和风",
+          "实惠",
+          "家常",
+          "料理台",
+          "水产",
+          "素",
+          "饱腹",
+          "高级",
+          "鲜"
+        ],
+        "covered_tags": [
+          "高级",
+          "饱腹",
+          "鲜"
+        ],
+        "score": 3,
+        "coverage_capped": 3,
+        "total_ingredients": 2,
+        "supply_margin": 42.0,
+        "ingredient_counts": {
+          "三文鱼": 1,
+          "海苔": 1
+        },
+        "remaining_supply": {
+          "三文鱼": 48.0,
+          "海苔": 42.0
+        }
+      }
+    },
+    {
+      "guest": "古明地恋",
+      "budget_display_only": "800－1200",
+      "preferred_tags": [
+        "咸",
+        "甜",
+        "生",
+        "猎奇",
+        "不可思议",
+        "梦幻"
+      ],
+      "disliked_tags": [],
+      "status": "planned",
+      "plan": {
+        "dish": "香炸蝉蜕",
+        "cookware": "油锅",
+        "sell_price": 19.0,
+        "base_ingredients": [
+          "蝉蜕"
+        ],
+        "added_ingredients": [
+          "可可豆"
+        ],
+        "final_tags": [
+          "不可思议",
+          "实惠",
+          "油锅",
+          "猎奇",
+          "甜",
+          "重油"
+        ],
+        "covered_tags": [
+          "甜",
+          "猎奇",
+          "不可思议"
+        ],
+        "score": 3,
+        "coverage_capped": 3,
+        "total_ingredients": 2,
+        "supply_margin": 10.0,
+        "ingredient_counts": {
+          "可可豆": 1,
+          "蝉蜕": 1
+        },
+        "remaining_supply": {
+          "可可豆": 10.0,
+          "蝉蜕": 21.0
+        }
+      }
+    },
+    {
+      "guest": "二岩猯藏",
+      "budget_display_only": "1000－1200",
+      "preferred_tags": [
+        "肉",
+        "水产",
+        "家常",
+        "传说",
+        "下酒",
+        "和风",
+        "果味"
+      ],
+      "disliked_tags": [
+        "灼热",
+        "辣"
+      ],
+      "status": "planned",
+      "plan": {
+        "dish": "炒肉丝",
+        "cookware": "油锅",
+        "sell_price": 15.0,
+        "base_ingredients": [
+          "猪肉"
+        ],
+        "added_ingredients": [],
+        "final_tags": [
+          "下酒",
+          "中华",
+          "实惠",
+          "家常",
+          "油锅",
+          "肉",
+          "重油"
+        ],
+        "covered_tags": [
+          "肉",
+          "家常",
+          "下酒"
+        ],
+        "score": 3,
+        "coverage_capped": 3,
+        "total_ingredients": 1,
+        "supply_margin": 10.0,
+        "ingredient_counts": {
+          "猪肉": 1
+        },
+        "remaining_supply": {
+          "猪肉": 10.0
+        }
+      }
+    },
+    {
+      "guest": "八云紫",
+      "budget_display_only": "4000－6000",
+      "preferred_tags": [
+        "家常",
+        "高级",
+        "传说",
+        "适合拍照",
+        "凉爽",
+        "猎奇",
+        "汤羹"
+      ],
+      "disliked_tags": [
+        "菌类",
+        "饱腹"
+      ],
+      "status": "planned",
+      "plan": {
+        "dish": "凉菜雕花",
+        "cookware": "料理台",
+        "sell_price": 20.0,
+        "base_ingredients": [
+          "萝卜"
+        ],
+        "added_ingredients": [
+          "三文鱼"
+        ],
+        "final_tags": [
+          "凉爽",
+          "料理台",
+          "水产",
+          "清淡",
+          "素",
+          "适合拍照",
+          "高级",
+          "鲜"
+        ],
+        "covered_tags": [
+          "高级",
+          "适合拍照",
+          "凉爽"
+        ],
+        "score": 3,
+        "coverage_capped": 3,
+        "total_ingredients": 2,
+        "supply_margin": 48.0,
+        "ingredient_counts": {
+          "三文鱼": 1,
+          "萝卜": 1
+        },
+        "remaining_supply": {
+          "三文鱼": 48.0,
+          "萝卜": 52.0
+        }
+      }
+    }
+  ]
+}

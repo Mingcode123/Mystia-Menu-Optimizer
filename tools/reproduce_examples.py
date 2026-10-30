@@ -1,4 +1,4 @@
-"""Reproduce all documented cases with the fictional dataset (standard library only)."""
+"""Reproduce synthetic cases and the game-data snapshot plan (standard library only)."""
 import json
 import sys
 from pathlib import Path
@@ -23,3 +23,10 @@ for name, settings in cases.items():
         write_csv_report(report, root / 'examples/demo-plan.csv')
     print(json.dumps({'case': name, 'cookware': report['selected_cookware'],
         'summary': report['summary'], 'plans': [{key: row[key] for key in ('guest', 'status', 'plan')} for row in report['guests']]}, ensure_ascii=False))
+
+game_data = load_dataset(root / 'data/game.json')
+game_report = plan_dataset(game_data, Settings(cookware_count=3))
+write_json_report(game_report, root / 'examples/game-plan.json')
+write_csv_report(game_report, root / 'examples/game-plan.csv')
+print(json.dumps({'case': 'game-plan', 'cookware': game_report['selected_cookware'],
+    'summary': game_report['summary']}, ensure_ascii=False))

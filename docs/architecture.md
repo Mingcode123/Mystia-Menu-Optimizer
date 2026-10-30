@@ -354,14 +354,16 @@ Worker 代码保存在脚本字符串中，通过 Blob URL 创建。主线程发
 
 | 工件 | 协议或内容 | 使用方式 |
 | --- | --- | --- |
-| [`data/demo.json`](../data/demo.json) | `mystia-planner-data/v1`，全部为合成资料 | 网页与 Python 的公共演示输入 |
-| [`web/demo-data.js`](../web/demo-data.js) | 同一数据赋给 `window.MYSTIA_DEMO_DATA` | 由 [`tools/sync_demo.py`](../tools/sync_demo.py) 同步，让双击页面也能载入样例 |
+| [`data/game.json`](../data/game.json) | `mystia-planner-data/v1`，作者工作簿的四表快照 | 网页默认数据与 Python 游戏规划输入 |
+| [`data/demo.json`](../data/demo.json) | 同一数据协议，全部为合成资料 | 受控案例与回归输入 |
+| [`web/game-data.js`](../web/game-data.js)、[`web/demo-data.js`](../web/demo-data.js) | 分别赋给 `window.MYSTIA_GAME_DATA` 与 `window.MYSTIA_DEMO_DATA` | 由 [`tools/sync_demo.py`](../tools/sync_demo.py) 同步，在本地直接载入 |
+| [`web/icon-map.js`](../web/icon-map.js)、[`web/icons/`](../web/icons/) | 按稀客／料理名称对应 PNG | 图片仅用于界面显示，不进入规划模型 |
 | 使用者的 XLSX | 四张具名工作表与缓存的单元格值 | 网页直接读取，或交给导入工具清洗 |
 | 本地标准 JSON | `format`、`metadata`、`sheets` | 四张表分别保存行字典；规划时按名称读取供给 |
 | Python 结果 JSON | `mystia-planner-result/v1` | 保存参数、选定厨具、汇总、逐客方案与模型边界 |
 | CSV / 网页 XLSX | 面向阅读的结果表 | 使用者主动导出；完整 Python 信息以 JSON 为准 |
 
-**网页路径。** 页面先解析随附的样例，或通过 File API 读取用户选定文件。点击计算后，把料理分段送入 Worker；所有任务完成后才形成可导出的完整结果。排序、筛选与导出读取同一份当前结果状态。刷新页面会结束内存中的会话。
+**网页路径。** 页面先解析随附的游戏快照，或通过 File API 读取用户选定文件。点击计算后，把料理分段送入 Worker；所有任务完成后才形成可导出的完整结果。排序、筛选与导出读取同一份当前结果状态。刷新页面会结束内存中的会话。
 
 **Python 路径。** CLI 读取标准 JSON 和参数，验证后执行 `plan_dataset()`。该函数先为每位顾客求各厨具下的最佳候选，再选择共享的厨具集合，最后生成逐客报告。保存 JSON 与 CSV 由 CLI 调用 `io.py` 完成。
 

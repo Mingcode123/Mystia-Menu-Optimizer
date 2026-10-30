@@ -8,7 +8,7 @@
 
 本项目源于《东方夜雀食堂》中的备菜决策：在有限配方、五格食材限制和顾客偏好下，如何找到合格的料理，并在多种合格方案中选择更适合持续制作的一种？项目将这一问题建模为离散组合优化，以明确的规则判断可行性，以有优先级的目标比较方案，最终输出逐客料理建议与共同使用的厨具组合。
 
-仓库提供两种本地工具：**浏览器候选查询器**用于交互探索料理与加料；**Python 批量规划器**用于求解每客方案及厨具选择。项目的设计重点是将游玩经验转化为可计算、可解释、可验证的决策模型。公开版本附带合成数据、参数对照案例和自动化检查，可独立运行。
+仓库提供两种本地工具：**浏览器候选查询器**用于交互探索料理与加料；**Python 批量规划器**用于求解每客方案及厨具选择。项目的设计重点是将游玩经验转化为可计算、可解释、可验证的决策模型。网页默认载入作者工作簿整理的游戏数据，可直接搜索博丽灵梦、雾雨魔理沙等 58 位稀客；另附合成数据用于受控案例与回归检查。
 
 [问题定义](#zh-problem) · [设计演进](#zh-evolution) · [数学模型](#zh-model) · [求解方法](#zh-methods) · [系统架构](#zh-architecture) · [实验验证](#zh-evaluation) · [快速开始](#zh-quickstart) · [范围与来源](#zh-scope)
 
@@ -136,7 +136,7 @@ XLSX ──→ prepare_data.py ──→ 标准 JSON ──→ Python 规划器 
 | 交互查询 | [index.html](index.html)、[web/app.js](web/app.js) | 文件读取、参数配置、并行枚举、筛选与导出 |
 | 数据准备 | [tools/prepare_data.py](tools/prepare_data.py) | 工作簿转 JSON、按名称关联商贩均价、生成导入审计 |
 | 规则与规划 | [src/mystia_planner/](src/mystia_planner/) | 数据对象、标签规则、组合搜索、厨具比较与 CLI |
-| 复现与检查 | [data/](data/)、[examples/](examples/)、[tests/](tests/) | 合成输入、案例输出和回归验证 |
+| 数据与验证 | [data/](data/)、[examples/](examples/)、[tests/](tests/) | 游戏数据快照、合成输入、案例输出与回归验证 |
 
 文件在本地处理，无需账户或计算后端。运行单元、组件依赖和数据流的详细视图见[架构说明](docs/architecture.md)。
 
@@ -155,15 +155,40 @@ XLSX ──→ prepare_data.py ──→ 标准 JSON ──→ Python 规划器 
 
 “代表料理总件数”统计每位有解顾客的一份推荐，不乘日订单量。需求增加案例中的负余量使供给压力显式可见；流行案例则检验标签覆盖与流行判断的执行顺序。完整输入、逐客输出与解释见[案例分析](docs/case-study.md)。
 
-![网页使用合成数据查询顾客候选，展示料理、加料、标签分与最终标签](docs/images/demo.jpg)
+[合成案例界面参考](docs/images/demo.jpg)
 
-实现验证包含 **31 项 Python 测试和 11 项网页测试**。Python 测试包含 90 组固定种子小输入，与独立的具体食材穷举结果比较；网页测试执行实际 Worker，覆盖禁忌、停止计算、零阈值和空筛选导出等边界。
+实现验证包含 **31 项 Python 测试和 13 项网页测试**。Python 测试包含 90 组固定种子小输入，与独立的具体食材穷举结果比较；网页测试执行实际 Worker，覆盖禁忌、停止计算、零阈值和空筛选导出，并检查默认游戏数据与合成数据切换。
 
-另以本地真实数据完成了 58 位顾客的默认参数规划与逐条规则复核，作为数据兼容性检查。公开复现以合成数据为准；真实输入未随仓库分发。检查方法与既有结果见[验证记录](docs/verification.md)，持续集成运行见 [GitHub Actions](https://github.com/Mingcode123/Mystia-Menu-Optimizer/actions)。
+游戏数据快照另完成了 58 位稀客的规划：最低分 3、每客日订单量 5、厨具数量 3、无流行条件下，58 位均有方案，选中料理台、油锅和煮锅。[完整 JSON](examples/game-plan.json) 与 [逐客 CSV](examples/game-plan.csv) 随仓库提供，可用相同输入复现。检查方法与结果见[验证记录](docs/verification.md)，持续集成运行见 [GitHub Actions](https://github.com/Mingcode123/Mystia-Menu-Optimizer/actions)。
 
 <a id="zh-quickstart"></a>
 
-## 7. 快速开始与复现
+## 7. 输入、输出与运行
+
+### 程序需要什么文件
+
+**直接使用仓库时，无需另外准备 Excel。** [data/game.json](data/game.json) 是从作者原始工作簿提取的运行数据，含 62 条食材记录、164 条料理记录、58 位稀客和 62 条食材供给记录。网页自动载入其脚本副本；Python 在命令中指定该 JSON 即可。快照保留历史记录口径，不代表游戏最新版本。
+
+| 用途 | 输入 | 输出 |
+| --- | --- | --- |
+| 网页查询候选 | 默认游戏数据；也可导入符合四表结构的 XLSX 或标准数据 JSON | 点击下载生成 `结果_<时间戳>.csv` 或 `.xlsx`，保存当前筛选、排序后的候选；XLSX 只有“结果”工作表 |
+| Python 批量规划 | `--input` 指定标准数据 JSON；Excel 需先转换 | `--output` 指定完整 JSON 报告；显式加 `--csv 路径` 才另存逐客 CSV |
+| Excel 数据转换 | 原始工作簿中的 `食材`、`料理`、`稀客`、`食材merchant_data` 四张表 | 默认生成 `local-data/game-data.json` 与 `local-data/import-report.json` |
+
+网页结果包含售价、得分、料理、厨具、食材件数、基础食材、加料和最终标签。Python JSON 还保留参数、选中厨具、逐客供给余量和无解状态；CSV 是供 Excel 阅读的逐客摘要。**候选表、规划报告和导入审计都是输出，不能重新作为四表源数据导入。** 完整字段与路径规则见[输入输出说明](docs/input-output.md)。
+
+### 原始项目文件各自的用途
+
+| 原始文件 | 角色 | 当前运行是否需要 |
+| --- | --- | --- |
+| `东方夜雀食堂.xlsx` | 游戏源数据，包含程序所需四表 | 自行更新 Excel 数据时使用；仓库已有提取后的 JSON |
+| `ALL利润.xlsx` | 历史利润／价格梯度分析输出 | 不需要 |
+| `料理原始得分表.xlsx` | 基础料理标签的顾客得分明细 | 不需要 |
+| `izakaya自用推荐菜单.xlsx` | 独立的 Excel 推荐与参考分析工具 | 不需要；不符合本程序的四表输入结构 |
+| `稀客料理表/` | 历史逐客规划结果、图标映射及展示文件 | 不需要；当前结果按上述导出入口重新生成 |
+| `INDEX.html` | 历史网页程序入口 | 当前入口为仓库根目录的 [index.html](index.html) |
+
+原工作簿与历史报表保留在本地；仓库发布运行需要的文字、数值快照和可复现结果。标签来源与作者采集的价格、供给记录分别标注，见[数据来源说明](docs/data-provenance.md)。
 
 ### 网页查询
 
@@ -173,18 +198,20 @@ XLSX ──→ prepare_data.py ──→ 标准 JSON ──→ Python 规划器 
 python -m http.server 8000 --bind 127.0.0.1
 ```
 
-访问 <http://127.0.0.1:8000>，合成样例会自动载入。选择顾客并点击“开始计算”，即可查看候选并调整筛选条件。界面、示例标签和详细文档目前使用中文；操作与导出说明见[网页指南](docs/web-guide.md)。
+访问 <http://127.0.0.1:8000>，游戏数据会自动载入。点击稀客选择框，输入“灵梦”等名字搜索并选中角色，再点击“开始计算”。通过现有文件选择器导入 `data/demo.json`，可复现虚构三客的合成案例。界面、数据标签和详细文档目前使用中文；操作与导出说明见[网页指南](docs/web-guide.md)。
+
+请保留整个仓库目录，页面依赖 `web/` 下的脚本、样式、表格库和图片。角色头像与料理图片由 [名称映射](web/icon-map.js) 匹配 [图标目录](web/icons/)，不需要在 Excel 中重新制作；图片仅用于显示，不参与计算。
 
 ### Python 规划
 
 需要 Python 3.10 或更新版本。JSON 规划与合成案例仅使用标准库。
 
 ```sh
-# 重建四组实验结果
+# 重建四组合成案例与真实游戏数据规划结果
 python tools/reproduce_examples.py
 
-# 使用合成数据生成规划报告
-python tools/run_planner.py --input data/demo.json --cookware-count 3 --output outputs/my-plan.json
+# 使用游戏数据生成完整报告和逐客表格
+python tools/run_planner.py --input data/game.json --cookware-count 3 --output outputs/my-plan.json --csv outputs/my-plan.csv
 
 # 查看顾客、流行、厨具、最低分和订单量参数
 python tools/run_planner.py --help
@@ -230,7 +257,7 @@ Node.js 仅用于网页测试；工作簿导入检查需要前述 Python 依赖�
 | 公开版本整理 | 在 AI 协助下完成模块化、合成案例、来源审计、回归检查、已记录修复与文档 |
 | 历史标签来源 | [AnYiEE/touhou-mystia-izakaya-assistant](https://github.com/AnYiEE/touhou-mystia-izakaya-assistant) |
 
-公开包使用合成数据，不附游戏美术、完整游戏数据库或原始聊天。数据字段与期望口径见[数据来源说明](docs/data-provenance.md)，整理变更见 [CHANGELOG](CHANGELOG.md)。SheetJS CE 0.20.3 随附其许可；本项目代码尚未单独选定开源许可证，详见[第三方与许可说明](THIRD_PARTY_NOTICES.md)。本项目是《东方夜雀食堂》的非官方个人工具。
+公开包提供注明来源的游戏数据快照、独立合成测试数据，以及界面使用的 58 张稀客头像和 163 张料理图片；原工作簿、游戏备份和原始聊天保留在本地。标签与图标整理来源为 AnYiEE 的项目，游戏美术归原权利人，作者手工记录的价格与供给另行说明。字段口径见[数据来源说明](docs/data-provenance.md)，整理变更见 [CHANGELOG](CHANGELOG.md)。上游 AGPL-3.0-only 许可文本和 SheetJS 许可随附；本项目代码尚未单独选定开源许可证，具体来源及各部分范围见[第三方与许可说明](THIRD_PARTY_NOTICES.md)。本项目是《东方夜雀食堂》的非官方个人工具。
 
 ---
 
@@ -244,7 +271,7 @@ Node.js 仅用于网页测试；工作簿导入检查需要前述 Python 依赖�
 
 This project addresses a meal preparation problem in *Touhou Mystia's Izakaya*: finding qualifying dishes under available recipes, a five-ingredient limit, and guest preferences, then selecting a plan suited to repeated preparation. It formulates the task as discrete combinatorial optimization, using explicit rules to determine feasibility and ordered objectives to compare alternatives. The output consists of per-guest dish recommendations and a shared cookware set.
 
-The repository provides two local tools: a **browser candidate explorer** for interactive dish and added-ingredient queries, and a **Python batch planner** for selecting guest plans and cookware. The design centers on translating gameplay experience into a computable, explainable, and verifiable decision model. The public version includes synthetic data, controlled parameter comparisons, and automated checks, and can run independently.
+The repository provides two local tools: a **browser candidate explorer** for interactive dish and added-ingredient queries, and a **Python batch planner** for selecting guest plans and cookware. The design centers on translating gameplay experience into a computable, explainable, and verifiable decision model. The browser loads game data prepared from the author's workbook by default, with 58 searchable rare guests including `博丽灵梦` and `雾雨魔理沙`. Synthetic data is also included for controlled cases and regression checks.
 
 [Problem definition](#en-problem) · [Design evolution](#en-evolution) · [Mathematical model](#en-model) · [Solution methods](#en-methods) · [Architecture](#en-architecture) · [Evaluation](#en-evaluation) · [Quick start](#en-quickstart) · [Scope and sources](#en-scope)
 
@@ -372,7 +399,7 @@ XLSX ──→ prepare_data.py ──→ Standard JSON ──→ Python planner 
 | Interactive queries | [index.html](index.html), [web/app.js](web/app.js) | File loading, parameter configuration, parallel enumeration, filtering, and export |
 | Data preparation | [tools/prepare_data.py](tools/prepare_data.py) | Convert workbooks to JSON, associate average purchase prices from merchants by name, and generate an import audit |
 | Rules and planning | [src/mystia_planner/](src/mystia_planner/) | Data objects, tag rules, combinatorial search, cookware comparison, and CLI |
-| Reproduction and checks | [data/](data/), [examples/](examples/), [tests/](tests/) | Synthetic inputs, case outputs, and regression verification |
+| Data and verification | [data/](data/), [examples/](examples/), [tests/](tests/) | Game data snapshot, synthetic inputs, case outputs, and regression verification |
 
 Files are processed locally, with no account or computation backend required. The [architecture notes (Chinese)](docs/architecture.md) provide detailed views of runtime units, component dependencies, and data flow.
 
@@ -391,15 +418,40 @@ The public experiments use **12 ingredients, eight dishes, and three fictional g
 
 “Total units across representative dishes” counts one recommended dish for each guest with a feasible plan, without multiplying by daily order volume. Negative slack in the increased-demand case exposes supply pressure. The trend case tests the order of tag overrides and trend evaluation. Full inputs, per-guest outputs, and explanations are provided in the [case analysis (Chinese)](docs/case-study.md).
 
-![The browser queries guest candidates using synthetic data, showing dishes, added ingredients, tag scores, and final tags](docs/images/demo.jpg)
+[Synthetic case interface reference](docs/images/demo.jpg)
 
-Implementation verification includes **31 Python tests and 11 web tests**. The Python tests compare 90 fixed-seed small inputs against an independent exhaustive search over specific ingredients. The web tests execute the actual Worker and cover edge cases including ingredient restrictions, cancellation, a zero threshold, and export with an empty filtered result.
+Implementation verification includes **31 Python tests and 13 web tests**. The Python tests compare 90 fixed-seed small inputs against an independent exhaustive search over specific ingredients. The web tests execute the actual Worker and cover ingredient restrictions, cancellation, a zero threshold, and export with an empty filtered result. They also check switching between the default game data and synthetic data.
 
-Default-parameter planning and a rule-by-rule review were also completed locally for 58 guests using real game data as a compatibility check. Public reproduction uses synthetic data; the real inputs are not distributed with the repository. See the [verification record (Chinese)](docs/verification.md) for methods and recorded results, and [GitHub Actions](https://github.com/Mingcode123/Mystia-Menu-Optimizer/actions) for continuous integration runs.
+The game data snapshot was also used to plan for 58 rare guests. With a minimum score of 3, five daily orders per guest, three cookware types, and no trends, all 58 guests have a plan; the selected cookware is `料理台`, `油锅`, and `煮锅`. The [complete JSON report](examples/game-plan.json) and [per-guest CSV](examples/game-plan.csv) are included in the repository and can be reproduced from the same input. See the [verification record (Chinese)](docs/verification.md) for methods and results, and [GitHub Actions](https://github.com/Mingcode123/Mystia-Menu-Optimizer/actions) for continuous integration runs.
 
 <a id="en-quickstart"></a>
 
-## 7. Quick start and reproduction
+## 7. Inputs, outputs, and running the tools
+
+### Required input files
+
+**No additional Excel workbook is needed to use the repository.** [data/game.json](data/game.json) contains runtime data extracted from the author's original workbook: 62 ingredient records, 164 dish records, 58 rare guests, and 62 ingredient supply records. The browser automatically loads a script copy of this data; Python uses the JSON file specified in the command. The snapshot retains the historical records and their definitions, and does not represent the latest game version.
+
+| Use | Input | Output |
+| --- | --- | --- |
+| Browser candidate queries | Default game data, or an imported XLSX workbook with the required four sheets or standard data JSON | Download `结果_<时间戳>.csv` or `.xlsx` containing the currently filtered and sorted candidates; XLSX contains only the `结果` sheet |
+| Python batch planning | Standard data JSON specified by `--input`; Excel must be converted first | A complete JSON report at `--output`; a per-guest CSV is saved only when `--csv` is explicitly supplied with an output path |
+| Excel data conversion | The `食材`, `料理`, `稀客`, and `食材merchant_data` sheets in the original workbook | By default, `local-data/game-data.json` and `local-data/import-report.json` |
+
+Browser results contain selling price, score, dish, cookware, ingredient count, base ingredients, additions, and final tags. Python JSON also retains parameters, selected cookware, per-guest supply slack, and no-solution status; CSV is a per-guest summary for viewing in Excel. **Candidate tables, planning reports, and import audits are outputs and cannot be re-imported as four-sheet source data.** See the [input/output guide (Chinese)](docs/input-output.md) for complete fields and path conventions.
+
+### Roles of the original project files
+
+| Original file | Role | Required for current operation? |
+| --- | --- | --- |
+| `东方夜雀食堂.xlsx` | Game source data containing the four required sheets | Used when updating the Excel data yourself; extracted JSON is already included in the repository |
+| `ALL利润.xlsx` | Historical profit and price-tier analysis output | No |
+| `料理原始得分表.xlsx` | Per-guest scores for base-dish tags | No |
+| `izakaya自用推荐菜单.xlsx` | A separate Excel recommendation and reference analysis tool | No; it does not follow this program's four-sheet input structure |
+| `稀客料理表/` | Historical per-guest planning results, icon mappings, and presentation files | No; current results are regenerated through the export options above |
+| `INDEX.html` | Historical web application entry point | The current entry point is [index.html](index.html) at the repository root |
+
+Original workbooks and historical reports remain local. The repository distributes the text and numeric snapshots needed at runtime, along with reproducible results. Tag sources and the author's price and supply records are attributed separately in the [data provenance notes (Chinese)](docs/data-provenance.md).
 
 ### Browser queries
 
@@ -409,18 +461,20 @@ Download the repository, preserve its directory structure, and start a local HTT
 python -m http.server 8000 --bind 127.0.0.1
 ```
 
-Visit <http://127.0.0.1:8000>; the synthetic sample loads automatically. Select a guest and click `开始计算` (start calculation) to view candidates and adjust filters. The interface, sample tags, and detailed documentation currently use Chinese. See the [web guide (Chinese)](docs/web-guide.md) for operation and export instructions.
+Visit <http://127.0.0.1:8000>; the game data loads automatically. Click the rare-guest selector, type a name such as `灵梦`, select the character, and click `开始计算` (start calculation). To reproduce the synthetic cases with three fictional guests, import `data/demo.json` using the page's existing file selector. The interface, data tags, and detailed documentation currently use Chinese. See the [web guide (Chinese)](docs/web-guide.md) for operation and export instructions.
+
+Keep the entire repository directory: the page depends on scripts, styles, the spreadsheet library, and images under `web/`. Guest portraits and dish images are matched through the [name mapping](web/icon-map.js) to files in the [icon directory](web/icons/); they do not need to be recreated in Excel. Images are used only for display and do not affect computation.
 
 ### Python planning
 
 Python 3.10 or later is required. JSON planning and the synthetic cases use only the standard library.
 
 ```sh
-# Rebuild the four experimental results
+# Rebuild the four synthetic cases and the game-data planning results
 python tools/reproduce_examples.py
 
-# Generate a planning report from synthetic data
-python tools/run_planner.py --input data/demo.json --cookware-count 3 --output outputs/my-plan.json
+# Generate a complete report and per-guest table from game data
+python tools/run_planner.py --input data/game.json --cookware-count 3 --output outputs/my-plan.json --csv outputs/my-plan.csv
 
 # View parameters for guests, trends, cookware, minimum score, and order volume
 python tools/run_planner.py --help
@@ -466,4 +520,4 @@ Small-scale exhaustive comparisons support implementation correctness within the
 | Public version preparation | Modularization, synthetic cases, source auditing, regression checks, documented fixes, and documentation were completed with AI assistance |
 | Historical tag source | [AnYiEE/touhou-mystia-izakaya-assistant](https://github.com/AnYiEE/touhou-mystia-izakaya-assistant) |
 
-The public package uses synthetic data and does not include game art, the complete game database, or original chat logs. See the [data provenance notes (Chinese)](docs/data-provenance.md) for fields and expectation definitions, and the [changelog (Chinese)](CHANGELOG.md) for preparation changes. SheetJS CE 0.20.3 is bundled with its license. An open-source license has not yet been selected separately for this project's own code; see the [third-party and licensing notes (Chinese)](THIRD_PARTY_NOTICES.md). This is an unofficial personal tool for *Touhou Mystia's Izakaya*.
+The public package provides an attributed game data snapshot, separate synthetic test data, and 58 rare-guest portraits and 163 dish images used by the interface. Original workbooks, game backups, and original chat logs remain local. The tag and icon collections come from AnYiEE's project; game artwork belongs to its respective rights holders, and the author's manually recorded prices and supply are documented separately. See the [data provenance notes (Chinese)](docs/data-provenance.md) for field definitions, and the [changelog (Chinese)](CHANGELOG.md) for preparation changes. The upstream AGPL-3.0-only license text and the SheetJS license are included. An open-source license has not yet been selected separately for this project's own code; see the [third-party and licensing notes (Chinese)](THIRD_PARTY_NOTICES.md) for specific sources and the scope of each component. This is an unofficial personal tool for *Touhou Mystia's Izakaya*.

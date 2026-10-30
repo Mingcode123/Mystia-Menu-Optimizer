@@ -11,7 +11,8 @@
 <header>
 <h1>夜雀食堂料理规划器</h1>
 <p class="intro">为稀客寻找满足标签条件的加料方案，并比较食材采购可得性。</p>
-<p class="dataSource" id="dataSource" role="status">正在加载合成示例数据…</p>
+<p class="dataSource" id="dataSource" role="status">正在加载游戏数据…</p>
+<p class="small"><a href="./docs/data-provenance.md">数据来源与说明</a></p>
 <details class="modelRules">
 <summary>查看计算规则与范围</summary>
 <p>
@@ -32,10 +33,11 @@
 <span class="pill" id="dataState">未加载数据</span>
 </div>
 <div class="bd">
+<button class="secondary" id="btnLoadGame" type="button">载入游戏数据</button>
 <button class="secondary" id="btnLoadDemo" type="button">载入合成示例</button>
 <label for="fileInput">导入游戏数据（XLSX / JSON）</label>
 <input accept=".xlsx,.json" id="fileInput" type="file"/>
-<p class="small">可导入原东方夜雀食堂 Excel。文件仅在本机处理，公开演示不含游戏美术或游戏数据。</p>
+<p class="small">默认使用作者工作簿的游戏数据快照，可直接选择游戏稀客。合成示例仅用于规则演示与回归案例。也可导入自己的 XLSX / JSON，文件仅在本机处理。</p>
 <!-- Trend first -->
 <div class="row">
 <div>
@@ -221,6 +223,8 @@
 <!-- SheetJS (local) -->
 <script src="./web/vendor/xlsx.full.min.js"></script>
 <script src="./web/demo-data.js"></script>
-<script src="./web/app.js"></script>
+<script src="./web/game-data.js"></script>
+<script src="./web/icon-map.js"></script>
+<script src="./web/app.js?v=game-data-icons-1"></script>
 </body>
 </html>

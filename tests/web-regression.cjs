@@ -9,16 +9,21 @@ const vm = require('node:vm');
 const appPath = path.join(__dirname, '..', 'web', 'app.js');
 const source = fs.readFileSync(appPath, 'utf8');
 new vm.Script(source, { filename: appPath });
+const root = path.join(__dirname, '..');
+const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+const scripts = [...html.matchAll(/<script src="\.\/([^\"]+)"><\/script>/g)].map(match => match[1].split('?')[0]);
 
 function createApp() {
   const elements = new Map();
   function element(id = '') {
     return {
-      id, value: '', checked: false, disabled: false, textContent: '', innerHTML: '',
+      id, value: '', checked: false, disabled: false, textContent: '',
+      get innerHTML() { return this.html || ''; },
+      set innerHTML(value) { this.html = value; this.children = []; },
       style: {}, dataset: {}, handlers: {}, children: [],
       classList: { add() {}, remove() {}, toggle() {}, contains() { return false; } },
       addEventListener(type, fn) { this.handlers[type] = fn; },
-      appendChild(child) { this.children.push(child); },
+      appendChild(child) { this.children.push(...(child.isFragment ? child.children : [child])); },
       setAttribute() {}, getAttribute() { return null; },
       querySelectorAll() { return []; }, contains() { return false; },
       focus() {}, remove() {}, click() { return this.handlers.click?.({ target: this }); },
@@ -29,7 +34,7 @@ function createApp() {
       if (!elements.has(id)) elements.set(id, element(id));
       return elements.get(id);
     },
-    createElement: () => element(), createDocumentFragment: () => element(),
+    createElement: () => element(), createDocumentFragment: () => ({ ...element(), isFragment: true }),
     querySelectorAll: () => [], addEventListener() {}, body: element(),
   };
   const workers = [];
@@ -50,7 +55,12 @@ function createApp() {
     },
   };
   vm.createContext(context);
-  vm.runInContext(source, context, { filename: appPath });
+  for (const script of scripts) {
+    // SheetJS is already supplied through require; run the published local bundles in page order.
+    if (script === 'web/vendor/xlsx.full.min.js') continue;
+    const filename = path.join(root, script);
+    vm.runInContext(fs.readFileSync(filename, 'utf8'), context, { filename });
+  }
   return { context, elements, workers, blobs, document };
 }
 
@@ -77,6 +87,71 @@ function input(overrides = {}) {
     ...overrides,
   };
 }
+
+test('published page defaults to the game snapshot and real guests are selectable', () => {
+  const { context, document } = createApp();
+  assert.ok(scripts.indexOf('web/game-data.js') < scripts.indexOf('web/app.js'));
+  const snapshot = JSON.parse(fs.readFileSync(path.join(root, 'data/game.json'), 'utf8'));
+  assert.deepEqual(JSON.parse(JSON.stringify(context.window.MYSTIA_GAME_DATA)), snapshot);
+  assert.equal(snapshot.metadata.kind, 'game-data');
+  assert.equal(snapshot.sheets['食材'].length, 62);
+  const counts = vm.runInContext('[DATA.ingredients.length, DATA.foods.length, DATA.guests.length]', context);
+  // The existing planner excludes the special ingredient 铃仙 from its candidate pool.
+  assert.deepEqual(Array.from(counts), [61, 164, 58]);
+  assert.equal(document.getElementById('dataState').textContent, '游戏数据');
+  assert.match(document.getElementById('dataSource').textContent, /作者工作簿的数据快照/);
+  assert.equal(document.getElementById('btnRun').disabled, false);
+  assert.equal(document.getElementById('warnBox').style.display, 'none');
+  document.getElementById('guestBtn').click();
+  assert.equal(document.getElementById('guestGrid').children.length, 58);
+  context.renderGuestGrid('博丽灵梦');
+  const guestCard = document.getElementById('guestGrid').children[0];
+  assert.equal(guestCard.children[0].children[0].src, './web/icons/customer_rare/007_博丽灵梦.png');
+  guestCard.click();
+  assert.equal(document.getElementById('guestNameText').textContent, '博丽灵梦');
+  assert.equal(document.getElementById('guestAvatar').children[0].src, './web/icons/customer_rare/007_博丽灵梦.png');
+  context.renderTable([{ '料理': '饭团', '售价': 6, '得分': 0, '总食材数': 1 }]);
+  assert.match(document.getElementById('tbody').children[0].innerHTML, /src="\.\/web\/icons\/recipe\/007_饭团\.png"/);
+  for (const [kind, entries] of Object.entries(context.window.IZAKAYA_ICON_MAP)) {
+    assert.ok(['recipe', 'customer_rare'].includes(kind));
+    for (const relative of Object.values(entries)) {
+      assert.ok(fs.existsSync(path.join(root, 'web', 'icons', relative)), 'missing icon: ' + relative);
+    }
+  }
+});
+
+test('switching between game and synthetic data clears old results and data-specific inputs', () => {
+  const { context, document } = createApp();
+  const demo = JSON.parse(fs.readFileSync(path.join(root, 'data/demo.json'), 'utf8'));
+  assert.deepEqual(JSON.parse(JSON.stringify(context.window.MYSTIA_DEMO_DATA)), demo);
+  const gameNames = vm.runInContext('DATA.guests.map(g => g.name)', context);
+  const seedPreviousState = () => {
+    vm.runInContext('RESULTS = [{"料理":"旧数据"}]; FILTERED = RESULTS; FILTERS.dishSet.add("旧数据");', context);
+    for (const id of ['trendLikeInput', 'trendHateInput', 'excludedTagInput', 'requiredTagInput']) {
+      document.getElementById(id).value = '旧标签';
+    }
+  };
+  const checkClearedState = () => {
+    assert.equal(vm.runInContext('RESULTS.length + FILTERED.length + FILTERS.dishSet.size', context), 0);
+    assert.equal(document.getElementById('btnCSV').disabled, true);
+    for (const id of ['trendLikeInput', 'trendHateInput', 'excludedTagInput', 'requiredTagInput']) {
+      assert.equal(document.getElementById(id).value, '');
+    }
+  };
+  seedPreviousState();
+  document.getElementById('btnLoadDemo').click();
+  assert.equal(document.getElementById('dataState').textContent, '合成示例');
+  assert.match(document.getElementById('dataSource').textContent, /均为虚构/);
+  const demoNames = vm.runInContext('DATA.guests.map(g => g.name)', context);
+  assert.equal(demoNames.length, 3);
+  assert.ok(demoNames.every(name => !gameNames.includes(name)));
+  checkClearedState();
+  seedPreviousState();
+  document.getElementById('btnLoadGame').click();
+  assert.equal(document.getElementById('dataState').textContent, '游戏数据');
+  assert.deepEqual(Array.from(vm.runInContext('DATA.guests.map(g => g.name)', context)), Array.from(gameNames));
+  checkClearedState();
+});
 
 test('forbidden entries exclude ingredient names and ingredient tags', () => {
   const data = input({ ingredients: [
@@ -156,11 +231,15 @@ test('stop immediately terminates all active Workers, resets controls and ignore
   const worker = app.workers[0];
   assert.equal(worker.sent.payload.options.minScore, 0);
   assert.equal(app.document.getElementById('fileInput').disabled, true);
+  assert.equal(app.document.getElementById('btnLoadGame').disabled, true);
+  assert.equal(app.document.getElementById('btnLoadDemo').disabled, true);
   app.document.getElementById('btnStop').click();
   assert.ok(app.workers.every(w => w.terminated));
   assert.equal(app.document.getElementById('btnRun').disabled, false);
   assert.equal(app.document.getElementById('btnStop').disabled, true);
   assert.equal(app.document.getElementById('fileInput').disabled, false);
+  assert.equal(app.document.getElementById('btnLoadGame').disabled, false);
+  assert.equal(app.document.getElementById('btnLoadDemo').disabled, false);
   const status = app.document.getElementById('statusText').textContent;
   assert.match(status, /已停止/);
   worker.onmessage({ data: { type: 'DONE', wid: 0 } });
