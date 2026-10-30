@@ -8,7 +8,7 @@
 
 本项目源于《东方夜雀食堂》的实际备菜需求：在配方、五格食材限制和顾客偏好下寻找料理，再比较重复制作时的用量、供给压力与厨具条件。项目保留原网页查询程序和不同阶段的 Python 脚本，以 Excel 为输入，提供交互查询、逐客规划及历史价格分析。
 
-网页使用原版布局、按钮、文字和计算逻辑，默认读取根目录的 [东方夜雀食堂.xlsx](东方夜雀食堂.xlsx)。[Python/](Python/) 保留原始脚本与各自的目标和输出格式；其中 `singlePLAN_cover3_mixIng_nCookware.py` 实现覆盖封顶、每客单方案与厨具数量选择。公开工作簿是运行数据快照，保留原程序读取的缓存值；来源和处理范围见[数据说明](docs/data-provenance.md)。
+网页使用原版布局、按钮、文字和计算逻辑，默认读取根目录的 [东方夜雀食堂.xlsx](东方夜雀食堂.xlsx)。[Python/](Python/) 保留原始脚本与各自的目标和输出格式；其中 `singlePLAN_cover3_mixIng_nCookware.py` 实现覆盖封顶、每客单方案与厨具数量选择。公开工作簿直接复制作者原文件，完整保留公式、已保存的计算结果和原有内容；来源与文件一致性见[数据说明](docs/data-provenance.md)。
 
 [问题](#zh-problem) · [目标演进](#zh-evolution) · [数学模型](#zh-model) · [CPU 实现](#zh-methods) · [运行与输出](#zh-running) · [已知限制](#zh-limits) · [验证](#zh-verification) · [贡献与来源](#zh-sources)
 
@@ -105,7 +105,7 @@ R(p)=\min_{i:c_i(p)>0}\left(q_i-Kc_i(p)\right)
 python -m pip install -r requirements.txt
 ```
 
-根目录工作簿包含 `稀客`、`普客`、`料理`、`食材`、`酒水`、`食材merchant_data`、`酒水merchant_data` 七张运行所需表。它是原记录缓存值的副本，不包含公式、内嵌图片、图像映射表和私人路径，也没有修正采购价或改写 `Owned`。详情及来源哈希见[工作簿说明](docs/data-provenance.md)和[快照审计](data/workbook-provenance.json)。
+根目录工作簿为作者完整原文件，共 13 张表，其中 `稀客`、`普客`、`料理`、`食材`、`酒水`、`食材merchant_data`、`酒水merchant_data` 是程序使用的七张输入表；另有五张图像映射表和 `Sheet1`。原公式、缓存值、格式、图片和 Icon 字段均保留，采购价与 `Owned` 未改写。程序读取已保存的单元格结果，不负责重算 Excel 公式；修改公式或其输入后，应先在支持这些公式的表格软件中重算并保存。详情及原件哈希见[工作簿说明](docs/data-provenance.md)和[文件一致性审计](data/workbook-provenance.json)。
 
 ### 网页
 
@@ -143,7 +143,7 @@ python Python/singlePLAN_cover3_mixIng_nCookware.py --help
 - 网页输入阈值 `0` 会回退为 `3`；零售价会派生“实惠”。“停止”发送消息，忙碌的同步 Worker 不保证立即响应。
 - 网页筛选为空时，导出会回退到全部结果；重复等价加料的 Top-N 权重仍按原组大小连乘方式处理。
 - Python 等价代表偏好原始日供给较高的食材，未完整优化结合基础耗用后的组内分配；中性补位候选存在前三项截断。
-- 历史采购价缓存含按行关联的错位风险。快照保留这些输入值，利润分析结果需要结合数据来源理解。
+- 历史采购价公式含按行关联的错位风险。原工作簿保留这些公式及缓存值，利润分析结果需要结合数据来源理解。
 
 模型中的供给余量可以为负，不保证整晚可供给。PLAN 系列没有联合优化共享库存、酒水搭配、完整满意度或现金利润；预算用于展示。独立利润脚本提供历史价格分析，不能替代完整经营模型。
 
@@ -151,7 +151,7 @@ python Python/singlePLAN_cover3_mixIng_nCookware.py --help
 
 ## 7. 验证与复现范围
 
-原版一致性需要分别核对源代码、输入和输出：Python 文件与基准脚本比较；发布 `index.html` 与原 `INDEX.html` 完整文件比较；工作簿核对各脚本读取的缓存值；同条件运行比较交互、候选及 Excel 单元格和版式。
+原版一致性需要分别核对源代码、输入和输出：Python 文件与基准脚本比较；发布 `index.html` 与原 `INDEX.html` 完整文件比较；发布工作簿与原 XLSX 比较整个文件的 SHA-256；同条件运行比较交互、候选及 Excel 单元格和版式。
 
 具体完成项与尚未覆盖项统一记录在[验证记录](docs/verification.md)。完整游戏条件、所有浏览器、任意数据规模和全局最优性均不由一次成功运行推出。不同 PLAN 脚本的目标不同，跨分支结果变化应结合对应模型解释。
 
@@ -164,10 +164,10 @@ python Python/singlePLAN_cover3_mixIng_nCookware.py --help
 | 需求与模型 | 作者定义游玩问题、规则语义、目标顺序、筛选与厨具条件，并以角色案例检查结果 |
 | 经验数据 | 作者手工记录价格、日供给和委托相关数据，整理经验期望 |
 | 求解实现 | 大量代码、算法推导和部分调试使用 AI 辅助；作者提出效率与一致性要求并核验方案 |
-| 发布整理 | 选取原程序、制作运行数据快照、保留原资源目录、补充来源及输入输出说明 |
+| 发布整理 | 选取原程序、直接复制完整原工作簿、保留原资源目录、补充来源及输入输出说明 |
 | 标签与图标 | 标签和图标整理来源为 [AnYiEE 的项目](https://github.com/AnYiEE/touhou-mystia-izakaya-assistant)，游戏美术归原权利人 |
 
-公开包附运行数据快照、58 张稀客头像和 163 张料理图片；原工作簿、完整游戏资料、备份和原始聊天不随包分发。原始采样次数与日期未完整留存，不把经验值视为确定游戏常数。SheetJS 与上游许可分别随附；本项目代码尚未单独选定开源许可证，见[第三方与许可说明](THIRD_PARTY_NOTICES.md)。这是非官方个人工具。
+公开包附完整原工作簿、58 张稀客头像和 163 张料理图片；完整游戏资料、备份和原始聊天不随包分发。原始采样次数与日期未完整留存，不把经验值视为确定游戏常数。SheetJS 与上游许可分别随附；本项目代码尚未单独选定开源许可证，见[第三方与许可说明](THIRD_PARTY_NOTICES.md)。这是非官方个人工具。
 
 ---
 
@@ -181,7 +181,7 @@ python Python/singlePLAN_cover3_mixIng_nCookware.py --help
 
 This project grew out of meal preparation in *Touhou Mystia's Izakaya*: finding dishes under recipe rules, a five-ingredient limit, and guest preferences, then comparing ingredient use, supply pressure, and cookware requirements for repeated preparation. It retains the original browser query program and Python scripts from different development stages, using Excel for interactive queries, per-guest planning, and historical price analysis.
 
-The browser retains the original layout, controls, wording, and computation, and loads [东方夜雀食堂.xlsx](东方夜雀食堂.xlsx) from the repository root. [Python/](Python/) preserves the original scripts with their respective objectives and output formats. `singlePLAN_cover3_mixIng_nCookware.py` combines capped coverage, one plan per guest, and cookware-count selection. The public workbook is a runtime snapshot of the cached values read by the original programs; its sources and scope are described in the [data notes (Chinese)](docs/data-provenance.md).
+The browser retains the original layout, controls, wording, and computation, and loads [东方夜雀食堂.xlsx](东方夜雀食堂.xlsx) from the repository root. [Python/](Python/) preserves the original scripts with their respective objectives and output formats. `singlePLAN_cover3_mixIng_nCookware.py` combines capped coverage, one plan per guest, and cookware-count selection. The public workbook is a direct copy of the author's original file, preserving its formulas, saved calculation results, and existing contents. Sources and file identity are described in the [data notes (Chinese)](docs/data-provenance.md).
 
 [Problem](#en-problem) · [Objective evolution](#en-evolution) · [Mathematical model](#en-model) · [CPU implementation](#en-methods) · [Running and outputs](#en-running) · [Known limitations](#en-limits) · [Verification](#en-verification) · [Contributions and sources](#en-sources)
 
@@ -278,7 +278,7 @@ Run commands from the repository root. Installing the complete Python dependenci
 python -m pip install -r requirements.txt
 ```
 
-The root workbook contains seven sheets used by the programs: `稀客`, `普客`, `料理`, `食材`, `酒水`, `食材merchant_data`, and `酒水merchant_data`. It is a snapshot of original cached values, without formulas, embedded images, image-mapping sheets, or private paths. Purchase prices are not corrected and `Owned` is not rewritten. See the [workbook notes (Chinese)](docs/data-provenance.md) and [snapshot audit](data/workbook-provenance.json) for scope and source hashes.
+The root workbook is the author's complete original file with 13 sheets. The programs use seven input sheets: `稀客`, `普客`, `料理`, `食材`, `酒水`, `食材merchant_data`, and `酒水merchant_data`; the file also retains five image-mapping sheets and `Sheet1`. Original formulas, cached values, formatting, images, and Icon fields are preserved. Purchase prices and `Owned` are unchanged. The programs read saved cell results and do not recalculate Excel formulas. After changing formulas or their inputs, recalculate and save in spreadsheet software that supports those formulas. See the [workbook notes (Chinese)](docs/data-provenance.md) and [file-identity audit](data/workbook-provenance.json) for details and original-file hashes.
 
 ### Browser
 
@@ -316,7 +316,7 @@ This version retains the original behavior, including these identified boundarie
 - A browser threshold of `0` falls back to `3`; a zero selling price receives `实惠`. Stop sends a message that a busy synchronous Worker may not process immediately.
 - Export with an empty browser filter falls back to all results. Top-N weighting for repeated equivalent additions retains the original product-of-group-sizes calculation.
 - Python favors equivalent representatives with higher raw daily supply without fully optimizing allocation after base-recipe consumption. Neutral filler candidates are limited to the top three.
-- Historical purchase-price caches carry a risk of row-based association errors. The snapshot preserves those values, so profit analysis must be interpreted with its data provenance.
+- Historical purchase-price formulas carry a risk of row-based association errors. The original workbook preserves those formulas and cached values, so profit analysis must be interpreted with its data provenance.
 
 Supply slack may be negative and does not guarantee sufficient stock for an evening. The PLAN scripts do not jointly optimize shared inventory, drink pairing, full satisfaction, or cash profit; budget is displayed only. Separate profit scripts provide historical price analysis rather than a complete operating model.
 
@@ -324,7 +324,7 @@ Supply slack may be negative and does not guarantee sufficient stock for an even
 
 ## 7. Verification and reproduction scope
 
-Original-version fidelity requires separate checks of source, inputs, and outputs: compare Python files against the reference scripts; compare the complete published `index.html` with the original `INDEX.html`; compare cached workbook values read by each script; and run matching conditions to compare interaction, candidates, Excel cells, and formatting.
+Original-version fidelity requires separate checks of source, inputs, and outputs: compare Python files against the reference scripts; compare the complete published `index.html` with the original `INDEX.html`; compare the published workbook's whole-file SHA-256 with the original XLSX; and run matching conditions to compare interaction, candidates, Excel cells, and formatting.
 
 Completed and outstanding checks are recorded in the [verification notes (Chinese)](docs/verification.md). One successful run does not establish correctness across all game conditions, browsers, data sizes, or global optima. PLAN branches have different objectives, so differences between their outputs must be interpreted against their respective models.
 
@@ -337,7 +337,7 @@ Completed and outstanding checks are recorded in the [verification notes (Chines
 | Requirements and models | The author defined gameplay problems, rule semantics, objective order, filters, and cookware conditions, and checked results through character cases |
 | Empirical data | The author manually recorded prices, daily supply, and commission-related data and compiled empirical expectations |
 | Solver implementation | Much of the code, algorithm derivation, and some debugging were AI-assisted; the author set efficiency and consistency requirements and checked solutions |
-| Publication preparation | Selection of original programs, a runtime data snapshot, preservation of the original resource directories, and source and input/output documentation |
+| Publication preparation | Selection of original programs, a direct copy of the complete original workbook, preservation of the original resource directories, and source and input/output documentation |
 | Tags and icons | Tag and icon collections come from [AnYiEE's project](https://github.com/AnYiEE/touhou-mystia-izakaya-assistant); game artwork belongs to its original rights holders |
 
-The package includes the runtime data snapshot, 58 rare-guest portraits, and 163 dish images. It does not distribute the original workbook, complete game materials, backups, or original chats. Original sampling counts and dates are incomplete, so empirical values are not treated as fixed game constants. SheetJS and upstream licenses are included separately. No separate open-source license has been selected for this project's own code; see the [third-party and licensing notes (Chinese)](THIRD_PARTY_NOTICES.md). This is an unofficial personal tool.
+The package includes the complete original workbook, 58 rare-guest portraits, and 163 dish images. It does not distribute complete game materials, backups, or original chats. Original sampling counts and dates are incomplete, so empirical values are not treated as fixed game constants. SheetJS and upstream licenses are included separately. No separate open-source license has been selected for this project's own code; see the [third-party and licensing notes (Chinese)](THIRD_PARTY_NOTICES.md). This is an unofficial personal tool.

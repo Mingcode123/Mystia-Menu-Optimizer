@@ -2,88 +2,88 @@
   "source_file": "东方夜雀食堂.xlsx",
   "source_sha256": "5c1a1ef52ce6594a2ca6cc90c8e10aff2d4dd40ac32928789dee9ea9a027a16f",
   "distributed_file": "东方夜雀食堂.xlsx",
-  "distributed_sha256": "be47d1363b9a2a3e06144f790ac75c10af694302395ae4b9494cbcbf5d6c177e",
+  "distributed_sha256": "5c1a1ef52ce6594a2ca6cc90c8e10aff2d4dd40ac32928789dee9ea9a027a16f",
+  "copy_mode": "byte-for-byte original workbook",
+  "bytes": 1267399,
+  "worksheet_count": 13,
   "worksheets": [
     {
+      "sheet": "Sheet1",
+      "dimension": "A1:B3",
+      "formula_cell_count": 0
+    },
+    {
       "sheet": "稀客",
-      "records": 58,
-      "columns": 8
+      "dimension": "A1:H59",
+      "formula_cell_count": 58
     },
     {
       "sheet": "普客",
-      "records": 47,
-      "columns": 6
+      "dimension": "A1:F48",
+      "formula_cell_count": 47
     },
     {
       "sheet": "料理",
-      "records": 164,
-      "columns": 8
+      "dimension": "A1:H165",
+      "formula_cell_count": 164
     },
     {
       "sheet": "食材",
-      "records": 62,
-      "columns": 7
+      "dimension": "A1:G63",
+      "formula_cell_count": 124
     },
     {
       "sheet": "酒水",
-      "records": 46,
-      "columns": 5
+      "dimension": "A1:E47",
+      "formula_cell_count": 92
     },
     {
       "sheet": "食材merchant_data",
-      "records": 62,
-      "columns": 16
+      "dimension": "A1:P63",
+      "formula_cell_count": 183
     },
     {
       "sheet": "酒水merchant_data",
-      "records": 46,
-      "columns": 14
+      "dimension": "A1:N47",
+      "formula_cell_count": 138
+    },
+    {
+      "sheet": "customer_rare_map",
+      "dimension": "A1:F59",
+      "formula_cell_count": 0
+    },
+    {
+      "sheet": "recipe_map",
+      "dimension": "A1:F164",
+      "formula_cell_count": 0
+    },
+    {
+      "sheet": "customer_normal_map",
+      "dimension": "A1:F48",
+      "formula_cell_count": 0
+    },
+    {
+      "sheet": "ingredient_map",
+      "dimension": "A1:F62",
+      "formula_cell_count": 0
+    },
+    {
+      "sheet": "beverage_map",
+      "dimension": "A1:F47",
+      "formula_cell_count": 0
     }
   ],
-  "scope": "Seven program-input worksheets, original sheet order, headers, rows, and cached values; Icon cells blanked. No price corrections, Owned changes, or recipe filtering.",
-  "omitted": [
-    "Sheet1 notes",
-    "five *_map worksheets",
-    "embedded images",
-    "image URLs and private file paths",
-    "source workbook metadata",
-    "source formulas (their saved values are retained)"
+  "transformations": [],
+  "preserved": [
+    "All worksheets in original order",
+    "Formula expressions and saved cached values",
+    "Original formatting, images, Icon fields and mapping sheets",
+    "Notes, local path text and workbook metadata"
   ],
+  "scope": "The complete author-supplied workbook is copied unchanged. It is not opened and saved, recalculated, cleaned, or converted to values for publication.",
+  "read_behavior": "The original programs read saved cell values. After editing formula inputs, recalculate and save the workbook in compatible spreadsheet software before running the programs.",
   "comparison": {
-    "cells_checked": 4422,
-    "non_icon_values_preserved": true,
-    "errors": [],
-    "non_icon_excel_errors_preserved": [
-      {
-        "sheet": "食材",
-        "cell": "F44",
-        "error": "#DIV/0!"
-      },
-      {
-        "sheet": "食材",
-        "cell": "F47",
-        "error": "#DIV/0!"
-      },
-      {
-        "sheet": "食材",
-        "cell": "F57",
-        "error": "#DIV/0!"
-      },
-      {
-        "sheet": "食材merchant_data",
-        "cell": "P61",
-        "error": "#DIV/0!"
-      },
-      {
-        "sheet": "食材merchant_data",
-        "cell": "P62",
-        "error": "#DIV/0!"
-      },
-      {
-        "sheet": "食材merchant_data",
-        "cell": "P63",
-        "error": "#DIV/0!"
-      }
-    ]
+    "whole_file_sha256_equal": true,
+    "source_bytes_equal_distributed_bytes": true
   }
 }

@@ -2,7 +2,7 @@
 
 ## 1. 运行数据与目录
 
-网页与原 Python 程序使用根目录的 [东方夜雀食堂.xlsx](../东方夜雀食堂.xlsx)。发布文件是运行数据快照，含 `稀客`、`普客`、`料理`、`食材`、`酒水`、`食材merchant_data`、`酒水merchant_data` 七表；保留原程序读取的缓存值，不复制公式、图像映射表、笔记、内嵌图片或私人路径。各脚本按自己的原规则选择和解释数据。制作范围见[数据来源](data-provenance.md)及[快照审计](../data/workbook-provenance.json)。
+网页与原 Python 程序使用根目录的 [东方夜雀食堂.xlsx](../东方夜雀食堂.xlsx)。发布文件直接复制完整原件，含 13 张表；其中 `稀客`、`普客`、`料理`、`食材`、`酒水`、`食材merchant_data`、`酒水merchant_data` 是程序使用的七张输入表，五张图像映射表和 `Sheet1` 也完整保留。原公式、缓存值、格式、图片和 Icon 字段均未清洗。各脚本按自己的原规则选择和解释数据。来源与文件一致性见[数据来源](data-provenance.md)及[原件审计](../data/workbook-provenance.json)。
 
 保留整个仓库目录：`index.html` 内嵌原样式和脚本，并读取 `HTML/xlsx.full.min.js`、`HTML/icon_map.js` 和 `HTML/izakaya_icons_pack/` 下的图片。图像按名称映射到原相对路径资源，不来自运行工作簿的内嵌图片。
 
@@ -35,7 +35,7 @@ python -m http.server 8000 --bind 127.0.0.1
 | `稀客` | `Name`、`Type`、`Preferred Tags`、`Disliked Tags` |
 | `食材merchant_data` | `Name`、`Total Daily Quantity` |
 
-网页稀客筛选要求 `Type` 为 `rare` 或 `稀客`；保留原有字段别名与列表解析。食材中的“黑暗物质”“铃仙”和料理中的“黑暗物质”按原规则排除。网页不按 Python 的 `Owned` 规则筛料理。自有文件应以运行快照和所选脚本为结构参考。
+网页稀客筛选要求 `Type` 为 `rare` 或 `稀客`；保留原有字段别名与列表解析。食材中的“黑暗物质”“铃仙”和料理中的“黑暗物质”按原规则排除。网页不按 Python 的 `Owned` 规则筛料理。自有文件应以原工作簿和所选脚本为结构参考。
 
 导出文件名为 `结果_<时间戳>.csv` 或 `结果_<时间戳>.xlsx`。XLSX 只有 `结果` 工作表，两种输出的列顺序相同：
 
@@ -117,6 +117,6 @@ python Python/singlePLAN_cover3_mixIng_nCookware.py --help
 
 ## 5. 工作簿与图片的关系
 
-网页使用 58 张稀客头像和 163 张料理图片，按 [HTML/icon_map.js](../HTML/icon_map.js) 映射到 [HTML/izakaya_icons_pack/](../HTML/izakaya_icons_pack/)；缺图行为沿用原程序。工作簿中的 Icon 列在公开快照中清空，原图像映射表不随快照发布。原 Python 输出仍保留空 Icon 列；如需历史带图版式，它属于独立的后处理，不是该规划入口自动输出的内容。
+网页使用 58 张稀客头像和 163 张料理图片，按 [HTML/icon_map.js](../HTML/icon_map.js) 映射到 [HTML/izakaya_icons_pack/](../HTML/izakaya_icons_pack/)；缺图行为沿用原程序。原工作簿中的 Icon 字段、图像映射表和图片也完整保留，但网页显示仍使用独立资源目录。原 Python 输出仍保留空 Icon 列；如需历史带图版式，它属于独立的后处理，不是该规划入口自动输出的内容。
 
-公开审计 [workbook-provenance.json](../data/workbook-provenance.json) 记录数据快照的来源与制作范围，它不是规划输入。修改自有 XLSX 后，程序直接读取所保存的单元格值；涉及公式时，应先在电子表格软件中计算并保存缓存。
+公开审计 [workbook-provenance.json](../data/workbook-provenance.json) 记录原文件来源及原件与发布副本的哈希一致性，它不是规划输入。程序读取已保存的单元格结果，不重算 Excel 公式。修改公式或其输入后，应先在支持这些公式的电子表格软件中重算并保存。去除公式后，原先依赖这些公式的计算不会再随输入更新，因此发布版直接保留完整原文件。
