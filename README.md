@@ -6,6 +6,12 @@
 
 **中文** | [English](#english)
 
+《东方夜雀食堂》是一款餐馆经营游戏，玩家需要为不同顾客制作料理。游戏以**标签**描述食物的离散属性，例如“肉”“素”“清淡”“昂贵”，分别涉及食材类别、口味或价格特征；同一份料理可以同时具有多个标签。稀客具有各自的喜好标签与厌恶标签，将料理的最终标签与这些偏好匹配，是本项目评价料理适配性的基础。
+
+在本项目中，料理的最终标签以工作簿记录的**料理固有标签**为起点，再合并厨具标签、售价派生的“实惠”或“昂贵”标签，以及**追加食材自身携带的标签**。基础配方中的食材计入制作所需的用量和格数，但其标签不再次叠加；额外加料则可以改变料理的标签集合。通过加料将总用料补至五件时，还会生成“大份”标签。同名标签只计一次，重复加入同一种食材不会重复增加该标签的命中数。
+
+标签合并后还需处理覆盖关系与流行条件。例如，追加食材引入“肉”标签时，会移除原有的“素”标签；加料因此既可能增加喜好命中，也可能使料理失去已有喜好标签或触发厌恶。流行标签则由覆盖处理后的标签是否命中指定流行条件决定。选择基础料理与追加食材，因而需要同时考虑标签变化、制作限制和食材消耗。
+
 《东方夜雀食堂》的备菜过程涉及顾客需求、料理配方、食材取得条件与厨具配置。面对同一位顾客，多个料理与加料组合可能同时达标，但在食材用量和持续制作时的供给压力上存在差异。本项目从这一选择问题出发，将游戏中的制作规则表述为可行性条件，将顾客偏好与资源取舍表述为可比较的数学指标。
 
 系统以 Excel 工作簿为输入，提供浏览器候选查询、Python 逐客规划，以及独立的得分与价格分析工具。第一章以 `singlePLAN_cover3_mixIng_nCookware.py`（简称 `nCookware`）为主要对象，依次说明问题抽象、变量、约束与目标函数；历史模型及其他入口的评价差异分别注明。
@@ -267,6 +273,12 @@ python Python/singlePLAN_cover3_mixIng_nCookware.py --help
 **Recipe planning under guest preferences, ingredient supply, and cookware constraints**
 
 [中文](#chinese) | **English**
+
+*Touhou Mystia's Izakaya* is a restaurant-management game in which players prepare dishes for different guests. **Tags** describe discrete food attributes, such as “肉” (meat), “素” (vegetarian), “清淡” (light), and “昂贵” (expensive), representing ingredient categories, flavor, or price characteristics. A dish can carry several tags simultaneously. Rare guests have individual liked-tag and disliked-tag sets; matching a dish's final tags against these preferences forms the basis of this project's evaluation of guest suitability.
+
+In this project, the final tag set starts with the **dish's inherent tags** recorded in the workbook, then incorporates cookware tags, the price-derived “实惠” (affordable) or “昂贵” (expensive) tag, and **tags carried by additional ingredients**. Base-recipe ingredients count toward quantities and occupied slots, but their tags are not added again; additional ingredients can change the dish's tag set. Filling the total ingredient count to five through additions also generates “大份” (large portion). Each distinct tag counts once, so adding the same ingredient repeatedly does not produce repeated matches for that tag.
+
+The combined tags then undergo override and trend processing. For example, introducing “肉” through an additional ingredient removes an existing “素” tag. An addition may therefore increase liked-tag matches, remove an existing liked tag, or trigger a dislike. Trend tags depend on whether the tags remaining after overrides match the specified trend conditions. Selecting a base dish and its additions consequently requires considering tag changes, preparation constraints, and ingredient consumption together.
 
 Meal preparation in *Touhou Mystia's Izakaya* involves guest requirements, recipes, ingredient availability, and cookware configuration. Several dish-and-addition combinations may qualify for the same guest while differing in ingredient use and supply pressure under repeated preparation. This project formalizes that selection problem by expressing preparation rules as feasibility conditions and guest preferences and resource tradeoffs as comparable mathematical criteria.
 
