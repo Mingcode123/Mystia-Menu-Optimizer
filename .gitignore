@@ -14,6 +14,7 @@ Thumbs.db
 local-data/
 outputs/
 *.xlsx
+!/东方夜雀食堂.xlsx
 *.xls
 *.docx
 *.zip

@@ -1,0 +1,89 @@
+{
+  "source_file": "东方夜雀食堂.xlsx",
+  "source_sha256": "5c1a1ef52ce6594a2ca6cc90c8e10aff2d4dd40ac32928789dee9ea9a027a16f",
+  "distributed_file": "东方夜雀食堂.xlsx",
+  "distributed_sha256": "be47d1363b9a2a3e06144f790ac75c10af694302395ae4b9494cbcbf5d6c177e",
+  "worksheets": [
+    {
+      "sheet": "稀客",
+      "records": 58,
+      "columns": 8
+    },
+    {
+      "sheet": "普客",
+      "records": 47,
+      "columns": 6
+    },
+    {
+      "sheet": "料理",
+      "records": 164,
+      "columns": 8
+    },
+    {
+      "sheet": "食材",
+      "records": 62,
+      "columns": 7
+    },
+    {
+      "sheet": "酒水",
+      "records": 46,
+      "columns": 5
+    },
+    {
+      "sheet": "食材merchant_data",
+      "records": 62,
+      "columns": 16
+    },
+    {
+      "sheet": "酒水merchant_data",
+      "records": 46,
+      "columns": 14
+    }
+  ],
+  "scope": "Seven program-input worksheets, original sheet order, headers, rows, and cached values; Icon cells blanked. No price corrections, Owned changes, or recipe filtering.",
+  "omitted": [
+    "Sheet1 notes",
+    "five *_map worksheets",
+    "embedded images",
+    "image URLs and private file paths",
+    "source workbook metadata",
+    "source formulas (their saved values are retained)"
+  ],
+  "comparison": {
+    "cells_checked": 4422,
+    "non_icon_values_preserved": true,
+    "errors": [],
+    "non_icon_excel_errors_preserved": [
+      {
+        "sheet": "食材",
+        "cell": "F44",
+        "error": "#DIV/0!"
+      },
+      {
+        "sheet": "食材",
+        "cell": "F47",
+        "error": "#DIV/0!"
+      },
+      {
+        "sheet": "食材",
+        "cell": "F57",
+        "error": "#DIV/0!"
+      },
+      {
+        "sheet": "食材merchant_data",
+        "cell": "P61",
+        "error": "#DIV/0!"
+      },
+      {
+        "sheet": "食材merchant_data",
+        "cell": "P62",
+        "error": "#DIV/0!"
+      },
+      {
+        "sheet": "食材merchant_data",
+        "cell": "P63",
+        "error": "#DIV/0!"
+      }
+    ]
+  }
+}

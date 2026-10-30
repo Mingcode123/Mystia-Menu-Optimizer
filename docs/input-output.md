@@ -1,151 +1,122 @@
 # 输入、输出与文件角色
 
-## 默认数据与运行方式
+## 1. 运行数据与目录
 
-网页打开后自动载入 [`data/game.json`](../data/game.json) 对应的游戏数据快照：62 条食材记录、164 条料理记录、58 位稀客。网页排除食材表中的非食材记录“铃仙”，使用 61 种食材；一条无具体配方的特殊料理在 Python 中禁用，163 条料理可参与规划。数据来自作者历史工作簿，不代表游戏最新版本或完整覆盖率。
+网页与原 Python 程序使用根目录的 [东方夜雀食堂.xlsx](../东方夜雀食堂.xlsx)。发布文件是运行数据快照，含 `稀客`、`普客`、`料理`、`食材`、`酒水`、`食材merchant_data`、`酒水merchant_data` 七表；保留原程序读取的缓存值，不复制公式、图像映射表、笔记、内嵌图片或私人路径。各脚本按自己的原规则选择和解释数据。制作范围见[数据来源](data-provenance.md)及[快照审计](../data/workbook-provenance.json)。
 
-合成数据 [`data/demo.json`](../data/demo.json) 保留用于规则演示、回归测试和参数对照案例。`tools/reproduce_examples.py` 使用它重建四组合成案例，并使用 `data/game.json` 重建游戏数据规划结果。
+保留整个仓库目录：`index.html` 内嵌原样式和脚本，并读取 `HTML/xlsx.full.min.js`、`HTML/icon_map.js` 和 `HTML/izakaya_icons_pack/` 下的图片。图像按名称映射到原相对路径资源，不来自运行工作簿的内嵌图片。
 
-发布包包含标准数据 JSON、对应的 `web/game-data.js` 与 `web/demo-data.js` 浏览器载入文件，以及显示用的 `web/icon-map.js` 和 `web/icons/` 图片；原始 Excel 不随包发布。修改 JSON 后运行 `python tools/sync_demo.py` 同步两个浏览器数据文件。数据来源与归一化说明见[数据来源文档](data-provenance.md)。
+| 入口 | 输入 | 输出 |
+| --- | --- | --- |
+| 根目录 `index.html` | 自动请求同目录 `东方夜雀食堂.xlsx`；文件选择器接受 XLSX | 候选 CSV 或只有 `结果` 表的 XLSX |
+| `Python/*PLAN*.py` | 直接读取 XLSX；主规划分支支持原有 `--input` | 按分支自动命名的规划 XLSX |
+| `Python/base_score.py` | 根工作簿的稀客与料理表 | 根目录 `料理原始得分表.xlsx` |
+| `Python/Export_Profit.py` | 根工作簿的价格与经营数据 | 根目录 `ALL利润.xlsx` |
+| `Python/Classes/夜雀食堂料理推荐.py` | 根工作簿的普客、稀客、料理、酒水、食材表 | 原交互菜单的查询与分析显示 |
 
-运行网页时应保留整个仓库目录结构，不要只复制 `index.html`。入口依赖 `web/` 下的脚本、样式、SheetJS、数据载入文件、图标映射和图片，图片路径也相对这套目录解析。
+候选表、`Plans` 和利润／得分表都是分析结果，不包含完整源表结构，不能用它们替换根工作簿。当前原程序没有 JSON 数据导入、JSON 规划报告或独立的 XLSX→JSON 转换步骤。
 
-稀客头像和料理图标按名称查询 `web/icon-map.js`，再读取 `web/icons/` 中的图片，不是由导入的 Excel 生成。当前映射包含 58 位稀客与 163 道料理的 221 张 PNG；稀客无匹配头像或图片加载失败时，以名字首字占位。图像只用于显示，不参与标签计算、供给比较或方案选择。素材说明见[第三方来源与许可](../THIRD_PARTY_NOTICES.md)。
+## 2. 网页输入与导出
 
-Python 没有隐含的默认输入或输出路径。使用游戏快照时，从仓库根目录运行：
+从仓库根目录启动本地静态服务：
 
 ```sh
-python tools/run_planner.py --input data/game.json --cookware-count 3 --output outputs/game-plan.json --csv outputs/game-plan.csv
+python -m http.server 8000 --bind 127.0.0.1
 ```
 
-这里的 `game-plan.json` 和 `game-plan.csv` 是命令指定的名称，不是程序自动生成的固定名称。合成数据规划可将 `--input` 改为 `data/demo.json`。
+访问 <http://127.0.0.1:8000>。页面自动请求 `./东方夜雀食堂.xlsx`；默认读取失败时，可用原文件选择器选取 XLSX。HTTP 服务只提供静态文件，计算在浏览器 CPU 中执行。
 
-## 三个入口的输入与输出
+网页主要读取四表：
 
-| 入口 | 接受的输入 | 输出 |
-| --- | --- | --- |
-| 网页 `index.html` | 内置游戏/合成数据，或导入 XLSX、标准数据 JSON | 当前候选表的 CSV 或 XLSX |
-| Python `tools/run_planner.py` | `--input` 指定的标准数据 JSON | `--output` 指定的规划 JSON；`--csv 路径` 可另存 CSV |
-| 导入器 `tools/prepare_data.py` | 位置参数指定的 XLSX 工作簿 | 标准数据 JSON，以及独立的导入审计 JSON |
+| 表 | 原字段示例 |
+| --- | --- |
+| `食材` | `Name`、`Tags` |
+| `料理` | `Name`、`Tags`、`Cookware`、`Sell Price`、`Required Ingredients`、`Forbidden Ingredients` |
+| `稀客` | `Name`、`Type`、`Preferred Tags`、`Disliked Tags` |
+| `食材merchant_data` | `Name`、`Total Daily Quantity` |
 
-网页直接读取 XLSX；Python 规划入口不直接读取 XLSX，应先转换：
+网页稀客筛选要求 `Type` 为 `rare` 或 `稀客`；保留原有字段别名与列表解析。食材中的“黑暗物质”“铃仙”和料理中的“黑暗物质”按原规则排除。网页不按 Python 的 `Owned` 规则筛料理。自有文件应以运行快照和所选脚本为结构参考。
+
+导出文件名为 `结果_<时间戳>.csv` 或 `结果_<时间戳>.xlsx`。XLSX 只有 `结果` 工作表，两种输出的列顺序相同：
+
+```text
+售价,得分,料理,cookware,总食材数,基础食材,加料,最终tag
+```
+
+每行对应当前稀客的一套料理与加料。头像和料理图片不写入这八列。候选表也不保存完整输入、顾客参数或 Python 的供给余量指标。
+
+原导出逻辑在筛选结果非空时采用筛选集合，筛选为空时回退到全部计算结果，再应用导出行数限制。因此空筛选不代表导出空文件。更多边界见[网页指南](web-guide.md)。
+
+## 3. Python 主规划入口
+
+完整依赖需要 Python 3.11 或更新版本：
 
 ```sh
 python -m pip install -r requirements.txt
-python tools/prepare_data.py my-workbook.xlsx --output local-data/game-data.json --report local-data/import-report.json
-python tools/run_planner.py --input local-data/game-data.json --output outputs/my-plan.json
+python Python/singlePLAN_cover3_mixIng_nCookware.py
 ```
 
-导入器省略 `--output` 和 `--report` 时，分别写入 `local-data/game-data.json` 与 `local-data/import-report.json`。命令行相对路径均以当前工作目录为基准，输出父目录自动创建；同名输出会被覆盖。输入、数据输出和报告输出必须使用不同路径。
+程序切换到脚本所在目录 `Python/`，默认读取其上一级的 `东方夜雀食堂.xlsx`。命令的启动目录不改变该默认输入；显式传入的相对 `--input`、`--output` 同样按脚本目录解释。
 
-## 四表数据结构
-
-工作簿只含以下四张表即可，不需要原工作簿中的普客、酒水、图像映射或其他说明表。第一行使用英文表头，各表内 `Name` 唯一，跨表名称和配方引用保持一致。
-
-| 表名 | 主要字段 | 用途 |
-| --- | --- | --- |
-| `食材` | `Name`、`Tags` | 食材名称及加料标签；可附带 `Buy Price`、`Level` |
-| `料理` | `Name`、`Cookware`、`Sell Price`、`Required Ingredients`、`Tags`、`Forbidden Ingredients`、`Owned` | 基础配方、售价、厨具与加料限制 |
-| `稀客` | `Name`、`Type`、`Preferred Tags`、`Disliked Tags`、`Budget` | 顾客偏好；网页要求 `Type` 为 `rare` 或 `稀客` |
-| `食材merchant_data` | `Name`、`Total Daily Quantity`、`Average Buy Price` | 日供给估计及导入时使用的采购均价 |
-
-标准数据 JSON 不要求 `Icon` 字段，也不包含历史工作簿或原型结果中的 `Name Icon`、`Dish Icon` 等展示列。网页图片映射与四表输入独立维护；原工作簿的图标列、图片公式和图像映射 sheet 均不是导入要求。
-
-标签可空；无喜好的顾客在 Python 中没有可行方案。每种食材必须有同名供给记录，`Total Daily Quantity` 为有限非负数；未知 `Average Buy Price` 可留空。有效的已拥有料理需有厨具和 1–5 件可识别的基础食材，`Owned` 建议显式填写 0 或 1。
-
-标签和食材清单支持顿号、中英文逗号或分号、斜线、竖线、换行、制表符分隔，普通空格不作为分隔符。两份相同基础食材写为 `豆腐、豆腐`，重复项计入用量；不要将其写成 `豆腐×2`。
-
-标准数据 JSON 采用以下外层结构，四个数组中存放以表头为键的记录对象：
-
-```json
-{
-  "format": "mystia-planner-data/v1",
-  "metadata": {},
-  "sheets": {
-    "食材": [],
-    "料理": [],
-    "稀客": [],
-    "食材merchant_data": []
-  }
-}
-```
-
-此处空数组仅展示结构，实际输入须含有效记录。完整实例见 [`game.json`](../data/game.json) 和 [`demo.json`](../data/demo.json)。网页与 Python 支持部分字段别名，导入器只保留白名单中的英文表头，因此跨入口使用时应采用上述名称。
-
-导入器只读取 Excel 已保存的缓存值，不计算公式。若精简工作簿涉及跨表公式，应先在电子表格软件中重算并保存所需值；缺失供给缓存会阻止转换。导入器按 `Name` 对应商贩均价，修正输出 JSON 中的食材采购价，未知价格保留 `null`，原 XLSX 不被改写。
-
-两个计算入口的校验和规则并非完全相同：Python严格校验供给、重复名称和已拥有配方，并按料理 `Owned` 筛选；网页当前不以 `Owned` 排除料理，按净标签得分筛选候选。Python不要求稀客 `Type`，并支持将无名续行并入上一名稀客；网页和导入器不会保留这种续行。为兼容三个入口，宜将一名稀客的信息整理在同一条具名记录中。
-
-## 网页候选表
-
-| 属性 | CSV | XLSX |
-| --- | --- | --- |
-| 文件名 | `结果_<毫秒时间戳>.csv` | `结果_<毫秒时间戳>.xlsx` |
-| 格式 | UTF-8 BOM，逗号分隔 | 新工作簿，仅含 `结果` sheet |
-| 列顺序 | `售价`、`得分`、`料理`、`cookware`、`总食材数`、`基础食材`、`加料`、`最终tag` | 同左 |
-
-每行是一套当前所选稀客的候选方案。`售价` 为基础料理售价，`得分` 为喜好命中数减厌恶命中数，`总食材数` 为基础与追加食材总件数。基础食材保留重复名称，加料中的重复项显示为 `名称×数量`，最终标签以顿号连接。
-
-导出保留当前的料理、厨具、得分、总食材数筛选及文本搜索，并沿用当前排序。“导出限制”为 0 时导出全部筛选结果，大于 0 时只取前 N 行。页面最多显示前 5,000 行，该显示上限不限制导出；筛选后无结果时不能导出隐藏候选。
-
-候选表不包含完整源数据、稀客名称或计算参数，也不包含 Python 的供给余量指标。网页显示的图片不会添加到上述 CSV/XLSX 导出列中。导出的 XLSX 只有结果表，不是四表数据模板，不能再次作为规划数据导入。
-
-## Python 规划报告
-
-`--input` 和 `--output` 均为必填参数；`--csv` 可省略，省略时不生成 CSV。CSV 路径必须显式提供，不会由 JSON 文件名自动派生。默认计算参数为最低分 3、每客日订单量 5、全部稀客、全部未排除的可用厨具、无流行附着；用 `--help` 查看选择稀客和厨具等选项。
-
-### JSON：完整规划结果
-
-JSON 的 `format` 为 `mystia-planner-result/v1`。顶层包括：
-
-| 字段 | 内容 |
+| 原参数 | 行为 |
 | --- | --- |
-| `source_metadata` | 输入数据的来源元数据 |
-| `settings` | 最低分、订单量、覆盖上限、流行、厨具数量及排除项 |
-| `selected_cookware` | 选中的共同厨具集合 |
-| `summary` | 顾客/有解/无解数量，覆盖、食材件数、余量汇总，以及带无解惩罚的比较值 |
-| `model_scope` | 预算、供给、共享库存和目标单位的模型边界 |
-| `guests` | 每位所选稀客的状态、偏好、展示预算及方案 |
+| `--input` | 可选 XLSX 路径；省略时使用父目录工作簿 |
+| `--output` | 可选 XLSX 路径；省略时按实际流行和厨具条件自动命名 |
+| `--min-score` | 整数，默认 3；保留原入口的取值处理 |
+| `--orders-per-day` | 整数，默认 5 |
+| `--trend-like`、`--trend-hate` | 非空参数代替对应流行提示；未提供或为空时交互询问 |
 
-`guests` 每条记录含 `guest`、`budget_display_only`、`preferred_tags`、`disliked_tags`、`status`、`plan`。状态为 `planned` 或 `no_feasible_plan`；无可行方案时 `plan` 为 `null`。
+流行提示支持空格及原有分隔符，回车表示没有该方向的流行。程序随后列出可用厨具并询问数量 `n`；回车或无法转换的回答使用全部可用厨具，越界值夹到有效范围。原入口没有 `--cookware-count`、`--guest` 或 `--exclude-cookware` 参数。
 
-非空 `plan` 含 `dish`、`cookware`、`sell_price`、`base_ingredients`、`added_ingredients`、`final_tags`、`covered_tags`、`score`、`coverage_capped`、`total_ingredients`、`supply_margin`、`ingredient_counts`、`remaining_supply`。
+```sh
+python Python/singlePLAN_cover3_mixIng_nCookware.py --help
+```
 
-数组字段保留具体标签和重复食材；`ingredient_counts` 记录每种食材的件数。`remaining_supply` 为该客假设订单量下的逐食材余量，`supply_margin` 取其中最小值，允许为负。它们没有跨顾客共同扣减库存；汇总食材件数按每客一份代表料理计算，不乘以每日订单量。
+帮助文字中的固定默认输出名是遗留说明；实际未指定 `--output` 时执行以下自动命名规则。
 
-### CSV：逐客摘要
-
-CSV 使用 UTF-8 BOM，每位所选稀客一行，列顺序为：
+### 自动输出位置
 
 ```text
-guest,status,dish,cookware,sell_price,base_ingredients,added_ingredients,final_tags,covered_tags,score,coverage_capped,total_ingredients,supply_margin
+稀客料理表/single_mixIng_nCookware/
+  single_cover3_mixIng_ncw_<流行条件>_<n与厨具名称>.xlsx
 ```
 
-列表以顿号连接；无方案稀客保留 `guest`、`status`，其余列为空。CSV不包含完整参数、总体厨具集合、汇总或逐食材剩余供给。以公式触发字符开头的字符串会添加单引号，以便按文本打开。
+没有某方向流行时不加入该段；选中厨具名称以 `&` 连接，并按原规则处理文件名非法字符。相同条件可能生成相同文件名，运行前应保存需要保留的旧结果。
 
-## 导入审计与回读限制
+### Plans 工作表
 
-导入器的标准数据 JSON 可供网页或 Python 继续使用。审计 JSON 则记录 `price_corrections`、`unknown_prices`、`disabled_recipes`、`warnings`、`row_counts` 和源文件 `source_sha256`，用于检查价格关联、未知值及禁用料理原因，不参与规划。
-
-| 文件类别 | 能否作为规划数据输入 | 原因 |
+| 列 | 原表头 | 内容 |
 | --- | --- | --- |
-| 四表 XLSX 源数据 | 网页可直接读；Python需先转换 | 提供食材、料理、稀客与供给 |
-| `mystia-planner-data/v1` JSON | 可以 | 标准输入格式，含四表记录 |
-| 网页 CSV / 单表 XLSX | 不可以 | 仅含计算后的候选行 |
-| `mystia-planner-result/v1` JSON / Python CSV | 不可以 | 结果格式，缺少四表源数据 |
-| 导入审计 JSON | 不可以 | 仅含修正、校验与来源记录 |
+| A | `Name` | 稀客名称 |
+| B | `Name Icon` | 空字符串占位，不嵌入头像 |
+| C | `Budget` | 展示预算 |
+| D | `Preferred Tags` | 命中部分与未命中部分以 `|` 分隔，保持原喜好次序 |
+| E | `Dish` | 料理名称 |
+| F | `Dish Icon` | 空字符串占位，不嵌入料理图片 |
+| G | `Cookware` | 厨具 |
+| H | `Sell Price` | 售价 |
+| I–M | `Ingredient1` 至 `Ingredient5` | 基础食材与追加食材混排，按 TDQ 降序和名称稳定排序 |
+| N | `Tags` | 最终标签 |
 
-## 原始文件与历史分析的角色
+无解顾客仍保留姓名、预算和喜好，其余方案列为空。原表还保留粗体表头、冻结 `A2`、顾客与料理区块合并、自动列宽、`Name Icon` 宽度 `10.64` 及数据行高 `59.7`。两列 Icon 只是原输出格式的一部分，不能理解为 Python 自动插图功能。
 
-下表说明项目历史材料的用途。这些原始工作簿和整理版报告不随发布包提供；当前运行可直接使用已发布的纯数据快照，无须收集这些文件。
+## 4. 其他原始脚本
 
-| 原始文件 | 实际角色 | 与当前运行的关系 |
-| --- | --- | --- |
-| `东方夜雀食堂.xlsx` | 网页和 Python 原型使用的游戏源工作簿，包含四个必需 sheet | 可作为本地 XLSX 输入；发布版由其必要字段形成 `data/game.json` |
-| `ALL利润.xlsx` | 历史 `Export_Profit.py` 根据源数据生成的料理/酒水利润及价格梯度报表 | 历史输出，不是规划输入；现存利润数值不代表本版已重新计算或验证 |
-| `料理原始得分表.xlsx` | 历史 `base_score.py` 按原料理标签与稀客喜好/厌恶生成的基础得分明细 | 历史输出，不包含完整加料和动态标签规划 |
-| `izakaya自用推荐菜单.xlsx` | 独立 Excel 参考与推荐分析工具，含料理、酒水、顾客、厨具及公式推荐矩阵 | 未发现网页或 Python 原型读取或生成它；结构不符合四表输入要求 |
-| `稀客料理表/` 下整理后的 `single_cover3_mixIng_ncw_*.xlsx` | 历史逐客方案，经过补图或版式整理 | 可作历史展示参考；不能声称当前发布版会逐字再生成该工作簿 |
-| `map.xlsx` 与原工作簿图像映射表 | 本地图片关联及结果展示辅助材料 | 不是当前规划输入；发布网页使用独立的 `web/icon-map.js` 与 `web/icons/` |
+| 文件 | 用途 |
+| --- | --- |
+| [detailedPLAN.py](../Python/detailedPLAN.py) | 每标签多方案，自动写入 `稀客料理表/detailed/` |
+| [singlePLAN.py](../Python/singlePLAN.py) | 每客单方案，覆盖不封顶，输出到对应 `single` 分支目录 |
+| [singlePLAN_cover3.py](../Python/singlePLAN_cover3.py) | 单客覆盖封顶，保留该版本的基础／加料列布局 |
+| [singlePLAN_cover3_mixedingredients.py](../Python/singlePLAN_cover3_mixedingredients.py) | 覆盖封顶，五格食材混排 |
+| [singlePLAN_cover3_mixIng_limitedCookware.py](../Python/singlePLAN_cover3_mixIng_limitedCookware.py) | 在源码 `EXCLUDE_COOKWARE` 中配置厨具排除；原值为烧烤架、蒸锅 |
+| [base_score.py](../Python/base_score.py) | 生成基础料理标签得分表 `Scores` |
+| [Export_Profit.py](../Python/Export_Profit.py) | 生成 `全料理价目`、`全酒水价目`、`全料理梯度`、`全酒水梯度` 四表 |
+| [Classes/夜雀食堂料理推荐.py](../Python/Classes/夜雀食堂料理推荐.py) | 保留地点、料理、酒水和利润相关的原交互菜单 |
 
-当前发布版 Python 输出 JSON/CSV，网页输出候选 CSV/XLSX，导入器输出数据 JSON 与审计 JSON。它们与历史利润表、基础得分表、带图方案工作簿是不同产物。
+各 PLAN 分支的目标、厨具处理与表格布局不同。不能把某一分支输出当作其余脚本的等价替代。`ALL利润.xlsx`、`料理原始得分表.xlsx` 和历史带图规划表也不等同于网页导出或当前一次 PLAN 结果。
+
+## 5. 工作簿与图片的关系
+
+网页使用 58 张稀客头像和 163 张料理图片，按 [HTML/icon_map.js](../HTML/icon_map.js) 映射到 [HTML/izakaya_icons_pack/](../HTML/izakaya_icons_pack/)；缺图行为沿用原程序。工作簿中的 Icon 列在公开快照中清空，原图像映射表不随快照发布。原 Python 输出仍保留空 Icon 列；如需历史带图版式，它属于独立的后处理，不是该规划入口自动输出的内容。
+
+公开审计 [workbook-provenance.json](../data/workbook-provenance.json) 记录数据快照的来源与制作范围，它不是规划输入。修改自有 XLSX 后，程序直接读取所保存的单元格值；涉及公式时，应先在电子表格软件中计算并保存缓存。

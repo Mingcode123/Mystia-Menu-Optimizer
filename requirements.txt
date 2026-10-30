@@ -1,3 +1,4 @@
-# The JSON planner and its tests use only the Python standard library.
-# Required only for importing a user's local Excel workbook with tools/prepare_data.py.
-openpyxl>=3.1,<4
+# Dependencies used by the original Excel planners, menu and profit scripts.
+# Versions available in the restoration verification environment.
+openpyxl==3.1.5
+pandas==3.0.1
