@@ -6,13 +6,45 @@
 
 **中文** | [English](#english)
 
-《东方夜雀食堂》是一款餐馆经营游戏，玩家需要为不同顾客制作料理。游戏以**标签**描述食物的离散属性，例如“肉”“素”“清淡”“昂贵”，分别涉及食材类别、口味或价格特征；同一份料理可以同时具有多个标签。稀客具有各自的喜好标签与厌恶标签，将料理的最终标签与这些偏好匹配，是本项目评价料理适配性的基础。
+《东方夜雀食堂》的核心循环是白天收集食材、学习配方，夜晚为顾客制作料理。稀客会通过需求提示点单，玩家需要结合其偏好选择菜品和加料。本项目研究其中的备菜决策：**为指定顾客选择哪道基础料理、追加哪些食材，才能在满足标签条件的同时减少用料和供给压力。** 游戏背景参见[官方介绍](https://store.steampowered.com/app/1584090/)。
 
-在本项目中，料理的最终标签以工作簿记录的**料理固有标签**为起点，再合并厨具标签、售价派生的“实惠”或“昂贵”标签，以及**追加食材自身携带的标签**。基础配方中的食材计入制作所需的用量和格数，但其标签不再次叠加；额外加料则可以改变料理的标签集合。通过加料将总用料补至五件时，还会生成“大份”标签。同名标签只计一次，重复加入同一种食材不会重复增加该标签的命中数。
+**标签连接料理属性与顾客偏好。** 标签是游戏预设的属性名称，例如“素”“甜”“饱腹”；一道料理可以同时具有多个标签。理解本项目时，需要区分三个对象：
 
-标签合并后还需处理覆盖关系与流行条件。例如，追加食材引入“肉”标签时，会移除原有的“素”标签；加料因此既可能增加喜好命中，也可能使料理失去已有喜好标签或触发厌恶。流行标签则由覆盖处理后的标签是否命中指定流行条件决定。选择基础料理与追加食材，因而需要同时考虑标签变化、制作限制和食材消耗。
+| 对象 | 标签的含义 | 本地工作簿中的实例 |
+| --- | --- | --- |
+| 基础料理 | 配方成品预设的属性 | 饭团记录为“素、家常、饱腹、和风、实惠” |
+| 食材 | 作为额外加料时可以带入的属性 | 海苔带“素、鲜”；蜂蜜带“甜”；猪肉带“肉” |
+| 顾客 | 对成品属性的喜好或厌恶 | 博丽灵梦喜欢“饱腹、甜、实惠”等标签，厌恶“下酒、昂贵”等标签 |
 
-《东方夜雀食堂》的备菜过程涉及顾客需求、料理配方、食材取得条件与厨具配置。面对同一位顾客，多个料理与加料组合可能同时达标，但在食材用量和持续制作时的供给压力上存在差异。本项目从这一选择问题出发，将游戏中的制作规则表述为可行性条件，将顾客偏好与资源取舍表述为可比较的数学指标。
+**配方材料与额外加料具有不同作用。** 例如，制作饭团需要一份海苔，但成品使用饭团自身预设的标签，不会自动获得海苔的全部标签。因此，基础饭团没有“鲜”；额外再加一份海苔，才会把“鲜”带入成品。蜂蜜作为加料，则带入“甜”。材料件数用于计算格数和消耗，标签集合用于计算顾客匹配；重复加入同一种食材会增加件数，同一个标签仍只匹配一次。
+
+**从标签生成到候选筛选。** 程序先合并料理固有标签、厨具与售价派生标签、加料标签，再处理覆盖和流行条件。厨具名称作为一个标签；在正常正售价下，售价低于 20 时加入“实惠”，高于 60 时加入“昂贵”。通过加料把总用料补满五件时，会加入“大份”；“肉”覆盖“素”等规则则会移除被覆盖的标签。流行条件由用户指定，例如以“和风”触发“流行·喜爱”。下图以 Python 单客规划程序 nCookware 为例；配方禁忌和五格制作上限另由可行性条件约束。
+
+```mermaid
+flowchart TD
+    Dish["基础料理<br/>固有、厨具与售价标签"] -->|料理标签| Merge["合并同名标签<br/>应用覆盖规则"]
+    Extra["追加食材"] -->|食材携带的标签| Merge
+    Qty["基础配方 + 加料<br/>食材总件数"] -->|加料补满五件时提供大份| Merge
+    Merge -->|覆盖后的标签| Final["按指定条件补充流行标签<br/>得到最终料理标签"]
+    Final -->|料理标签集合| Gate{"喜好命中达到门槛<br/>且厌恶命中为零？"}
+    Guest["顾客喜好与厌恶"] -->|顾客标签集合| Gate
+    Gate -->|是| Keep["保留为候选"]
+    Gate -->|否| Drop["排除"]
+```
+
+图中，基础配方参与用量计算，额外加料同时参与用量与标签计算；最终标签经过顾客匹配后，才用于候选准入。浏览器入口采用净分筛选，与图中的 Python 准入规则不同，详见第 1 章。
+
+**实际例子：为博丽灵梦配置饭团。** 以下按仓库[工作簿](东方夜雀食堂.xlsx)和原程序计算，条件为无流行、nCookware 默认喜好门槛 3。基础饭团的最终标签是“素、家常、饱腹、和风、实惠、料理台”；海苔是必需配方材料，蜂蜜和猪肉是可选加料。
+
+| 方案 | 总用料 | 相对基础饭团的标签变化 | 灵梦的喜好命中 | 厌恶命中 |
+| --- | --- | --- | --- | --- |
+| 饭团，不加料 | 海苔 ×1，共 1 件 | 无 | 饱腹、实惠：2 项，未达门槛 | 0 |
+| 饭团＋蜂蜜 | 海苔 ×1＋蜂蜜 ×1，共 2 件 | 新增“甜” | 饱腹、实惠、甜：3 项，达到门槛 | 0 |
+| 饭团＋蜂蜜＋猪肉 | 海苔 ×1＋蜂蜜 ×1＋猪肉 ×1，共 3 件 | 新增“甜、肉”，移除“素” | 仍为上述 3 项 | 0 |
+
+“饭团＋蜂蜜”已由原候选生成函数验证。第三行是按标签规则计算的对照，用于说明新增属性未必增加目标顾客的喜好命中，不表示该组合一定保留在筛选后的候选集中。在相同覆盖收益下，少用一件食材的蜂蜜方案具有更高优先级；若件数也相同，再比较供给余量。这里的三项门槛是程序的规划设置，标签命中数并不等于完整游戏满意度。
+
+上述过程将游玩问题分解为**制作可行性、顾客标签匹配、资源消耗比较**三个环节，下面的数学模型分别定义其约束和目标。实现依据见[原 Python 脚本](Python/singlePLAN_cover3_mixIng_nCookware.py)及[网页入口](index.html)。游戏侧资料可交叉参照 [BWIKI 饭团条目](https://wiki.biligame.com/tmi/%E9%A5%AD%E5%9B%A2)与[玩家加料机制说明](https://www.bilibili.com/opus/722047645466492949)；本例的完整字段和计算结果以仓库文件为准。
 
 系统以 Excel 工作簿为输入，提供浏览器候选查询、Python 逐客规划，以及独立的得分与价格分析工具。第一章以 `singlePLAN_cover3_mixIng_nCookware.py`（简称 `nCookware`）为主要对象，依次说明问题抽象、变量、约束与目标函数；历史模型及其他入口的评价差异分别注明。
 
@@ -274,13 +306,45 @@ python Python/singlePLAN_cover3_mixIng_nCookware.py --help
 
 [中文](#chinese) | **English**
 
-*Touhou Mystia's Izakaya* is a restaurant-management game in which players prepare dishes for different guests. **Tags** describe discrete food attributes, such as “肉” (meat), “素” (vegetarian), “清淡” (light), and “昂贵” (expensive), representing ingredient categories, flavor, or price characteristics. A dish can carry several tags simultaneously. Rare guests have individual liked-tag and disliked-tag sets; matching a dish's final tags against these preferences forms the basis of this project's evaluation of guest suitability.
+In *Touhou Mystia's Izakaya*, players collect ingredients and learn recipes by day, then prepare dishes for guests at night. Rare guests order through hints, requiring players to choose dishes and additions with their preferences in mind. This project studies the preparation decision: **which base dish and additional ingredients should be selected for a guest to meet tag conditions while reducing ingredient use and supply pressure?** See the [official game introduction](https://store.steampowered.com/app/1584090/) for background.
 
-In this project, the final tag set starts with the **dish's inherent tags** recorded in the workbook, then incorporates cookware tags, the price-derived “实惠” (affordable) or “昂贵” (expensive) tag, and **tags carried by additional ingredients**. Base-recipe ingredients count toward quantities and occupied slots, but their tags are not added again; additional ingredients can change the dish's tag set. Filling the total ingredient count to five through additions also generates “大份” (large portion). Each distinct tag counts once, so adding the same ingredient repeatedly does not produce repeated matches for that tag.
+**Tags connect dish attributes to guest preferences.** A tag is a predefined game attribute, such as “素” (vegetarian), “甜” (sweet), or “饱腹” (filling); one dish can have several tags. Three distinct objects matter in this project:
 
-The combined tags then undergo override and trend processing. For example, introducing “肉” through an additional ingredient removes an existing “素” tag. An addition may therefore increase liked-tag matches, remove an existing liked tag, or trigger a dislike. Trend tags depend on whether the tags remaining after overrides match the specified trend conditions. Selecting a base dish and its additions consequently requires considering tag changes, preparation constraints, and ingredient consumption together.
+| Object | Meaning of its tags | Example from the local workbook |
+| --- | --- | --- |
+| Base dish | Preset attributes of the recipe's finished dish | 饭团 (rice ball) records “素、家常、饱腹、和风、实惠” (vegetarian, home-style, filling, Japanese-style, affordable) |
+| Ingredient | Attributes it can contribute when used as an addition | 海苔 (seaweed) carries “素、鲜”; 蜂蜜 (honey) carries “甜”; 猪肉 (pork) carries “肉” |
+| Guest | Liked or disliked attributes of the finished dish | 博丽灵梦 (Reimu Hakurei) likes tags including “饱腹、甜、实惠” and dislikes tags including “下酒、昂贵” |
 
-Meal preparation in *Touhou Mystia's Izakaya* involves guest requirements, recipes, ingredient availability, and cookware configuration. Several dish-and-addition combinations may qualify for the same guest while differing in ingredient use and supply pressure under repeated preparation. This project formalizes that selection problem by expressing preparation rules as feasibility conditions and guest preferences and resource tradeoffs as comparable mathematical criteria.
+**Required recipe ingredients and optional additions play different roles.** A rice ball requires one unit of seaweed, but the finished dish starts with the rice ball's preset tags and does not automatically inherit all seaweed tags. A plain rice ball therefore lacks “鲜” (umami); adding a second unit of seaweed introduces it. Honey as an addition introduces “甜” (sweet). Ingredient quantities determine occupied slots and consumption, while the tag set determines guest matches. Repeating an ingredient increases its quantity, but each distinct tag still matches only once.
+
+**From tag construction to candidate filtering.** The program merges the dish's inherent tags, cookware and price-derived tags, and addition tags, then applies overrides and trend conditions. The cookware name contributes a tag; for normal positive selling prices, a price below 20 adds “实惠” (affordable), while a price above 60 adds “昂贵” (expensive). Filling the total ingredient count to five through additions generates “大份” (large portion); overrides such as “肉” replacing “素” remove the overridden tag. The user specifies trend conditions, such as “和风” triggering “流行·喜爱”. The diagram uses the Python single-guest planner nCookware as its example; recipe prohibitions and the five-slot preparation limit are separate feasibility conditions.
+
+```mermaid
+flowchart TD
+    Dish["Base dish<br/>Inherent, cookware and price tags"] -->|Dish tags| Merge["Merge duplicate tags<br/>Apply overrides"]
+    Extra["Additional ingredients"] -->|Ingredient tags| Merge
+    Qty["Base recipe + additions<br/>Total ingredient units"] -->|Additions fill five slots: large portion| Merge
+    Merge -->|Tags after overrides| Final["Apply specified trend conditions<br/>Obtain final dish tags"]
+    Final -->|Dish tag set| Gate{"Liked matches reach threshold<br/>and no disliked matches?"}
+    Guest["Guest likes and dislikes"] -->|Guest tag sets| Gate
+    Gate -->|Yes| Keep["Retain as candidate"]
+    Gate -->|No| Drop["Exclude"]
+```
+
+The base recipe contributes to quantities, while additions contribute to both quantities and tags. The final tags are matched against guest preferences to determine eligibility. The browser uses a net-score filter rather than the Python eligibility rule shown here; Chapter 1 explains the difference.
+
+**Worked example: a rice ball for Reimu Hakurei.** The following calculations use the repository [workbook](东方夜雀食堂.xlsx) and original program, with no trends and the default nCookware liked-tag threshold of 3. The plain rice ball's final tags are “素、家常、饱腹、和风、实惠、料理台”. Seaweed is the required recipe ingredient; honey and pork are optional additions.
+
+| Plan | Total ingredient use | Tag changes relative to the plain rice ball | Reimu's liked-tag matches | Disliked matches |
+| --- | --- | --- | --- | --- |
+| Rice ball, no additions | Seaweed ×1; 1 unit | None | “饱腹、实惠”: 2, below threshold | 0 |
+| Rice ball + honey | Seaweed ×1 + honey ×1; 2 units | Adds “甜” | “饱腹、实惠、甜”: 3, reaches threshold | 0 |
+| Rice ball + honey + pork | Seaweed ×1 + honey ×1 + pork ×1; 3 units | Adds “甜、肉”; removes “素” | The same 3 matches | 0 |
+
+The original candidate generator was checked to produce the rice-ball-and-honey plan. The third row is a rule-based comparison showing that an additional attribute need not increase the target guest's liked-tag matches; it does not imply that this combination survives candidate filtering. At equal coverage benefit, the honey plan takes priority because it uses one fewer ingredient unit. Supply slack is compared when unit counts also tie. The three-match threshold is a planning setting in this program; tag matches do not constitute the full in-game satisfaction model.
+
+This process separates the gameplay problem into **preparation feasibility, guest-tag matching, and resource-use comparison**. The mathematical model below defines their constraints and objectives. Implementation references are the [original Python script](Python/singlePLAN_cover3_mixIng_nCookware.py) and [browser entry point](index.html). The [BWIKI rice-ball entry](https://wiki.biligame.com/tmi/%E9%A5%AD%E5%9B%A2) and a [player's explanation of addition mechanics](https://www.bilibili.com/opus/722047645466492949) provide game-side cross-checks; the complete fields and calculations in this example follow the repository files.
 
 The system uses an Excel workbook as input and provides browser-based candidate queries, Python planning for individual guests, and separate score and price analysis tools. Chapter 1 focuses on `singlePLAN_cover3_mixIng_nCookware.py` (`nCookware` for short), introducing the abstraction, variables, constraints, and objectives. Historical models and differences between entry points are identified separately.
 
