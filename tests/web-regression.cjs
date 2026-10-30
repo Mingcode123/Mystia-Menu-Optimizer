@@ -12,6 +12,7 @@ new vm.Script(source, { filename: appPath });
 const root = path.join(__dirname, '..');
 const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
 const scripts = [...html.matchAll(/<script src="\.\/([^\"]+)"><\/script>/g)].map(match => match[1].split('?')[0]);
+const declaredIds = new Set([...html.matchAll(/\bid="([^\"]+)"/g)].map(match => match[1]));
 
 function createApp() {
   const elements = new Map();
@@ -31,6 +32,7 @@ function createApp() {
   }
   const document = {
     getElementById(id) {
+      if (!declaredIds.has(id)) return null;
       if (!elements.has(id)) elements.set(id, element(id));
       return elements.get(id);
     },
@@ -98,8 +100,13 @@ test('published page defaults to the game snapshot and real guests are selectabl
   const counts = vm.runInContext('[DATA.ingredients.length, DATA.foods.length, DATA.guests.length]', context);
   // The existing planner excludes the special ingredient 铃仙 from its candidate pool.
   assert.deepEqual(Array.from(counts), [61, 164, 58]);
-  assert.equal(document.getElementById('dataState').textContent, '游戏数据');
-  assert.match(document.getElementById('dataSource').textContent, /作者工作簿的数据快照/);
+  assert.match(html, /<title>INDEX<\/title>/);
+  assert.match(html, /<h1>INDEX<\/h1>/);
+  assert.equal(document.getElementById('dataState').textContent, '数据已加载');
+  assert.equal(document.getElementById('statusText').textContent, '已加载数据，准备就绪');
+  assert.equal(document.getElementById('dataSource'), null);
+  assert.equal(document.getElementById('btnLoadGame'), null);
+  assert.equal(document.getElementById('btnLoadDemo'), null);
   assert.equal(document.getElementById('btnRun').disabled, false);
   assert.equal(document.getElementById('warnBox').style.display, 'none');
   document.getElementById('guestBtn').click();
@@ -120,11 +127,18 @@ test('published page defaults to the game snapshot and real guests are selectabl
   }
 });
 
-test('switching between game and synthetic data clears old results and data-specific inputs', () => {
+test('importing synthetic and game JSON through the original file input clears stale state', async () => {
   const { context, document } = createApp();
   const demo = JSON.parse(fs.readFileSync(path.join(root, 'data/demo.json'), 'utf8'));
   assert.deepEqual(JSON.parse(JSON.stringify(context.window.MYSTIA_DEMO_DATA)), demo);
   const gameNames = vm.runInContext('DATA.guests.map(g => g.name)', context);
+  const importJSON = async name => {
+    const fileInput = document.getElementById('fileInput');
+    fileInput.files = [{ name, text: async () => fs.readFileSync(path.join(root, 'data', name), 'utf8') }];
+    await fileInput.handlers.change({ target: fileInput });
+    assert.equal(fileInput.value, '');
+    assert.equal(document.getElementById('warnBox').style.display, 'none');
+  };
   const seedPreviousState = () => {
     vm.runInContext('RESULTS = [{"料理":"旧数据"}]; FILTERED = RESULTS; FILTERS.dishSet.add("旧数据");', context);
     for (const id of ['trendLikeInput', 'trendHateInput', 'excludedTagInput', 'requiredTagInput']) {
@@ -139,16 +153,15 @@ test('switching between game and synthetic data clears old results and data-spec
     }
   };
   seedPreviousState();
-  document.getElementById('btnLoadDemo').click();
-  assert.equal(document.getElementById('dataState').textContent, '合成示例');
-  assert.match(document.getElementById('dataSource').textContent, /均为虚构/);
+  await importJSON('demo.json');
+  assert.equal(document.getElementById('dataState').textContent, '数据已加载');
   const demoNames = vm.runInContext('DATA.guests.map(g => g.name)', context);
   assert.equal(demoNames.length, 3);
   assert.ok(demoNames.every(name => !gameNames.includes(name)));
   checkClearedState();
   seedPreviousState();
-  document.getElementById('btnLoadGame').click();
-  assert.equal(document.getElementById('dataState').textContent, '游戏数据');
+  await importJSON('game.json');
+  assert.equal(document.getElementById('dataState').textContent, '数据已加载');
   assert.deepEqual(Array.from(vm.runInContext('DATA.guests.map(g => g.name)', context)), Array.from(gameNames));
   checkClearedState();
 });
@@ -231,15 +244,11 @@ test('stop immediately terminates all active Workers, resets controls and ignore
   const worker = app.workers[0];
   assert.equal(worker.sent.payload.options.minScore, 0);
   assert.equal(app.document.getElementById('fileInput').disabled, true);
-  assert.equal(app.document.getElementById('btnLoadGame').disabled, true);
-  assert.equal(app.document.getElementById('btnLoadDemo').disabled, true);
   app.document.getElementById('btnStop').click();
   assert.ok(app.workers.every(w => w.terminated));
   assert.equal(app.document.getElementById('btnRun').disabled, false);
   assert.equal(app.document.getElementById('btnStop').disabled, true);
   assert.equal(app.document.getElementById('fileInput').disabled, false);
-  assert.equal(app.document.getElementById('btnLoadGame').disabled, false);
-  assert.equal(app.document.getElementById('btnLoadDemo').disabled, false);
   const status = app.document.getElementById('statusText').textContent;
   assert.match(status, /已停止/);
   worker.onmessage({ data: { type: 'DONE', wid: 0 } });

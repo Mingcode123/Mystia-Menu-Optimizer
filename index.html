@@ -4,26 +4,20 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width,initial-scale=1" name="viewport"/>
-<title>夜雀食堂料理规划器 · 规则与数值分析</title>
-<link rel="stylesheet" href="./web/styles.css"/>
+<title>INDEX</title>
+<link rel="stylesheet" href="./web/styles.css?v=original-ui-1"/>
 </head>
 <body>
 <header>
-<h1>夜雀食堂料理规划器</h1>
-<p class="intro">为稀客寻找满足标签条件的加料方案，并比较食材采购可得性。</p>
-<p class="dataSource" id="dataSource" role="status">正在加载游戏数据…</p>
-<p class="small"><a href="./docs/data-provenance.md">数据来源与说明</a></p>
-<details class="modelRules">
-<summary>查看计算规则与范围</summary>
+<h1>INDEX</h1>
 <p>
-    <strong>规则</strong>：最终标签 = 料理自带tag + cookware tag + 价格tag + 加料食材tag；
-    加料允许重复；标签去重计分（喜好 +1 / 厌恶 -1）；总食材数 ≤ 5；
-    料理禁忌标签与禁用食材只限制“额外加料”；覆盖：肉→素，饱腹→下酒，重油→清淡，大份→小巧；
+    <strong>规则</strong>：总tag = 料理自带tag + cookware tag + 价格tag + 加料食材tag；
+    加料允许重复；tag 去重计分（fav +1 / disl -1）；总食材数 ≤ 5；
+    forbiddenIngredients 只限制“额外加料”；覆盖：肉→素，饱腹→下酒，重油→清淡，大份→小巧；
     大份：当料理原本食材数&lt;5 且通过加料凑到 5 时，追加“大份”；
-    价格标签：0&lt;售价&lt;20 円加“实惠”，售价&gt;60 円加“昂贵”；缺失或为 0 时不添加价格标签。<br>
-    流行·喜爱/厌恶可附着到指定标签。此处得分是标签命中差值，未模拟完整满意度、酒水、预算与库存消耗。
+    价格 tag：&lt;20 円加“实惠”，&gt;60 円加“昂贵”;<br>
+    流行·喜爱/厌恶可附着到指定tag。
   </p>
-</details>
 </header>
 <div class="wrap">
 <!-- left -->
@@ -33,11 +27,8 @@
 <span class="pill" id="dataState">未加载数据</span>
 </div>
 <div class="bd">
-<button class="secondary" id="btnLoadGame" type="button">载入游戏数据</button>
-<button class="secondary" id="btnLoadDemo" type="button">载入合成示例</button>
-<label for="fileInput">导入游戏数据（XLSX / JSON）</label>
+<label>选择 Excel（东方夜雀食堂.xlsx）</label>
 <input accept=".xlsx,.json" id="fileInput" type="file"/>
-<p class="small">默认使用作者工作簿的游戏数据快照，可直接选择游戏稀客。合成示例仅用于规则演示与回归案例。也可导入自己的 XLSX / JSON，文件仅在本机处理。</p>
 <!-- Trend first -->
 <div class="row">
 <div>
@@ -78,7 +69,7 @@
 </div>
 <div class="row rowWide">
 <div>
-<label>必含标签</label>
+<label>Required Tag</label>
 <div class="tagPick">
 <div class="comboWrap" style="width:100%;">
 <input autocomplete="off" disabled="" id="requiredTagInput" spellcheck="false" type="text"/>
@@ -89,7 +80,7 @@
 </div>
 <div class="small" style="margin-top:6px;color:var(--muted);">可输入多个 tag，用空格分隔；留空表示不限制。</div>
 <div style="margin-top:10px;">
-<label>排除标签</label>
+<label>Excluded Tag</label>
 <div class="tagPick">
   <div class="comboWrap" style="width:100%;">
     <input autocomplete="off" disabled="" id="excludedTagInput" spellcheck="false" type="text"/>
@@ -122,10 +113,10 @@
 </div>
 <div class="togLine tdqLine">
 <label class="togMain"><input id="tdqRecommend" type="checkbox"/> <span>依采购推荐（按 TDQ）</span></label>
-<label class="togSub tdqTopCtl"><span>保留前 N 名及并列</span><input id="tdqTopN" type="number" min="1" max="999" step="1" value="3"/></label>
+<label class="togSub tdqTopCtl"><span>Top n</span><input id="tdqTopN" type="number" min="1" max="999" step="1" value="3"/></label>
 </div>
 </div>
-<div class="eqGroupBox" id="eqGroupInfo">导入数据后在这里展示等价食材组（仅用于“加料”视为等价）。</div>
+<div class="eqGroupBox" id="eqGroupInfo">导入 Excel 后在这里展示等价食材组（仅用于“加料”视为等价）。</div>
 <div class="row">
 <div>
 <label>导出限制（0=不限制）</label>
@@ -137,7 +128,7 @@
 <button class="secondary" disabled="" id="btnStop">停止</button>
 </div>
 <div class="hint" id="guestInfo">
-        加载数据后显示稀客的喜好与厌恶标签。
+        加载 Excel 后在这里显示稀客 preferredTags / dislikedTags。
       </div>
 <div class="warnBox" id="warnBox"></div>
 </div>
@@ -148,7 +139,7 @@
 </div>
 </div>
 <!-- right -->
-<div class="card resultCard">
+<div class="card">
 <div class="mainTop">
 <div>
 <div><strong>结果</strong></div>
@@ -160,7 +151,7 @@
 <button class="secondary" disabled="" id="btnXLSX">下载 XLSX</button>
 </div>
 </div>
-<div class="resultsScroll">
+<div style="overflow:auto; max-height: calc(100vh - 160px);">
 <table id="resultTable">
 <colgroup>
 <col style="width:var(--col-price)"/>
@@ -188,7 +179,7 @@
 <button class="thBtn filterBtn" data-filter="料理" title="筛选料理（包含）" type="button">⏷</button>
 </th>
 <th class="thCtl">
-<span>厨具</span>
+<span>cookware</span>
 <button class="thBtn filterBtn" data-filter="cookware" title="筛选 cookware" type="button">⏷</button>
 </th>
 <th class="thCtl">
@@ -198,7 +189,7 @@
 </th>
 <th>基础食材</th>
 <th>加料</th>
-<th>最终标签</th>
+<th>总tag</th>
 </tr>
 </thead>
 <tbody id="tbody">
@@ -225,6 +216,6 @@
 <script src="./web/demo-data.js"></script>
 <script src="./web/game-data.js"></script>
 <script src="./web/icon-map.js"></script>
-<script src="./web/app.js?v=game-data-icons-1"></script>
+<script src="./web/app.js?v=original-ui-1"></script>
 </body>
 </html>

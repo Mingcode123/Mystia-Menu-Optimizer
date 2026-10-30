@@ -46,8 +46,6 @@ function stopCalculation(label = "已停止；本次未完成结果已清空"){
 
 function setImportEnabled(enabled){
   $("fileInput").disabled = !enabled;
-  $("btnLoadGame").disabled = !enabled;
-  $("btnLoadDemo").disabled = !enabled;
 }
 
 function setStatus(text, pct){
@@ -610,7 +608,7 @@ function setCurrentGuest(g){
   const diss = (g && g.dislikedTags) ? g.dislikedTags : [];
   const budget = (g && !isNaNLike(g.budget) && safeStr(g.budget) !== "") ? safeStr(g.budget) : "(空)";
   $("guestInfo").innerHTML =
-    '<div><span class="pill">预算参考（不参与筛选）</span> ' + escapeHTML(budget) + '</div>' +
+    '<div><span class="pill">budget</span> ' + escapeHTML(budget) + '</div>' +
     '<div style="margin-top:6px"><span class="pill">preferredTags</span> ' + (fav.length ? escapeHTML(fav.join("、")) : "(空)") + '</div>' +
     '<div style="margin-top:6px"><span class="pill">dislikedTags</span> ' + (diss.length ? escapeHTML(diss.join("、")) : "(空)") + '</div>';
 
@@ -784,8 +782,7 @@ function applyFilters(){
 
   $("resultMeta").textContent =
     (LAST_META || ("共 " + RESULTS.length.toLocaleString() + " 条")) +
-    "；当前 " + FILTERED.length.toLocaleString() + " 条" +
-    (FILTERED.length > 5000 ? "（页面显示前 5,000 条；可导出全部筛选结果）" : "");
+    "；当前 " + FILTERED.length.toLocaleString() + " 条";
 
   $("btnCSV").disabled = FILTERED.length === 0;
   $("btnXLSX").disabled = FILTERED.length === 0;
@@ -959,38 +956,26 @@ function resetResults(){
   LAST_META = "";
   for (const key of ["dishSet", "cookwareSet", "scoreSet", "totalCountSet"]) FILTERS[key].clear();
   $("searchBox").value = "";
-  renderTable([]);
-  $("resultMeta").textContent = "等待计算";
+  $("tbody").innerHTML = '<tr><td class="small" colspan="8" style="padding:16px;color:var(--muted)">加载数据后开始计算。</td></tr>';
+  $("resultMeta").textContent = "尚无结果";
   $("btnCSV").disabled = true;
   $("btnXLSX").disabled = true;
   updateFilterBtnUI();
 }
 
-function loadBundledData(kind){
+function loadGame(){
   clearWarn();
-  const isGame = kind === "game";
-  const label = isGame ? "游戏数据" : "合成示例";
   try{
-    const bundled = isGame ? window.MYSTIA_GAME_DATA : window.MYSTIA_DEMO_DATA;
-    DATA = parseJSONData(bundled);
+    DATA = parseJSONData(window.MYSTIA_GAME_DATA);
     resetResults();
     afterDataLoaded();
-    $("dataSource").textContent = isGame
-      ? "游戏数据：作者工作簿的数据快照，含 " + bundled.sheets["食材"].length + " 条食材记录（参与规划 " + DATA.ingredients.length + " 种）、" + DATA.foods.length + " 条料理记录、" + DATA.guests.length + " 位稀客。来源与范围见下方说明。"
-      : "合成示例数据：人物、配方、价格与供给均为虚构，仅用于规则演示与回归案例。";
-    $("dataState").textContent = label;
-    setStatus(label + "已加载：选择稀客与参数后点击开始计算", 0);
   }catch(err){
-    warn(label + "加载失败：" + err.message + " 请手动导入 data/" + (isGame ? "game" : "demo") + ".json 或自己的游戏数据表。");
-    setStatus(DATA ? label + "加载失败，保留原有数据" : "加载失败", 0);
+    warn("加载失败：" + err.message);
+    setStatus("加载失败", 0);
+    $("dataState").textContent = "加载失败";
   }
 }
 
-function loadGame(){ loadBundledData("game"); }
-function loadDemo(){ loadBundledData("demo"); }
-
-$("btnLoadGame").addEventListener("click", loadGame);
-$("btnLoadDemo").addEventListener("click", loadDemo);
 $("fileInput").addEventListener("change", async function(ev){
   clearWarn();
   const f = ev.target.files && ev.target.files[0];
@@ -998,13 +983,12 @@ $("fileInput").addEventListener("change", async function(ev){
   $("btnRun").disabled = true;
   setImportEnabled(false);
   try{
-    setStatus("读取数据...", 0);
     const isJSON = /\.json$/i.test(f.name);
+    setStatus(isJSON ? "读取 JSON..." : "读取 Excel...", 0);
     const parsed = isJSON ? parseJSONData(JSON.parse(await f.text())) : parseExcel(await f.arrayBuffer());
     DATA = parsed;
     resetResults();
     afterDataLoaded();
-    $("dataSource").textContent = "当前导入：" + f.name + "（仅在本机浏览器处理）";
   }catch(err){
     warn("加载失败：" + err.message);
     setStatus(DATA ? "导入失败，保留原有数据" : "加载失败", 0);
@@ -1170,7 +1154,7 @@ $("hdrPopApply").addEventListener("click", function(){
 
 $("btnRun").addEventListener("click", function(){
   clearWarn();
-  if (!DATA){ warn("请先载入游戏数据、合成示例或导入 XLSX / JSON 数据"); return; }
+  if (!DATA){ warn("请先加载 Excel 或 JSON 数据（左上角选择文件）"); return; }
   if (!CURRENT_GUEST){ warn("请先选择稀客"); return; }
   const minScore = readMinScore($("scoreMin").value);
   if (minScore === null){ warn("得分阈值请输入 -10 到 10 之间的整数。"); return; }
