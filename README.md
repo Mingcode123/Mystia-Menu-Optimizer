@@ -6,11 +6,11 @@
 
 **中文** | [English](#english)
 
-在[《东方夜雀食堂》](https://store.steampowered.com/app/1584090/)中，玩家通过料理与加料满足顾客偏好。**标签**是“甜”“饱腹”等料理属性，与顾客喜好重合的标签计为命中。本项目比较喜好覆盖、食材件数与供给余量，寻找给定条件下的优先方案。
+在[《东方夜雀食堂》](https://store.steampowered.com/app/1584090/)中，玩家通过料理与加料满足顾客偏好。**一个方案由基础料理及追加食材组成**。标签是“甜”“饱腹”等属性；方案的最终标签与人物喜好取交集，得到命中项。本项目比较喜好覆盖、食材件数与供给余量，寻找给定条件下的优先方案。
 
-![三个标签实例，紫色表示人物喜好、蓝色表示食谱属性、橙色表示追加食材属性。1：灵梦本例相关喜好为饱腹、实惠、甜；饭团提供前两项，蜂蜜带入甜，喜好命中从2项增至3项，食材从1件增至2件。2：饭团加猪肉，肉覆盖素，移除素并保留肉。3：臭豆腐禁忌甜与果味，蜂蜜带入甜，因此该组合被 Python nCookware 排除。](docs/images/tag-example.png)
+![完整标签与方案匹配：紫色为人物偏好，蓝色为料理属性，橙色为食材标签。灵梦料理喜好为高级、饱腹、甜、不可思议、实惠、流行·喜爱；厌恶为下酒、昂贵、流行·厌恶，无流行时两个流行词条未启用。方案框包含基础料理和加料。A：饭团加蜂蜜，最终标签为素、家常、饱腹、和风、实惠、料理台、甜；连线标明饱腹、实惠、甜命中，3项喜好、0项厌恶、2件食材。B：饭团加猪肉，肉覆盖素，最终标签为家常、饱腹、和风、实惠、料理台、肉；命中饱腹和实惠，低于3项门槛。C：臭豆腐的甜、果味禁忌与蜂蜜的甜相交，Python nCookware 在评分前排除。基础配方原料标签另列，计用量但不重复叠加。](docs/images/tag-example.png)
 
-*参考游戏图标生成的规则示意，非游戏截图。* 配方与标签依据[原工作簿](东方夜雀食堂.xlsx)。**禁忌过滤示例以 Python `nCookware` 为准**，网页处理差异见[网页使用说明](docs/web-guide.md)。完整规则、目标顺序与求解范围见[模型说明](docs/design.md)。
+*参考游戏图标生成的规则示意，非游戏截图。* 图中列出该人物的完整料理偏好及示例对象的全部标签，无流行时将流行词条标为未启用。配方与标签依据[原工作簿](东方夜雀食堂.xlsx)。**禁忌过滤示例以 Python `nCookware` 为准**，网页处理差异见[网页使用说明](docs/web-guide.md)。完整规则、目标顺序与求解范围见[模型说明](docs/design.md)。
 
 项目以 Excel 为输入，提供网页查询与 Python 规划。第一章以 `singlePLAN_cover3_mixIng_nCookware.py`（简称 `nCookware`）为例定义数学模型。
 
@@ -272,11 +272,11 @@ python Python/singlePLAN_cover3_mixIng_nCookware.py --help
 
 [中文](#chinese) | **English**
 
-In [*Touhou Mystia's Izakaya*](https://store.steampowered.com/app/1584090/), players choose dishes and additions to satisfy guest preferences. **Tags** are dish attributes such as sweet or filling; an attribute shared with a guest's likes counts as a match. This project compares preference coverage, ingredient units, and supply slack to rank plans under given conditions.
+In [*Touhou Mystia's Izakaya*](https://store.steampowered.com/app/1584090/), players choose dishes and additions to satisfy guest preferences. **A plan consists of a base dish and additional ingredients**. Tags are attributes such as sweet or filling; intersecting the plan's final tags with the guest's likes gives the matched tags. This project compares preference coverage, ingredient units, and supply slack to rank plans under given conditions.
 
-![Three tag examples: purple identifies guest preferences, blue recipe attributes, and orange added-ingredient attributes. 1: Reimu's relevant likes are filling, affordable, and sweet. The rice ball provides the first two; honey adds sweet, raising liked matches from 2 to 3 and ingredient units from 1 to 2. 2: Adding pork to a rice ball removes vegetarian and keeps meat. 3: Stinky tofu forbids sweet and fruity tags; honey adds sweet, so Python nCookware excludes the combination.](docs/images/tag-example.png)
+![Complete tags and plan matching: purple identifies guest preferences, blue recipe attributes, and orange ingredient tags. Reimu likes high-grade, filling, sweet, wondrous, affordable, and liked trend; she dislikes pub food, expensive, and disliked trend. Both trend entries are inactive without trends. Each plan frame contains its base dish and additions. A: Rice ball plus honey produces vegetarian, homestyle, filling, Japanese, affordable, prep counter, and sweet. Connectors identify filling, affordable, and sweet as 3 liked matches, with 0 disliked matches and 2 ingredient units. B: Pork overrides vegetarian, leaving homestyle, filling, Japanese, affordable, prep counter, and meat. Only filling and affordable match, below threshold 3. C: Honey's sweet tag intersects stinky tofu's sweet and fruity prohibitions, so Python nCookware excludes it before scoring. Required-ingredient tags are listed separately; their units count, but their tags are not added again.](docs/images/tag-example.png)
 
-*Rule illustration generated with game icons as references, not a game screenshot.* Recipes and tags come from the [original workbook](东方夜雀食堂.xlsx). **The forbidden-tag filtering example follows Python `nCookware`**; browser behavior differs as documented in the [browser guide](docs/web-guide.md). See the [model documentation](docs/design.md) for full rules, objective priorities, and solution scope.
+*Rule illustration generated with game icons as references, not a game screenshot.* The figure lists the guest's complete food preferences and all tags of the example objects, marking trend entries inactive when no trends apply. Recipes and tags come from the [original workbook](东方夜雀食堂.xlsx). **The forbidden-tag filtering example follows Python `nCookware`**; browser behavior differs as documented in the [browser guide](docs/web-guide.md). See the [model documentation](docs/design.md) for full rules, objective priorities, and solution scope.
 
 The project takes Excel input and provides browser queries and Python planning. Chapter 1 defines the mathematical model using `singlePLAN_cover3_mixIng_nCookware.py` (`nCookware` for short).
 
