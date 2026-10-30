@@ -1,0 +1,3 @@
+# The JSON planner and its tests use only the Python standard library.
+# Required only for importing a user's local Excel workbook with tools/prepare_data.py.
+openpyxl>=3.1,<4

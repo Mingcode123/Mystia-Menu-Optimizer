@@ -1,0 +1,25 @@
+name: Regression checks
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+      - run: python tools/run_checks.py
+      - run: node --test tests/web-regression.cjs
+      - name: Verify reproducible examples
+        run: |
+          python tools/sync_demo.py
+          python tools/reproduce_examples.py
+          git diff --exit-code -- data web/demo-data.js examples

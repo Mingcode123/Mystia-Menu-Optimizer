@@ -1,0 +1,188 @@
+{
+  "format": "mystia-planner-result/v1",
+  "source_metadata": {
+    "title": "合成餐馆样例",
+    "kind": "synthetic",
+    "description": "为演示规则与供给取舍人工编写；人物、配方、价格、供给均为虚构，不是游戏攻略。",
+    "provenance": "Created for this portfolio during AI-assisted project cleanup.",
+    "price_semantics": "Fictional expected acquisition prices; no empirical claim."
+  },
+  "settings": {
+    "min_score": 3,
+    "orders_per_day": 15,
+    "coverage_cap": 3,
+    "trend_like": [],
+    "trend_hate": [],
+    "cookware_count": 3,
+    "exclude_cookware": []
+  },
+  "selected_cookware": [
+    "料理台",
+    "油锅",
+    "烧烤架"
+  ],
+  "summary": {
+    "guest_count": 3,
+    "planned_count": 3,
+    "unplanned_count": 0,
+    "coverage_sum": 9,
+    "total_ingredients_sum": 4,
+    "supply_margin_sum": 31.0,
+    "comparison_total_with_missing_penalty": 4,
+    "comparison_margin_with_missing_penalty": 31.0
+  },
+  "model_scope": {
+    "budget_is_constraint": false,
+    "negative_supply_margin_allowed": true,
+    "inventory_shared_across_guests": false,
+    "ingredient_cost_unit": "count, not purchase price",
+    "missing_plan_ingredient_penalty": 1000000000,
+    "missing_plan_margin_penalty": 1000000000000000000
+  },
+  "guests": [
+    {
+      "guest": "旅人",
+      "budget_display_only": "30–60",
+      "preferred_tags": [
+        "家常",
+        "饱腹",
+        "实惠",
+        "料理台"
+      ],
+      "disliked_tags": [
+        "重油"
+      ],
+      "status": "planned",
+      "plan": {
+        "dish": "家常饭",
+        "cookware": "料理台",
+        "sell_price": 6.0,
+        "base_ingredients": [
+          "谷物"
+        ],
+        "added_ingredients": [],
+        "final_tags": [
+          "和风",
+          "实惠",
+          "家常",
+          "料理台",
+          "素",
+          "饱腹"
+        ],
+        "covered_tags": [
+          "家常",
+          "饱腹",
+          "实惠",
+          "料理台"
+        ],
+        "score": 4,
+        "coverage_capped": 3,
+        "total_ingredients": 1,
+        "supply_margin": 21.0,
+        "ingredient_counts": {
+          "谷物": 1
+        },
+        "remaining_supply": {
+          "谷物": 21.0
+        }
+      }
+    },
+    {
+      "guest": "茶客",
+      "budget_display_only": "40–80",
+      "preferred_tags": [
+        "素",
+        "清淡",
+        "甜",
+        "和风"
+      ],
+      "disliked_tags": [
+        "咸",
+        "肉"
+      ],
+      "status": "planned",
+      "plan": {
+        "dish": "家常饭",
+        "cookware": "料理台",
+        "sell_price": 6.0,
+        "base_ingredients": [
+          "谷物"
+        ],
+        "added_ingredients": [
+          "豆腐"
+        ],
+        "final_tags": [
+          "和风",
+          "实惠",
+          "家常",
+          "料理台",
+          "清淡",
+          "素",
+          "饱腹"
+        ],
+        "covered_tags": [
+          "素",
+          "清淡",
+          "和风"
+        ],
+        "score": 3,
+        "coverage_capped": 3,
+        "total_ingredients": 2,
+        "supply_margin": 11.0,
+        "ingredient_counts": {
+          "谷物": 1,
+          "豆腐": 1
+        },
+        "remaining_supply": {
+          "谷物": 21.0,
+          "豆腐": 11.0
+        }
+      }
+    },
+    {
+      "guest": "匠人",
+      "budget_display_only": "50–100",
+      "preferred_tags": [
+        "肉",
+        "香",
+        "下酒",
+        "烧烤架"
+      ],
+      "disliked_tags": [
+        "甜"
+      ],
+      "status": "planned",
+      "plan": {
+        "dish": "烤串",
+        "cookware": "烧烤架",
+        "sell_price": 30.0,
+        "base_ingredients": [
+          "肉片"
+        ],
+        "added_ingredients": [],
+        "final_tags": [
+          "下酒",
+          "烧烤架",
+          "肉",
+          "香"
+        ],
+        "covered_tags": [
+          "肉",
+          "香",
+          "下酒",
+          "烧烤架"
+        ],
+        "score": 4,
+        "coverage_capped": 3,
+        "total_ingredients": 1,
+        "supply_margin": -1.0,
+        "ingredient_counts": {
+          "肉片": 1
+        },
+        "remaining_supply": {
+          "肉片": -1.0
+        }
+      }
+    }
+  ]
+}

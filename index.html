@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<title>夜雀食堂料理规划器 · 规则与数值分析</title>
+<link rel="stylesheet" href="./web/styles.css"/>
+</head>
+<body>
+<header>
+<h1>夜雀食堂料理规划器</h1>
+<p class="intro">为稀客寻找满足标签条件的加料方案，并比较食材采购可得性。</p>
+<p class="dataSource" id="dataSource" role="status">正在加载合成示例数据…</p>
+<details class="modelRules">
+<summary>查看计算规则与范围</summary>
+<p>
+    <strong>规则</strong>：最终标签 = 料理自带tag + cookware tag + 价格tag + 加料食材tag；
+    加料允许重复；标签去重计分（喜好 +1 / 厌恶 -1）；总食材数 ≤ 5；
+    料理禁忌标签与禁用食材只限制“额外加料”；覆盖：肉→素，饱腹→下酒，重油→清淡，大份→小巧；
+    大份：当料理原本食材数&lt;5 且通过加料凑到 5 时，追加“大份”；
+    价格标签：0&lt;售价&lt;20 円加“实惠”，售价&gt;60 円加“昂贵”；缺失或为 0 时不添加价格标签。<br>
+    流行·喜爱/厌恶可附着到指定标签。此处得分是标签命中差值，未模拟完整满意度、酒水、预算与库存消耗。
+  </p>
+</details>
+</header>
+<div class="wrap">
+<!-- left -->
+<div class="card allowOverflow">
+<div class="hd">
+<strong>输入与参数</strong>
+<span class="pill" id="dataState">未加载数据</span>
+</div>
+<div class="bd">
+<button class="secondary" id="btnLoadDemo" type="button">载入合成示例</button>
+<label for="fileInput">导入游戏数据（XLSX / JSON）</label>
+<input accept=".xlsx,.json" id="fileInput" type="file"/>
+<p class="small">可导入原东方夜雀食堂 Excel。文件仅在本机处理，公开演示不含游戏美术或游戏数据。</p>
+<!-- Trend first -->
+<div class="row">
+<div>
+<label>流行·喜爱附着 tag（可空）</label>
+<div class="comboWrap">
+<input autocomplete="off" disabled="" id="trendLikeInput" spellcheck="false" type="text"/>
+<button aria-label="展开" class="dropBtn" id="trendLikeBtn" type="button">▾</button>
+<div aria-label="流行·喜爱候选" class="comboPop" id="trendLikePop" role="listbox"></div>
+</div>
+</div>
+<div>
+<label>流行·厌恶附着 tag（可空）</label>
+<div class="comboWrap">
+<input autocomplete="off" disabled="" id="trendHateInput" spellcheck="false" type="text"/>
+<button aria-label="展开" class="dropBtn" id="trendHateBtn" type="button">▾</button>
+<div aria-label="流行·厌恶候选" class="comboPop" id="trendHatePop" role="listbox"></div>
+</div>
+</div>
+</div>
+<!-- Guest picker -->
+<label>稀客</label>
+<div class="pickerWrap">
+<div aria-expanded="false" aria-haspopup="listbox" class="pickerBtn" id="guestBtn">
+<div class="pickerLeft">
+<div class="avatar" id="guestAvatar">客</div>
+<div class="pickerName" id="guestNameText">未选择</div>
+</div>
+<div class="caret">▾</div>
+</div>
+<div class="popover" id="guestPopover">
+<div class="popoverTop">
+<input id="guestSearch" placeholder="搜索稀客名字…" type="text"/>
+<button aria-label="关闭" class="xBtn" id="guestClose" type="button">×</button>
+</div>
+<div aria-label="稀客列表" class="grid" id="guestGrid" role="listbox"></div>
+</div>
+<div class="backdrop" id="guestBackdrop"></div>
+</div>
+<div class="row rowWide">
+<div>
+<label>必含标签</label>
+<div class="tagPick">
+<div class="comboWrap" style="width:100%;">
+<input autocomplete="off" disabled="" id="requiredTagInput" spellcheck="false" type="text"/>
+<button aria-label="展开" class="dropBtn" id="requiredTagBtn" type="button">▾</button>
+<div aria-label="必含tag候选（preferredTags）" class="comboPop" id="requiredTagPop" role="listbox"></div>
+</div>
+<datalist id="allTagsList"></datalist>
+</div>
+<div class="small" style="margin-top:6px;color:var(--muted);">可输入多个 tag，用空格分隔；留空表示不限制。</div>
+<div style="margin-top:10px;">
+<label>排除标签</label>
+<div class="tagPick">
+  <div class="comboWrap" style="width:100%;">
+    <input autocomplete="off" disabled="" id="excludedTagInput" spellcheck="false" type="text"/>
+    <button aria-label="展开" class="dropBtn" id="excludedTagBtn" type="button">▾</button>
+    <div aria-label="排除tag候选（allTags）" class="comboPop" id="excludedTagPop" role="listbox"></div>
+  </div>
+</div>
+<div class="small" style="margin-top:6px;color:var(--muted);">可输入多个 tag，用空格分隔；</div>
+</div>
+
+</div>
+<div>
+<label>得分阈值</label>
+<input id="scoreMin" max="10" min="-10" step="1" type="number" value="3"/>
+</div>
+</div>
+<div class="togBlock" id="extraFilterBlock">
+<div class="togLine">
+<label class="togMain"><input id="subsetFilter" type="checkbox"/> <span>加料子集过滤</span></label>
+<label class="togSub"><input id="subsetScoreFilter" type="checkbox"/> <span>考虑得分</span></label>
+</div>
+<div class="togLine">
+<label class="togMain"><input id="ingUpgradeFilter" type="checkbox"/> <span>食材高级过滤</span></label>
+<label class="togSub"><input id="ingUpgradeScoreFilter" type="checkbox"/> <span>考虑得分</span></label>
+</div>
+</div>
+<div class="togBlock" style="margin-top:10px;">
+<div class="togLine">
+<label class="togMain"><input id="eqIngDedup" type="checkbox"/> <span>等价食材去重（仅加料）</span></label>
+</div>
+<div class="togLine tdqLine">
+<label class="togMain"><input id="tdqRecommend" type="checkbox"/> <span>依采购推荐（按 TDQ）</span></label>
+<label class="togSub tdqTopCtl"><span>保留前 N 名及并列</span><input id="tdqTopN" type="number" min="1" max="999" step="1" value="3"/></label>
+</div>
+</div>
+<div class="eqGroupBox" id="eqGroupInfo">导入数据后在这里展示等价食材组（仅用于“加料”视为等价）。</div>
+<div class="row">
+<div>
+<label>导出限制（0=不限制）</label>
+<input id="exportLimit" max="500000" min="0" step="1000" type="number" value="0"/>
+</div>
+</div>
+<div class="btns">
+<button disabled="" id="btnRun">开始计算</button>
+<button class="secondary" disabled="" id="btnStop">停止</button>
+</div>
+<div class="hint" id="guestInfo">
+        加载数据后显示稀客的喜好与厌恶标签。
+      </div>
+<div class="warnBox" id="warnBox"></div>
+</div>
+<div class="status">
+<span id="statusText">准备就绪</span>
+<div class="bar"><i id="barFill"></i></div>
+<span class="num" id="statusRight">0%</span>
+</div>
+</div>
+<!-- right -->
+<div class="card resultCard">
+<div class="mainTop">
+<div>
+<div><strong>结果</strong></div>
+<div class="meta" id="resultMeta">尚无结果</div>
+</div>
+<div class="tools">
+<input disabled="" id="searchBox" placeholder="搜索：料理 / 食材 / tag / cookware"/>
+<button class="secondary" disabled="" id="btnCSV">下载 CSV</button>
+<button class="secondary" disabled="" id="btnXLSX">下载 XLSX</button>
+</div>
+</div>
+<div class="resultsScroll">
+<table id="resultTable">
+<colgroup>
+<col style="width:var(--col-price)"/>
+<col style="width:var(--col-score)"/>
+<col style="width:var(--col-dish)"/>
+<col style="width:var(--col-cookware)"/>
+<col style="width:var(--col-total)"/>
+<col style="width:var(--col-base)"/>
+<col style="width:var(--col-added)"/>
+<col/>
+</colgroup>
+<thead>
+<tr>
+<th class="thCtl">
+<span>售价</span>
+<button class="thBtn sortBtn" data-sort="售价" title="按售价排序" type="button">▼</button>
+</th>
+<th class="thCtl">
+<span>得分</span>
+<button class="thBtn sortBtn" data-sort="得分" title="按得分排序" type="button">↕</button>
+<button class="thBtn filterBtn" data-filter="得分" title="筛选得分（等于）" type="button">⏷</button>
+</th>
+<th class="thCtl">
+<span>料理名</span>
+<button class="thBtn filterBtn" data-filter="料理" title="筛选料理（包含）" type="button">⏷</button>
+</th>
+<th class="thCtl">
+<span>厨具</span>
+<button class="thBtn filterBtn" data-filter="cookware" title="筛选 cookware" type="button">⏷</button>
+</th>
+<th class="thCtl">
+<span>总食材数</span>
+<button class="thBtn sortBtn" data-sort="总食材数" title="按总食材数排序" type="button">↕</button>
+<button class="thBtn filterBtn" data-filter="总食材数" title="筛选总食材数（等于）" type="button">⏷</button>
+</th>
+<th>基础食材</th>
+<th>加料</th>
+<th>最终标签</th>
+</tr>
+</thead>
+<tbody id="tbody">
+<tr><td class="small" colspan="8" style="padding:16px;color:var(--muted)">加载数据后开始计算。</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</div> <!-- end .wrap -->
+<!-- Header filter popup -->
+<div class="hdrPop" id="hdrPop" style="display:none;">
+<div class="hdrPopHd">
+<div class="hdrPopTitle" id="hdrPopTitle"></div>
+<button class="secondary" id="hdrPopClose" style="padding:6px 10px;border-radius:10px;" type="button">关闭</button>
+</div>
+<div id="hdrPopBody"></div>
+<div class="hdrPopFt">
+<button class="secondary" id="hdrPopClear" type="button">清空</button>
+<button id="hdrPopApply" type="button">应用</button>
+</div>
+</div>
+<!-- SheetJS (local) -->
+<script src="./web/vendor/xlsx.full.min.js"></script>
+<script src="./web/demo-data.js"></script>
+<script src="./web/app.js"></script>
+</body>
+</html>
