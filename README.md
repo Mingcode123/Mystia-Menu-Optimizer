@@ -8,7 +8,7 @@
 
 在[《东方夜雀食堂》](https://store.steampowered.com/app/1584090/)中，玩家通过料理与加料满足顾客偏好。**标签**是“甜”“饱腹”等料理属性，与顾客喜好重合的标签计为命中。本项目比较喜好覆盖、食材件数与供给余量，寻找给定条件下的优先方案。
 
-![图标流程示例：饭团1件命中2项，加蜂蜜后2件命中3项，再加猪肉后3件仍命中3项，肉覆盖素。另例：臭豆腐禁忌甜与果味，蜂蜜带入甜，因此该组合被 Python nCookware 排除。](docs/images/tag-example.png)
+![三个标签实例，紫色表示人物喜好、蓝色表示食谱属性、橙色表示追加食材属性。1：灵梦本例相关喜好为饱腹、实惠、甜；饭团提供前两项，蜂蜜带入甜，喜好命中从2项增至3项，食材从1件增至2件。2：饭团加猪肉，肉覆盖素，移除素并保留肉。3：臭豆腐禁忌甜与果味，蜂蜜带入甜，因此该组合被 Python nCookware 排除。](docs/images/tag-example.png)
 
 *参考游戏图标生成的规则示意，非游戏截图。* 配方与标签依据[原工作簿](东方夜雀食堂.xlsx)。**禁忌过滤示例以 Python `nCookware` 为准**，网页处理差异见[网页使用说明](docs/web-guide.md)。完整规则、目标顺序与求解范围见[模型说明](docs/design.md)。
 
@@ -274,7 +274,7 @@ python Python/singlePLAN_cover3_mixIng_nCookware.py --help
 
 In [*Touhou Mystia's Izakaya*](https://store.steampowered.com/app/1584090/), players choose dishes and additions to satisfy guest preferences. **Tags** are dish attributes such as sweet or filling; an attribute shared with a guest's likes counts as a match. This project compares preference coverage, ingredient units, and supply slack to rank plans under given conditions.
 
-![Icon-based example flow: a rice ball uses 1 unit for 2 matches; honey raises this to 2 units and 3 matches; adding pork uses 3 units but still matches 3 tags, with meat overriding vegetarian. Separate case: stinky tofu forbids sweet and fruity tags; honey contributes sweet, so Python nCookware excludes the combination.](docs/images/tag-example.png)
+![Three tag examples: purple identifies guest preferences, blue recipe attributes, and orange added-ingredient attributes. 1: Reimu's relevant likes are filling, affordable, and sweet. The rice ball provides the first two; honey adds sweet, raising liked matches from 2 to 3 and ingredient units from 1 to 2. 2: Adding pork to a rice ball removes vegetarian and keeps meat. 3: Stinky tofu forbids sweet and fruity tags; honey adds sweet, so Python nCookware excludes the combination.](docs/images/tag-example.png)
 
 *Rule illustration generated with game icons as references, not a game screenshot.* Recipes and tags come from the [original workbook](东方夜雀食堂.xlsx). **The forbidden-tag filtering example follows Python `nCookware`**; browser behavior differs as documented in the [browser guide](docs/web-guide.md). See the [model documentation](docs/design.md) for full rules, objective priorities, and solution scope.
 
