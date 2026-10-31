@@ -707,11 +707,13 @@ python -m http.server 8000 --bind 127.0.0.1
 
 两项“考虑得分”的删除条件分别见[食材高级过滤](#124-食材高级过滤比较指定的基础替代)与[加料子集过滤](#125-加料子集过滤比较能否少加食材)。
 
-**实际结果：** 计算完成后得到 264 条候选。在结果区搜索框输入“饭团”，页面显示 5 条记录，包含饭团、炙猪肉饭团和温暖饭团。搜索按文本包含关系筛选已计算结果，不重新生成候选。
+**实际结果：** 计算完成后得到 264 条候选。以下界面显示未输入搜索条件时的结果与完整参数。
 
-[![HTML 实际查询结果：博丽灵梦，流行厌恶水产，共 264 条候选，搜索饭团后显示 5 条](https://raw.githubusercontent.com/Mingcode123/Mystia-Menu-Optimizer/e53cb65b0f1a2630612933d6a84f8f5c1e8f7b78/docs/images/web-case-results.jpg)](https://raw.githubusercontent.com/Mingcode123/Mystia-Menu-Optimizer/e53cb65b0f1a2630612933d6a84f8f5c1e8f7b78/docs/images/web-case-results.jpg)
+[![HTML 完整查询界面：博丽灵梦，流行厌恶水产，264 条未搜索候选；三张原始截图按左侧参数栏对齐拼接](https://raw.githubusercontent.com/Mingcode123/Mystia-Menu-Optimizer/16e379956891d5b89b97de54e37d149cd5cdd22e/docs/images/web-case-overview.png)](https://raw.githubusercontent.com/Mingcode123/Mystia-Menu-Optimizer/16e379956891d5b89b97de54e37d149cd5cdd22e/docs/images/web-case-overview.png)
 
-*实际网页结果区截图，展示当前界面与原游戏图标。* [查看含输入参数的界面截图](https://raw.githubusercontent.com/Mingcode123/Mystia-Menu-Optimizer/e53cb65b0f1a2630612933d6a84f8f5c1e8f7b78/docs/images/web-case-overview.jpg)。
+*作者提供的实际网页截图，按左侧控件对齐拼接，保留原始像素。* [查看饭团方案局部放大](https://raw.githubusercontent.com/Mingcode123/Mystia-Menu-Optimizer/16e379956891d5b89b97de54e37d149cd5cdd22e/docs/images/web-case-results.png)。
+
+在结果区搜索框输入“饭团”，页面显示 5 条记录，包含饭团、炙猪肉饭团和温暖饭团。搜索按文本包含关系筛选已计算结果，不重新生成候选。
 
 其中，料理名恰为“饭团”的两条记录如下；两者均使用料理台，基础食材为海苔×1。喜爱与厌恶命中项按页面最终标签和灵梦偏好核对：
 
@@ -1626,11 +1628,13 @@ Visit <http://127.0.0.1:8000> and wait for the workbook to load automatically, o
 
 The removal conditions for the two “Consider score” switches are defined under the [ingredient-upgrade filter](#124-ingredient-upgrade-filter-comparing-designated-base-alternatives) and [addition-subset filter](#125-addition-subset-filter-comparing-smaller-additions).
 
-**Observed results:** The completed query produced 264 candidates. Entering `饭团` (rice ball) in the results search box displayed 5 records, including 饭团, 炙猪肉饭团, and 温暖饭团. Search filters existing results by text containment without regenerating candidates.
+**Observed results:** The completed query produced 264 candidates. The interface below shows the unfiltered results and complete parameter panel.
 
-[![Actual HTML query: Reimu, disliked trend Aquatic, 264 candidates and 5 records matching the rice-ball search](https://raw.githubusercontent.com/Mingcode123/Mystia-Menu-Optimizer/e53cb65b0f1a2630612933d6a84f8f5c1e8f7b78/docs/images/web-case-results.jpg)](https://raw.githubusercontent.com/Mingcode123/Mystia-Menu-Optimizer/e53cb65b0f1a2630612933d6a84f8f5c1e8f7b78/docs/images/web-case-results.jpg)
+[![Complete HTML query: Reimu, disliked trend Aquatic, 264 unfiltered candidates; three original screenshots aligned by the left control panel](https://raw.githubusercontent.com/Mingcode123/Mystia-Menu-Optimizer/16e379956891d5b89b97de54e37d149cd5cdd22e/docs/images/web-case-overview.png)](https://raw.githubusercontent.com/Mingcode123/Mystia-Menu-Optimizer/16e379956891d5b89b97de54e37d149cd5cdd22e/docs/images/web-case-overview.png)
 
-*Screenshot of the actual results area, showing the current interface and original game icons.* [View the interface with input parameters](https://raw.githubusercontent.com/Mingcode123/Mystia-Menu-Optimizer/e53cb65b0f1a2630612933d6a84f8f5c1e8f7b78/docs/images/web-case-overview.jpg). The interface retains its Chinese labels.
+*Actual webpage screenshots supplied by the author, aligned by the left control panel and stitched at original pixel resolution.* [View the rice-ball records in detail](https://raw.githubusercontent.com/Mingcode123/Mystia-Menu-Optimizer/16e379956891d5b89b97de54e37d149cd5cdd22e/docs/images/web-case-results.png). The interface retains its Chinese labels.
+
+Entering `饭团` (rice ball) in the results search box displayed 5 records, including 饭团, 炙猪肉饭团, and 温暖饭团. Search filters existing results by text containment without regenerating candidates.
 
 Two records have the exact dish name 饭团 (rice ball). Both use the prep counter and one seaweed as the base ingredient. The preference matches below were checked against the displayed final tags and Reimu's preferences:
 
