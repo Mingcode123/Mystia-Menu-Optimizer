@@ -45,10 +45,6 @@
 
 ## 1. 数学模型：从游戏决策到优化任务
 
-[![备菜决策模型流程：HTML查询达标候选；detailedPLAN按目标喜好标签配置多套方案，先最少预计日食材件数，再最大最低供给余量；singlePLAN改为每客一套方案，按喜爱命中、每份件数和供给余量比较；cover3将覆盖收益封顶为3。输出格式、固定厨具和共同厨具为独立扩展，箭头表示模型关系。](https://raw.githubusercontent.com/Mingcode123/Mystia-Menu-Optimizer/3cb15df86ee619bd6ad67c045a98672e45b9be29/docs/images/model-evolution.png)](https://raw.githubusercontent.com/Mingcode123/Mystia-Menu-Optimizer/3cb15df86ee619bd6ad67c045a98672e45b9be29/docs/images/model-evolution.png)
-
-*图 2. 备菜决策的模型流程。主线展示决策对象、订单假设与目标顺序的变化；输出表达及两类厨具条件分别成支。箭头表示问题依赖，不表示程序调用或精确开发时间线。* [SVG 矢量原图](https://raw.githubusercontent.com/Mingcode123/Mystia-Menu-Optimizer/3cb15df86ee619bd6ad67c045a98672e45b9be29/docs/images/model-evolution.svg).
-
 ### 1.1 通用符号与基础模型
 
 备菜决策包含两个层次：确定一份料理的制作方案，以及在满足条件的方案之间作出选择。各版本共享食材用量与标签匹配的基本定义；候选生成规则、订单假设和优化目标分别由具体模型规定。
@@ -101,6 +97,10 @@ S_g(p)=H_g^{\mathrm L}(p)-H_g^{\mathrm D}(p)
 | $`S_g(p),S_{\min}`$ | $`s_g(p),\tau`$ | 净分、最低净分 |
 
 </details>
+
+[![备菜决策模型流程：HTML查询达标候选；detailedPLAN按目标喜好标签配置多套方案，先最少预计日食材件数，再最大最低供给余量；singlePLAN改为每客一套方案，按喜爱命中、每份件数和供给余量比较；cover3将覆盖收益封顶为3。输出格式、固定厨具和共同厨具为独立扩展，箭头表示模型关系。](https://raw.githubusercontent.com/Mingcode123/Mystia-Menu-Optimizer/3cb15df86ee619bd6ad67c045a98672e45b9be29/docs/images/model-evolution.png)](https://raw.githubusercontent.com/Mingcode123/Mystia-Menu-Optimizer/3cb15df86ee619bd6ad67c045a98672e45b9be29/docs/images/model-evolution.png)
+
+*图 2. 备菜决策的模型流程。主线展示决策对象、订单假设与目标顺序的变化；输出表达及两类厨具条件分别成支。箭头表示问题依赖，不表示程序调用或精确开发时间线。* [SVG 矢量原图](https://raw.githubusercontent.com/Mingcode123/Mystia-Menu-Optimizer/3cb15df86ee619bd6ad67c045a98672e45b9be29/docs/images/model-evolution.svg).
 
 ### 1.2 HTML：定义方案、筛选候选与比较采购条件
 
@@ -647,10 +647,6 @@ Preparation models build on plans, ingredient quantities, and tag matching, dist
 
 ## 1. Mathematical model: from gameplay decisions to optimization
 
-[![Preparation-model flow: HTML queries qualifying candidates; detailedPLAN assigns multiple plans by target liked tag, minimizing expected daily ingredient units before maximizing minimum supply slack; singlePLAN selects one plan per guest by liked matches, units per serving, and slack; cover3 caps coverage benefit at 3. Output formatting, fixed cookware, and shared cookware form separate extensions. Arrows show model relationships.](https://raw.githubusercontent.com/Mingcode123/Mystia-Menu-Optimizer/3cb15df86ee619bd6ad67c045a98672e45b9be29/docs/images/model-evolution-en.png)](https://raw.githubusercontent.com/Mingcode123/Mystia-Menu-Optimizer/3cb15df86ee619bd6ad67c045a98672e45b9be29/docs/images/model-evolution-en.png)
-
-*Figure 2. Preparation-model flow. The main sequence shows changes in decision units, order assumptions, and objective priority; output presentation and the two cookware conditions form separate branches. Arrows indicate problem dependencies, not program calls or an exact development timeline.* [Vector SVG](https://raw.githubusercontent.com/Mingcode123/Mystia-Menu-Optimizer/3cb15df86ee619bd6ad67c045a98672e45b9be29/docs/images/model-evolution-en.svg).
-
 ### 1.1 Common notation and base model
 
 Preparation decisions have two levels: specifying how to prepare one dish and choosing among plans that satisfy the requirements. The versions share basic definitions of ingredient use and tag matching; each model specifies its own candidate-generation rules, order assumptions, and optimization objectives.
@@ -703,6 +699,10 @@ The net score describes how a plan matches a guest's preferences. Eligibility an
 | $`S_g(p),S_{\min}`$ | $`s_g(p),\tau`$ | Net score and minimum net score |
 
 </details>
+
+[![Preparation-model flow: HTML queries qualifying candidates; detailedPLAN assigns multiple plans by target liked tag, minimizing expected daily ingredient units before maximizing minimum supply slack; singlePLAN selects one plan per guest by liked matches, units per serving, and slack; cover3 caps coverage benefit at 3. Output formatting, fixed cookware, and shared cookware form separate extensions. Arrows show model relationships.](https://raw.githubusercontent.com/Mingcode123/Mystia-Menu-Optimizer/3cb15df86ee619bd6ad67c045a98672e45b9be29/docs/images/model-evolution-en.png)](https://raw.githubusercontent.com/Mingcode123/Mystia-Menu-Optimizer/3cb15df86ee619bd6ad67c045a98672e45b9be29/docs/images/model-evolution-en.png)
+
+*Figure 2. Preparation-model flow. The main sequence shows changes in decision units, order assumptions, and objective priority; output presentation and the two cookware conditions form separate branches. Arrows indicate problem dependencies, not program calls or an exact development timeline.* [Vector SVG](https://raw.githubusercontent.com/Mingcode123/Mystia-Menu-Optimizer/3cb15df86ee619bd6ad67c045a98672e45b9be29/docs/images/model-evolution-en.svg).
 
 ### 1.2 HTML: defining plans, filtering candidates, and comparing procurement conditions
 
