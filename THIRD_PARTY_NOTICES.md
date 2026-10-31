@@ -47,7 +47,7 @@ README 提供[中文机制图](docs/images/tag-example.png)与[英文机制图](
 
 图示依次说明五格配方与加料、完整人物偏好匹配、标签覆盖、配方禁忌及独立流行情境；它是规则示意，非游戏截图。图标涉及的游戏角色与美术归属沿用上述游戏素材声明，图示制作不改变原素材的权利归属。
 
-另附[中文模型演进图](docs/images/model-evolution.png)、[英文模型演进图](docs/images/model-evolution-en.png)及对应[中文 SVG](docs/images/model-evolution.svg)、[英文 SVG](docs/images/model-evolution-en.svg)，解释各阶段决策对象、目标函数与约束。图稿由原代码和留存需求记录整理，按决策依赖组织；版式与文字由 AI 辅助制作，公式使用 LaTeX 排版，游戏图标沿用上述原像素素材。该图不表示精确开发时间线，也不改变原程序。
+另附[中文模型演进图](docs/images/model-evolution.png)、[英文模型演进图](docs/images/model-evolution-en.png)及对应[中文 SVG](docs/images/model-evolution.svg)、[英文 SVG](docs/images/model-evolution-en.svg)，解释各阶段决策对象、目标函数与约束。图稿由原代码和留存需求记录整理，按决策依赖组织；版式与文字由 AI 辅助制作，以原生文字和几何线条生成 SVG 与高清 PNG，输入条的饭团图标沿用上述原像素素材。该图不表示精确开发时间线，也不改变原程序。
 
 图中禁忌案例同时参照 BWIKI 的[臭豆腐条目](https://wiki.biligame.com/tmi/臭豆腐)及[黑暗物质条目](https://wiki.biligame.com/tmi/黑暗物质)：前者列明甜、果味禁忌，后者说明标签冲突可产生黑暗物质。流行随机事件与标签覆盖的机制说明参考[《东方夜雀食堂攻略：强迫症的做菜指南》](https://www.bilibili.com/opus/722047645466492949)。琪露诺喜欢“流行·厌恶”、厌恶“流行·喜爱”的案例同时参照 BWIKI 的[琪露诺条目](https://wiki.biligame.com/tmi/顾客:琪露诺)。角色的流行偏好取自原工作簿，触发标签的输入与派生逻辑以原程序为准；这些社区资料用于解释游戏背景，不替代程序实现说明。
 
