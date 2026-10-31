@@ -12,7 +12,7 @@
 
 作者的主要工作是提出游玩问题、梳理规则语义、记录供给与价格、确定目标和约束，并通过角色案例核对结果；代码实现、部分算法推导与调试使用 AI 辅助。本文重点说明这些建模选择及其影响，结果解释限定于给定数据、假设和实际保留的候选范围。
 
-[数学模型](#zh-model) · [设计依据与演进](#zh-evolution) · [数据与假设](#zh-data) · [案例与验证](#zh-verification) · [求解与复现](#zh-methods) · [局限](#zh-limits) · [贡献与文档](#zh-sources)
+[数学模型](#zh-model) · [数据与建模依据](#zh-data) · [求解算法](#zh-algorithms) · [案例与验证](#zh-verification) · [运行与复现](#zh-methods) · [贡献与资料](#zh-sources)
 
 **机制与术语** &nbsp; <a href="#zh-tag-figure"><img src="docs/images/jump-to-figure-zh.png" alt="直接看机制图" width="132" height="28" align="middle"></a>
 
@@ -433,184 +433,285 @@ S\subseteq H,\qquad |S|=n
 以上数学记号贯穿各版本，候选集合由对应版本的规则确定。标签等价代表与中性补位截断限制了实际搜索范围，因此最优性结论限定于保留候选，尚无覆盖全部合法食材组合的全局最优性证明。供给余量作为允许负值的排序指标使用，模型未设库存或顾客预算硬约束；售价参与平局处理，利润属于独立分析支线。各阶段的取舍依据见第 2 章，候选规约与求解细节见[优化模型与算法边界](docs/design.md)。
 
 <a id="zh-evolution"></a>
-
-## 2. 模型设计依据与目标演进
-
-### 2.1 从备菜问题到可比较的目标
-
-项目起点是寻找满足顾客要求的备菜方案。随着规则和使用条件明确，“最优”的含义逐步落实为决策单位、准入条件和比较顺序。早期需求还包括按实际利润排序；后续规划主线采用食材件数与供给余量表达资源需求，普客、酒水、价格和利润保留为独立分析支线。
-
-| 决策问题 | 模型调整 | 取舍依据与影响 |
-| --- | --- | --- |
-| 为多个喜好标签分别准备什么 | 每个可覆盖标签配置方案，按订单均分假设估计总用量；先最少预期件数，再最大最低供给余量 | 不同标签分别承担订单份额；并列最少件数的方案仍需保留，因为食材分配会影响供给压力 |
-| 每位顾客固定准备什么 | 决策单位改为一位顾客的一套方案；先比较喜好覆盖，再比较件数与余量 | 需求明确改为每位稀客固定输出一套方案；不再按各标签均分订单，该方案承担全部假设订单，目标转向单份料理的覆盖与消耗 |
-| 达标后是否继续追求更多命中 | 将覆盖收益封顶为 3 | 达标后优先控制用料；额外命中仍可存在，但不再增加第一目标收益 |
-| 有限设备如何服务多位顾客 | 从指定厨具排除扩展到选择恰好 n 种共同厨具 | 单客方案需适配共同设备；默认门槛下，集合评价首先增加有合格方案的顾客数 |
-
-这些阶段改变了优化问题的定义。将基础食材与加料合并到五个输出格，则属于结果表达调整，沿用既有目标。分支对应关系、历史需求和角色验收案例见[需求与设计决策演进](docs/prompt-journey.md)。
-
-### 2.2 评价指标与取舍依据
-
-覆盖、件数和供给余量表达不同偏好。以下选择构成模型的评价政策，其作用可以由目标函数直接解释。
-
-| 选择 | 决策含义 | 代价与适用条件 |
-| --- | --- | --- |
-| 覆盖收益封顶 | 达到目标覆盖后，把资源节约作为主要比较依据 | 第 4 项及更多命中的第一目标新增收益为零；3 是本模型的覆盖效用上限，其描述范围限于标签覆盖 |
-| 以食材件数衡量消耗 | 每件食材按相同数量单位计入基础配方与加料 | 件数仅衡量数量；采购金额和取得难度可能随食材而异，供给条件另设指标衡量 |
-| 比较最低供给余量 | 关注方案实际用料中余量最小的食材，识别需求下的供给瓶颈 | 余量允许为负；未估计缺货概率，也未作为必须满足的库存约束 |
-| 采用词典序 | 后一指标只在前一指标相同时参与比较，保持明确的优先级 | 用料件数的优先级高于供给余量；该顺序依据项目需求设定，其对其他备菜偏好的适用性仍待验证 |
-
-### 2.3 制作规则、准入与排序的分工
-
-配方禁忌决定制作冲突。规划模型以无厌恶命中和最低喜好门槛筛选候选，再按分层目标排序。浏览器查询则以喜好命中减厌恶命中的净分筛选候选。图中得分描述标签匹配，规划准入确定可接受范围，覆盖效用用于比较合格方案；网页与各规划版本分别生成并评价各自的候选。
-
 <a id="zh-data"></a>
 
-## 3. 数据来源、参数估计与假设
+## 2. 数据与建模依据
 
-模型输入分为规则资料、人工观测与情境设定。下表列出各类输入的来源、用途及据此计算的指标。
+### 2.1 数据来源与质量
 
-| 类别 | 内容与依据 | 在模型中的作用 |
+根目录工作簿共 13 张表。按 `nCookware` 的解析口径，其中包含 62 条食材记录、164 道料理记录和 58 位稀客；163 道料理标记为持有。
+
+| 数据类别 | 来源 | 用途 |
 | --- | --- | --- |
-| 规则与属性资料 | 历史工作簿中的配方、厨具、标签和人物偏好；标签资料来自 AnYiEE 的项目 | 确定制作条件、标签处理和偏好匹配 |
-| 经验观测 | 作者手工记录价格、日供给及委托相关数据，并整理经验期望 | 日供给作为资源评价输入；价格用于独立经济分析 |
-| 需求与情境假设 | 每客日订单默认 5；单客模型中这些订单使用同一方案；历史模型按可行标签均分订单 | 将单份配方用量转化为假设日需求 |
-| 评价政策 | 喜好门槛、无厌恶准入、覆盖封顶、目标顺序及厨具数量 | 定义可接受方案和方案间的优先关系 |
-| 派生指标 | 喜好与厌恶命中、食材件数、最低供给余量及集合汇总值 | 根据数据、假设和决策计算评价结果 |
+| 配方、厨具、标签与人物偏好 | 历史工作簿；标签资料来自 AnYiEE 的项目 | 确定配方与标签匹配规则 |
+| 价格、日供给与委托记录 | 作者在游戏中手工记录，并整理经验期望 | 日供给用于资源评价；价格用于独立经济分析 |
+| 流行、持有料理与厨具条件 | 工作簿记录及运行时输入 | 定义本次查询或规划的情境 |
 
-工作簿按 `nCookware` 的解析口径包含 62 条食材记录、164 道料理记录和 58 位稀客，其中 163 道料理标记为持有。`Total Daily Quantity` 表示经验日供给；最低供给余量是该供给值扣除假设日需求后的模型指标，计算中未使用玩家实时库存。
+`Total Daily Quantity` 对应第一章的给定供给参数 $`q_i`$。独立价格分析采用数量加权口径：对食材 $`i`$，令 $`\mathcal O_i`$ 为纳入计算的渠道记录集合，$`\pi_{i\ell}`$ 为记录 $`\ell`$ 的单位采购价，$`w_{i\ell}`$ 为对应数量，则：
 
-价格波动通过历史记录与数量加权计算处理，但完整采样日期、次数和来源版本未留存。采购价公式还存在按行关联错位及部分错误缓存的风险。因此，现有价格和供给用于描述历史经验条件，尚不足以建立可靠的需求分布、置信区间或缺货概率。具体字段、估计口径与来源范围见[数据来源说明](docs/data-provenance.md)。
+```math
+\bar\pi_i=
+\frac{\sum_{\ell\in\mathcal O_i}w_{i\ell}\pi_{i\ell}}
+{\sum_{\ell\in\mathcal O_i}w_{i\ell}},
+\qquad \sum_{\ell\in\mathcal O_i}w_{i\ell}>0.
+```
+
+$`\pi_{i\ell}`$ 与 $`\bar\pi_i`$ 的单位为游戏货币／件，$`w_{i\ell}`$ 的单位为件；价格和数量须对应同一来源范围。若委托数量计入分母且无对应现金支出，该部分在此口径下计为零现金采购成本。该口径未计入时间与机会成本。
+
+完整采样日期、次数和来源版本未留存，采购价公式还存在按行关联错位及部分错误缓存的风险。现有数据用于描述历史经验条件，尚不足以估计可靠的需求分布、置信区间或缺货概率。字段与估计口径见[数据来源说明](docs/data-provenance.md)。
+
+### 2.2 建模选择的依据
+
+早期需求包含按实际利润排序。后续 PLAN 主线围绕喜好满足、食材消耗和供给压力建立评价，价格与利润保留为独立分析支线；历史需求与取舍过程见[需求与设计决策演进](docs/prompt-journey.md)。
+
+| 选择 | 依据与适用条件 |
+| --- | --- |
+| 食材件数与供给分别计量 | 件数对应制作中的实际用量；同件数食材的采购金额与取得难度可能不同，因此另用日供给评价资源压力。 |
+| 覆盖封顶与明确优先级 | 表达达到目标偏好后节约用料的备菜需求。封顶值与比较顺序由项目需求设定，其对其他备菜偏好的适用性仍待验证。 |
+| 每客日订单默认 5 | 用于将单份用量换算为日需求，属于情境假设；现有记录缺少实测订单概率，历史模型的订单均分也基于假设。 |
+
+PLAN 主线聚焦料理与加料，酒水、完整满意度和现金利润尚未联合建模；顾客预算为展示字段。各版本的决策量、目标变化及候选范围见第一章。
+
+<a id="zh-algorithms"></a>
+
+## 3. 求解算法与计算优化
+
+程序在第一章定义的候选范围内执行枚举、剪枝和目标比较。本章区分给定食材池上的完整枚举、候选生成前的规约，以及保留候选上的精确比较。以下采用基础配方使用 1–5 件食材、供给值有限的正常数据条件。
+
+### 3.1 给定食材池的组合枚举
+
+对顾客 $`g`$ 和料理 $`d`$，令实际枚举食材池为 $`(i_1,\ldots,i_{n_{g,d}})`$，$`n_{g,d}`$ 为池大小。基础配方使用 1–5 件食材，剩余格数为 $`s_d`$。追加 $`k`$ 件时，DFS 按非递减索引选择食材，允许重复同一种食材，并使每个多重集只生成一次。剪枝前的组合数为：
+
+```math
+\begin{gathered}
+s_d=5-\sum_i b_i(d),\qquad 0\le k\le s_d,\\
+1\le j_1\le\cdots\le j_k\le n_{g,d}\quad(k\ge1),\\
+N_{g,d}=\sum_{k=0}^{s_d}\binom{n_{g,d}+k-1}{k}
+=\binom{n_{g,d}+s_d}{s_d}\quad(n_{g,d}\ge1).
+\end{gathered}
+```
+
+空池只可能生成零加料组合。网页在必含标签指定「大份」且料理原标签未含「大份」时，将枚举限制为 $`k=s_d`$。网页按料理静态分块，最多使用 8 个 Web Worker 并行；各 Python 入口使用 CPU 求解。上述计数针对筛选、去重后的池，实际输出还受准入与后续过滤影响。
+
+### 3.2 Python DFS 的喜爱命中估计
+
+原 Python 在搜索中估计剩余格子能带来的喜爱命中，提前终止估计值不足的分支。令 $`T_0(d)`$ 为料理、厨具和售价产生、尚未应用覆盖与流行规则的标签；$`\delta_\ell`$ 为第 $`\ell`$ 种食材的直接喜爱标签数，$`\Delta_j`$ 为从索引 $`j`$ 开始的最大增量：
+
+```math
+\begin{gathered}
+\beta_{g,d}=|T_0(d)\cap\mathcal L_g|
++\eta_{\mathrm{large}}+\eta_{\mathrm L}+\eta_{\mathrm D},\\
+\delta_\ell=|T(i_\ell)\cap\mathcal L_g|,\qquad
+\Delta_j=\max_{\ell\ge j}\delta_\ell.
+\end{gathered}
+```
+
+空后缀取 $`\Delta_{n_{g,d}+1}=0`$。三个 $`\eta`$ 均在相应条件满足时取 1，否则取 0：大份项要求顾客喜爱「大份」且有剩余格子；两个流行项分别要求顾客喜爱相应流行词条，且基础标签或枚举食材的直接标签能命中其锚点。状态 $`(j,r,\gamma)`$ 记录下一件的最小索引、还需选择的件数及累计估计；初始 $`\gamma=\beta_{g,d}`$，选择 $`\ell\ge j`$ 后转为 $`(\ell,r-1,\gamma+\delta_\ell)`$。
+
+```math
+B(j,r,\gamma)=\gamma+r\Delta_j,\qquad
+B(j,r,\gamma)<S_{\min}\ \Longrightarrow\ \text{prune}.
+```
+
+料理级预检使用 $`\beta_{g,d}+s_d\Delta_1`$。该估计重复累计喜爱标签并忽略厌恶扣分；在所有可能新增喜爱均被初始项与增量覆盖时，它构成安全上界。原实现的流行可达性检查仅看直接标签，可能漏计凑满五件生成「大份」后触发的流行。相关食材筛选和最多三种中性补位也限制候选范围。叶节点仍须重新计算最终标签并检查厌恶与最低分，边界见[优化模型与算法边界](docs/design.md)。
+
+### 3.3 单客候选的支配过滤与词典序选择
+
+单客 `plan_for_guest` 缓存已生成候选的评价值，维护非支配前沿，并从中确定最佳方案。将三个目标统一写成最大化方向，候选 $`a`$ 支配 $`b`$ 的条件为：
+
+```math
+\begin{gathered}
+\mathbf f_g(p)=\left(U(H_g^{\mathrm L}(p)),-C(p),R(p)\right),\\
+f_{g,j}(a)\ge f_{g,j}(b)\quad(j=1,2,3),\qquad
+\exists j:\ f_{g,j}(a)>f_{g,j}(b).
+\end{gathered}
+```
+
+其中 $`f_{g,j}`$ 为目标向量的第 $`j`$ 个分量。被支配者的词典序目标必然较差，因而可在保留候选内删除。未封顶的 `singlePLAN` 用 $`H_g^{\mathrm L}(p)`$ 替代 $`U(H_g^{\mathrm L}(p))`$。记 $`\mathrm{best}_g(\mathcal P)`$ 为从非空候选集 $`\mathcal P`$ 中按 $`\mathbf f_g`$ 选取方案的函数；三项全同后，依次采用售价降序、料理名升序、加料字符串升序的平局规则。`nCookware` 的正常路径直接扫描每厨具候选并保留 best，不构建该 Pareto 前沿。
+
+### 3.4 历史多方案的阈值搜索与状态复用
+
+`detailedPLAN` 需要为每个目标标签选择方案。固定 $`J_g`$、$`m_g>0`$ 与 $`K>0`$，令每标签订单份额 $`\alpha=K/m_g`$。每个标签从 $`\mathcal C_{g,t}`$ 中选择一个方案。由于第一目标按标签相加，可先保留各标签全部并列最少件数候选：
+
+```math
+\begin{gathered}
+\mathcal M_{g,t}=\left\{p\in\mathcal C_{g,t}:C(p)=\min_{p'\in\mathcal C_{g,t}}C(p')\right\},\\
+\min E_{\mathrm{old}}=\alpha\sum_{t\in J_g}\min_{p\in\mathcal C_{g,t}}C(p).
+\end{gathered}
+```
+
+程序进一步合并总用量向量相同的候选。并列件数但用料不同的方案继续参与组合，因为它们对供给余量的影响不同。令 $`\lambda`$ 为最低日供给余量阈值（件／日），$`F_g(\lambda)\in\{0,1\}`$ 为可行指示量：从每个 $`\mathcal M_{g,t}`$ 选取一个方案，若存在组合使最低余量达到阈值，则取 1，否则取 0。利用用量的整数性，有限阈值条件可转换为容量上界：
+
+```math
+\begin{gathered}
+u_i^{\max}(\lambda)=\left\lfloor\frac{q_i-\lambda}{\alpha}\right\rfloor,\\
+R_{\mathrm{old}}\ge\lambda\ \Longleftrightarrow
+\forall i,\ u_i=0\ \lor\ u_i\le u_i^{\max}(\lambda).
+\end{gathered}
+```
+
+容量仅约束实际使用的食材。降低 $`\lambda`$ 会放宽所有容量，因此 $`\lambda_1\le\lambda_2`$ 时有 $`F_g(\lambda_2)=1\Rightarrow F_g(\lambda_1)=1`$。令 $`\mathcal I_g`$ 为保留候选可能使用的食材集合；每份至多五件使 $`u_i\le5m_g`$，故最低余量可在有限网格上搜索：
+
+```math
+\begin{gathered}
+\Lambda_g=\{-\infty\}\cup\{q_i-\alpha u:i\in\mathcal I_g,\ u=0,\ldots,5m_g\},\\
+\lambda^\star=\max\{\lambda\in\Lambda_g:F_g(\lambda)=1\}.
+\end{gathered}
+```
+
+外层二分定位最高可行阈值。源码将网格值舍入到小数点后 10 位，并以 $`\lfloor(q_i-\lambda)/\alpha+10^{-12}\rfloor`$ 计算容量；$`-\infty`$ 为无容量限制的哨兵。上述等价推导采用精确算术，原实现的边界判定还受这些浮点处理影响。
+
+每次阈值测试先删除单份即超容量的候选，再按候选数从少到多将 $`J_g`$ 中的标签排序为 $`t_1,\ldots,t_{m_g}`$。DFS 状态 $`(r,\mathbf u)`$ 表示已处理前 $`r`$ 个标签及其累计用量；记 $`\mathbf c(p)=(c_i(p))_i`$，选择下一标签方案后的转移为：
+
+```math
+(r,\mathbf u)\longrightarrow(r+1,\mathbf u+\mathbf c(p)).
+```
+
+任一已用食材超容量即剪枝；非负用量保证后续选择无法消除超额。相同状态具有相同的剩余问题，程序缓存其可行性；不同阈值分别建立缓存。二分减少阈值测试次数，单次判定仍包含组合搜索。
+
+找到 $`\lambda^\star`$ 后，程序在其容量下进一步最大化实际使用食材的完整升序余量向量。令 $`\boldsymbol\Phi(r,\mathbf u)`$ 为该状态可达到的最佳终态向量；无可行后继时标记无解。以下最大值仅遍历满足容量的转移：
+
+```math
+\begin{gathered}
+\boldsymbol\rho(\mathbf u)=\mathrm{sort}_{\uparrow}\big((q_i-\alpha u_i)_{i:u_i>0}\big),\\
+\boldsymbol\Phi(m_g,\mathbf u)=\boldsymbol\rho(\mathbf u),\\
+\boldsymbol\Phi(r,\mathbf u)=\max_{p\in\mathcal M_{g,t_{r+1}}}^{\mathrm{lex}}
+\boldsymbol\Phi(r+1,\mathbf u+\mathbf c(p)).
+\end{gathered}
+```
+
+每种实际使用的食材贡献一个分量。程序缓存最佳向量，再按固定候选顺序重建首个达到该向量的组合。变长向量按 Python 元组规则比较：首个不同分量较大者优先，完整前缀相同时较长者优先。缓存状态仍可能大量增长；该历史路线的阈值搜索未被 `nCookware` 正常主流程调用。
+
+### 3.5 共同厨具的预计算与集合枚举
+
+共同厨具求解先复用每客每厨具的最佳候选。取 $`v=\mathrm{nCookware}`$。对顾客 $`g`$、厨具 $`h`$ 和设备集合 $`S`$，沿用第一章的设备限制候选集与本章 best 函数；best 仅对非空集定义，下式只纳入存在候选的单厨具结果，第二式用于有解顾客：
+
+```math
+\begin{gathered}
+p_{g,h}^{\star}=\mathrm{best}_g\left(\mathcal C_g^v(\{h\})\right),\\
+p_g^{\star}(S)=\mathrm{best}_g\left(\{p_{g,h}^{\star}:h\in S\}\right).
+\end{gathered}
+```
+
+固定 $`S`$ 后，各客方案与逐客供给独立，该集合内的无解惩罚为常量，有解顾客的候选集为各单厨具集合的并集。因此，先取每厨具 best 再比较具有相同最优目标；各客独立最优也给出汇总目标的最优值：
+
+```math
+\max_{(p_g)\in\prod_{g\in G_S}\mathcal C_g^v(S)}^{\mathrm{lex}}
+\sum_{g\in G_S}\mathbf f_g(p_g)
+=\sum_{g\in G_S}\mathbf f_g(p_g^{\star}(S)).
+```
+
+这一分解依赖固定设备集合、实际保留候选及无共享库存等跨客耦合约束。对 $`1\le n\le|H|`$，外层枚举全部 $`\binom{|H|}{n}`$ 个恰好含 $`n`$ 种厨具的集合，按第一章的汇总目标与无解惩罚比较；全部厨具可用且选满时只有一个集合。
+
+令 $`N_{\mathrm{cand}}`$ 为所有顾客实际返回的候选总数。在单次指标求值成本固定的计量下，候选生成后的比较成本及 best 表容量分别为：
+
+```math
+O\left(N_{\mathrm{cand}}+\binom{|H|}{n}|G|n\right),\qquad O(|G||H|).
+```
+
+前者不含候选 DFS 的生成成本，后者仅计每客每厨具 best 表。相关筛选、等价代表与补位截断决定实际候选范围；现有记录尚无统一性能基准或跨设备对照。具体调用关系见[系统架构](docs/architecture.md)，完整最优性边界见[优化模型与算法边界](docs/design.md)。
 
 <a id="zh-verification"></a>
 
-## 4. 案例分析与验证范围
+## 4. 案例与验证
 
-以下案例分别解释规则准入、目标变化和候选简化的影响。其中的说明性比较与构造反例用于检验模型逻辑；已有程序运行记录另列于 4.4 节。
+### 4.1 目标设置对选择的影响
 
-### 4.1 从机制图到候选准入
+固定顾客 $`g`$ 与门槛 $`S_{\min}=3`$，令 $`p_{\mathrm P},p_{\mathrm Q}`$ 为两个合法候选，均满足 $`H_g^{\mathrm D}(p_{\mathrm P})=H_g^{\mathrm D}(p_{\mathrm Q})=0`$。表中列出决定本例选择的前两项目标：
 
-图 1 中，饭团加蜂蜜命中灵梦 3 项喜好、0 项厌恶；饭团加猪肉命中 2 项喜好、0 项厌恶。在默认 `nCookware` 条件下，前者满足喜好门槛，后者未达门槛。臭豆腐加蜂蜜触发配方禁忌，在该规划流程中于评分前排除。
-
-独立流行情境中，同一份饭团加蜂蜜因「甜」触发「流行·喜爱」，命中 4 项喜好、0 项厌恶，原始得分为 4；总用料仍为 2 件，`cover3` 的效用仍为 3。此结果已用原工作簿与原候选生成函数分别在无流行和有流行条件下核对。
-
-该例展示制作冲突与偏好准入的两级判定。饭团加蜂蜜通过准入后，仍须与其他合格候选按目标函数比较，才能确定最终选择。
-
-### 4.2 覆盖封顶如何改变选择
-
-考虑两个均合法、无厌恶命中的说明性候选：
-
-| 候选 | 喜好命中数 | 每份食材件数 | 未封顶覆盖优先 | 三分封顶后 |
+| 方案 | 喜好命中 $`H_g^{\mathrm L}(p)`$ | 食材件数 $`C(p)`$ | 未封顶覆盖优先 | 三分封顶后 |
 | --- | --- | --- | --- | --- |
-| P | 3 | 2 | 覆盖数低于 Q | 覆盖收益同为 3，因用料较少而优先 |
-| Q | 4 | 3 | 因覆盖更多而优先 | 额外命中不增加覆盖收益，件数较多 |
+| $`p_{\mathrm P}`$ | 3 | 2 | 覆盖数较低 | 覆盖收益同为 3，因用料较少而优先 |
+| $`p_{\mathrm Q}`$ | 4 | 3 | 因覆盖更多而优先 | 额外命中不增加覆盖收益，件数较多 |
 
-覆盖封顶后，两方案的第一目标收益相同，选择转由食材件数决定；供给余量仅在件数相同时参与比较。这一说明性案例展示评价政策如何影响选择，实际游玩的节省比例仍需实测。
+封顶后，选择由 $`p_{\mathrm Q}`$ 转为 $`p_{\mathrm P}`$。该算例展示目标设置对选择的影响，实际游玩的节省比例仍需实测。
 
-### 4.3 标签等价不代表资源效果等价
+### 4.2 同标签食材的资源差异
 
-考虑食材 A、B 标签相同，日供给分别为 10、9 件。基础配方已使用 A×1，还需追加一件同类标签食材；假设每日制作 5 份，并且两种追加选择均合法。
+记两种食材为 $`\mathrm A,\mathrm B`$，满足 $`T(\mathrm A)=T(\mathrm B)`$，并设 $`q_{\mathrm A}=10`$、$`q_{\mathrm B}=9`$、$`K=5`$。两方案使用同一料理，其基础配方仅为 A×1；$`p_{\mathrm A},p_{\mathrm B}`$ 分别再追加 A 或 B 一件，并假设均合法。
 
-| 追加选择 | 每份总用量 | 最低供给余量（件／日） |
+| 方案 | 每份总用量 | 最低供给余量（件／日） |
 | --- | --- | --- |
-| A | A×2 | $`10-5\times2=0`$ |
-| B | A×1、B×1 | $`\min(10-5,9-5)=4`$ |
+| $`p_{\mathrm A}`$ | A×2 | $`R(p_{\mathrm A})=10-5\times2=0`$ |
+| $`p_{\mathrm B}`$ | A×1、B×1 | $`R(p_{\mathrm B})=\min(10-5,9-5)=4`$ |
 
-两种选择具有相同标签与件数；计入基础配方耗用后，分散使用 A、B 获得更高的最低供给余量。这个构造反例表明，按原始日供给最高值选取标签组代表时，可能遗漏资源目标更优的组合。候选压缩对最优性范围的影响详见[优化模型与算法边界](docs/design.md)。
+两种选择具有相同标签与件数，分散使用 A、B 获得更高的最低供给余量。这个构造反例表明，按原始日供给最高值选取标签组代表时，可能遗漏资源目标更优的组合。候选压缩的完整讨论见[优化模型与算法边界](docs/design.md)。
 
-### 4.4 已有运行证据与可支持的结论
+### 4.3 运行证据与验证范围
 
-| 已有核对 | 观测 | 支持的结论 |
+| 核对项目 | 条件与观测 | 支持的结论 |
 | --- | --- | --- |
-| 原函数流行对照 | 原工作簿、灵梦、饭团加蜂蜜；无流行为 3 分，「甜」流行为 4 分；均为 2 件食材、0 项厌恶，封顶效用均为 3 | 流行增加命中，覆盖封顶仅改变优化效用 |
+| 原函数流行对照 | 原工作簿、灵梦、饭团加蜂蜜；无流行为 3 分，「甜」流行为 4 分；均为 2 件食材、0 项厌恶，封顶效用均为 3 | 原候选生成函数与机制图中的流行案例一致 |
 | 完整工作簿网页案例 | 博丽灵梦、阈值 3，启用加料子集过滤与等价去重：生成 4,372 条候选，搜索「饭团」后为 59 行，XLSX 导出同为 59 行 | 指定条件下查询与导出行为一致 |
 | 小规模 Python 对照 | 12 种食材、8 道料理、3 位顾客、5 种厨具；无流行、选择 3 种厨具。原件与副本共 4 次运行，XLSX 除时间元数据外一致 | 指定条件下发布副本保持原有计算行为 |
 
-文件与原工作簿的逐字节校验、完整条件及导出结构见[验证记录](docs/verification.md)。现有核对覆盖指定条件下的复现一致性。与人工备菜或其他策略的统一效果比较、58 位顾客的 Python 全量输出对照尚待完成；实际收益提升、缺货风险下降及全局最优性仍需独立证据。
+文件与原工作簿的逐字节校验、完整运行条件及导出结构见[验证记录](docs/verification.md)。
+
+<a id="zh-limits"></a>
+
+现有证据覆盖指定条件下的复现一致性。与人工备菜或其他策略的统一效果比较、58 位顾客的 Python 全量输出对照尚待完成；实际收益提升与缺货风险下降仍需独立验证。
+
+后续研究可考察订单量与供给变化的敏感性、多顾客共享库存约束，以及候选压缩与小规模完整枚举之间的结果差异。
 
 <a id="zh-methods"></a>
 
-## 5. 求解方法与复现入口
-
-### 5.1 使模型能够计算
-
-程序承担候选生成、指标计算、方案比较与结果导出。开发中的效率问题集中在组合枚举和重复计算，提速要求是在既定规则与目标下保持结果含义。现有实现使用 CPU；网页和 Python 是共享工作簿的独立入口，其评价规则与候选范围分别定义。
-
-| 计算环节 | 使用的方法 | 对求解范围的解释 |
-| --- | --- | --- |
-| 网页候选枚举 | 按料理静态分块，最多使用 8 个 Web Worker；枚举可重复加料组合并过滤 | 在浏览器 CPU 上计算，HTTP 服务只提供静态文件 |
-| Python 候选生成 | 标签等价分组、相关加料筛选、DFS 与得分上界 | 等价代表选择和中性补位前三项截断会限制候选范围 |
-| 历史多标签组合 | 以 $`\lambda`$ 为最低余量门槛，使用二分、DFS、容量剪枝和状态缓存 | 较高门槛可行意味着较低门槛可行；单次判定仍包含组合搜索 |
-| 共同厨具比较 | 预计算并复用每客每厨具结果，再枚举设备集合 | 复用子问题减少重复计算，集合评价仍遵循既定目标 |
-
-这些方法的适用分支和数据流见[系统架构](docs/architecture.md)。统一性能基准和跨设备对照尚待补充，目前可核对的内容为求解方法及其适用范围。
+## 5. 运行与复现
 
 <a id="zh-problem"></a>
 <a id="zh-running"></a>
 
-### 5.2 数据与执行方式
+### 5.1 数据准备与网页查询
 
-根目录 [东方夜雀食堂.xlsx](东方夜雀食堂.xlsx) 为完整原工作簿，共 13 张表。程序读取已保存的单元格结果；修改公式或其输入后，应先在支持相应公式的电子表格软件中重算并保存。
+网页和 Python 是共享根目录 [东方夜雀食堂.xlsx](东方夜雀食堂.xlsx) 的独立入口，各自解析数据并输出结果。程序读取工作簿已保存的单元格结果；修改公式或其输入后，需在支持相应公式的电子表格软件中重算并保存。
 
-以下命令从仓库根目录执行，完整 Python 依赖要求 Python 3.11 或更新版本：
+以下命令均从仓库根目录执行。完整 Python 依赖要求 Python 3.11 或更新版本：
 
 ```sh
 python -m pip install -r requirements.txt
 ```
 
-浏览器用于按人物、得分和筛选条件检查候选，并导出 CSV 或单表 XLSX：
+启动网页静态服务：
 
 ```sh
 python -m http.server 8000 --bind 127.0.0.1
 ```
 
-访问 <http://127.0.0.1:8000>，页面自动读取同目录工作簿，也支持文件导入。具体操作与筛选边界见[网页使用说明](docs/web-guide.md)。
+访问 <http://127.0.0.1:8000>。页面自动读取同目录工作簿，也支持手动导入 XLSX；按人物、得分和筛选条件查询后，可导出 CSV 或含 `结果` 表的 XLSX。操作及入口差异见[网页使用说明](docs/web-guide.md)。
 
-单客与共同厨具规划入口：
+### 5.2 Python 规划
+
+运行单客与共同厨具规划入口：
 
 ```sh
 python Python/singlePLAN_cover3_mixIng_nCookware.py
 ```
 
-程序依次询问流行喜爱标签、流行厌恶标签和厨具数量。流行留空表示无对应条件；厨具数量留空表示使用全部可用类型。默认读取根目录工作簿，结果写入 `稀客料理表/single_mixIng_nCookware/`。显式相对输入、输出路径以脚本目录 `Python/` 为基准解析。完整参数、工作表字段与输出约定见[输入输出规范](docs/input-output.md)。
+程序依次询问流行喜爱标签、流行厌恶标签和厨具数量。流行留空表示无对应条件，厨具数量留空表示使用全部可用类型。默认读取根目录工作簿，并在根目录下的 `稀客料理表/single_mixIng_nCookware/` 生成含 `Plans` 表的 XLSX。
 
-得分与利润脚本是使用同一工作簿的独立历史数据分析入口；上述规划模型的目标仍为覆盖、食材件数和供给余量。
-
-<a id="zh-limits"></a>
-
-## 6. 适用边界与讨论
-
-本项目的结论适用于既有游戏规则下的备菜比较，模型的解释范围由评价政策、数据和候选生成共同决定。
-
-- **目标范围**：覆盖封顶和严格优先级表达特定备菜偏好；PLAN 系列未联合建模酒水、完整满意度或现金利润，顾客预算为展示字段。
-- **资源范围**：最低供给余量逐客独立核算，允许为负。共同厨具模型尚缺多顾客共享库存约束，整晚供给可行性需要单独检验。
-- **搜索范围**：标签等价代表选择与中性补位截断可能遗漏具体组合。目标比较限定于保留的候选，全部合法组合上的全局最优性尚未建立。
-- **数据与验证**：历史采样和版本信息不完整，价格公式存在已知风险；缺少统一策略对照、真实订单分布和性能基准。参数变化的实际影响仍需在固定数据与明确条件下检验。
-- **入口差异**：网页与 Python 的禁忌处理、得分筛选和等价替代等行为存在差异。使用时需按所选入口解释结果，具体触发条件见[网页使用说明](docs/web-guide.md)。
-
-后续待研究的问题包括订单量与供给变化的敏感性、共享库存约束，以及候选压缩与小规模完整枚举之间的结果差异。
+显式相对输入、输出路径以脚本目录 `Python/` 为基准解析。参数、字段及文件命名规则见[输入输出规范](docs/input-output.md)。得分与利润脚本作为同一工作簿的独立分析入口，分别输出得分表和利润表。
 
 <a id="zh-sources"></a>
 
-## 7. 作者贡献、来源与补充文档
+## 6. 贡献与资料
 
-| 工作 | 贡献与归属 |
+本项目为非官方个人建模案例与辅助工具。
+
+| 参与方 | 工作与归属 |
 | --- | --- |
-| 问题定义与模型选择 | 作者提出实际游玩问题，梳理既有规则语义，确定决策单位、评价顺序、筛选和厨具条件 |
-| 数据记录与案例验收 | 作者手工记录价格、供给和委托相关数据，并通过具体角色与参数组合核对结果 |
-| 实现与推导 | 大量代码、算法推导和部分调试使用 AI 辅助；作者负责需求澄清、取舍和结果验收 |
-| 标签与图像 | 标签资料来自 [AnYiEE 的项目](https://github.com/AnYiEE/touhou-mystia-izakaya-assistant)；游戏图像归属、依赖许可和图示制作方式见[第三方声明](THIRD_PARTY_NOTICES.md) |
+| 作者 | 提出游玩问题、梳理规则，确定决策单位、评价顺序及筛选与厨具条件；手工记录价格、供给和委托数据，并通过角色与参数案例验收结果 |
+| AI 辅助 | 大量代码、算法推导和部分调试使用 AI 辅助；需求澄清、模型取舍与结果验收由作者负责 |
+| 第三方资料 | 标签资料来自 [AnYiEE 的项目](https://github.com/AnYiEE/touhou-mystia-izakaya-assistant)；游戏图像归属、依赖许可及图示制作方式见[第三方声明](THIRD_PARTY_NOTICES.md) |
 
-本项目为非官方个人建模案例与辅助工具。补充文档承载详细规则、实现和复现资料：
+详细资料按用途分列：
 
 | 文档 | 内容 |
 | --- | --- |
 | [优化模型与算法边界](docs/design.md) | 变量、目标、集合评价与候选范围 |
-| [需求与设计决策演进](docs/prompt-journey.md) | 从历史需求整理的目标变化、取舍与案例依据 |
+| [需求与设计决策演进](docs/prompt-journey.md) | 历史需求、目标变化、取舍与案例依据 |
 | [数据来源说明](docs/data-provenance.md) | 人工记录、上游资料及估计口径 |
 | [验证记录](docs/verification.md) | 观测条件、复现核对与未覆盖范围 |
 | [系统架构](docs/architecture.md) | 执行边界、数据流与文件职责 |
-| [输入输出规范](docs/input-output.md) | 工作簿结构、参数、路径与输出格式 |
+| [输入输出规范](docs/input-output.md) | 工作簿字段、参数、路径与输出格式 |
 | [网页使用说明](docs/web-guide.md) | 操作步骤、筛选含义与边界行为 |
 
 ---
@@ -629,7 +730,7 @@ This project formulates these questions as a discrete decision model. It defines
 
 The author's main work comprises identifying gameplay problems, clarifying rule semantics, recording supply and prices, specifying objectives and constraints, and checking results through character cases. Code implementation, some algorithm derivation, and debugging were AI-assisted. This document focuses on those modeling choices and their consequences. Interpretation of results is bounded by the given data, assumptions, and candidates actually retained.
 
-[Mathematical model](#en-model) · [Design rationale and evolution](#en-evolution) · [Data and assumptions](#en-data) · [Cases and verification](#en-verification) · [Solution methods and reproduction](#en-methods) · [Limitations](#en-limits) · [Contributions and documentation](#en-sources)
+[Mathematical model](#en-model) · [Data and modeling rationale](#en-data) · [Solution algorithms](#en-algorithms) · [Cases and verification](#en-verification) · [Running and reproduction](#en-methods) · [Contributions and references](#en-sources)
 
 **Mechanics and terminology** &nbsp; <a href="#en-tag-figure"><img src="docs/images/jump-to-figure-en.png" alt="Jump to diagram" width="156" height="28" align="middle"></a>
 
@@ -1050,182 +1151,283 @@ This main line retains 1 HTML file and 6 PLAN files. Its objectives progress fro
 The mathematical notation extends across versions, with candidate sets determined by each version's rules. Tag-equivalent representatives and neutral-filler cutoffs limit the actual search scope, so optimality conclusions apply to retained candidates; global optimality over all legal ingredient combinations has not been established. Supply slack is a ranking criterion that permits negative values, and the model has no hard inventory or guest-budget constraint. Selling price participates in tie-breaking; profit belongs to a separate analysis branch. Chapter 2 explains the tradeoffs at each stage; candidate reduction and solution details appear in the [optimization model and algorithm boundaries (Chinese)](docs/design.md).
 
 <a id="en-evolution"></a>
-
-## 2. Model design rationale and objective evolution
-
-### 2.1 From preparation problems to comparable objectives
-
-The project began by seeking preparation plans that meet guest requirements. As rules and use conditions became clearer, the meaning of an optimal plan was progressively specified through the decision unit, eligibility conditions, and comparison order. Early requirements also included ranking by actual profit. The subsequent planning models express resource requirements through ingredient units and supply slack, while regular guests, drinks, prices, and profit remain separate analysis branches.
-
-| Decision problem | Model change | Rationale and consequences |
-| --- | --- | --- |
-| What to prepare for several liked tags | Assign a plan to each coverable tag and estimate total use under equal order allocation; first minimize expected ingredient units, then maximize minimum supply slack | Different tags account for separate order shares; candidates tied for minimum units must still be retained because ingredient allocation affects supply pressure |
-| What fixed plan to prepare for each guest | Change the decision unit to one plan per guest; compare preference coverage, then units and slack | The requirement explicitly became one fixed plan per rare guest; orders are no longer split by tag, and the chosen plan serves all assumed orders, shifting the objective to the coverage and consumption of one dish |
-| Whether to pursue additional matches after qualification | Cap coverage benefit at 3 | Prioritize ingredient use after meeting the coverage target; additional matches may remain, but no longer increase the first objective |
-| How limited equipment can serve several guests | Extend specified cookware exclusions to the selection of exactly n shared cookware types | Guest-specific plans must fit the common equipment set; at the default threshold, set evaluation first increases the number of guests with qualifying plans |
-
-These stages change the definition of the optimization problem. Combining required ingredients and additions into five output slots changes result presentation while retaining the existing objective. Branch mappings, historical requirements, and character-based acceptance cases are described in the [requirements and design retrospective (Chinese)](docs/prompt-journey.md).
-
-### 2.2 Evaluation criteria and tradeoffs
-
-Coverage, ingredient units, and supply slack express different preferences. The following choices define the model's evaluation policy; their effects follow directly from the objective function.
-
-| Choice | Decision meaning | Tradeoff and conditions |
-| --- | --- | --- |
-| Cap coverage benefit | Make resource conservation the main comparison criterion after reaching the coverage target | The fourth and subsequent matches contribute zero additional benefit to the first objective; 3 is the model's utility cap for tag coverage |
-| Measure consumption in ingredient units | Count each ingredient unit equally across the base recipe and additions | Unit counts measure quantity; purchase costs and acquisition difficulty can vary by ingredient, and a separate criterion measures supply conditions |
-| Compare minimum supply slack | Focus on the ingredient with the least remaining supply among those used, identifying the bottleneck under assumed demand | Slack may be negative; it neither estimates shortage probability nor imposes a hard inventory constraint |
-| Use lexicographic ordering | Consider each later criterion only when earlier criteria tie, preserving explicit priorities | Ingredient units take priority over supply slack. This order follows the project requirements; its suitability for other preparation preferences remains to be evaluated |
-
-### 2.3 Roles of preparation rules, eligibility, and ranking
-
-Recipe prohibitions determine preparation conflicts. The planning model admits candidates with zero disliked matches and a minimum liked-tag count, then ranks them by the hierarchical objective. Browser queries filter candidates by the net score of liked minus disliked matches. The figure's score describes tag matching, eligibility defines the acceptable set, and coverage utility compares qualified plans. The browser query and each planning version generate and evaluate their own candidate sets.
-
 <a id="en-data"></a>
 
-## 3. Data sources, parameter estimates, and assumptions
+## 2. Data and modeling rationale
 
-Model inputs comprise rule references, manual observations, and scenario settings. The table lists their sources, uses, and derived criteria.
+### 2.1 Data sources and quality
 
-| Category | Content and basis | Role in the model |
+The root workbook contains 13 sheets. As parsed by `nCookware`, it includes 62 ingredient records, 164 dish records, and 58 rare guests; 163 dishes are marked as owned.
+
+| Data category | Source | Use |
 | --- | --- | --- |
-| Rule and attribute data | Recipes, cookware, tags, and guest preferences in the historical workbook; tag data came from AnYiEE's project | Define preparation conditions, tag processing, and preference matching |
-| Empirical observations | The author manually recorded prices, daily supply, and commission-related data and compiled empirical expectations | Daily supply is an input to resource evaluation; prices support separate economic analysis |
-| Demand and scenario assumptions | The default is 5 orders per guest per day; the single-guest model uses one plan for those orders; the historical model distributes orders equally across feasible tags | Convert per-dish ingredient use into assumed daily demand |
-| Evaluation policy | Liked-tag threshold, zero-dislike eligibility, coverage cap, objective order, and cookware count | Define acceptable plans and their priority relationships |
-| Derived criteria | Liked and disliked matches, ingredient units, minimum supply slack, and set-level aggregates | Calculate evaluation results from data, assumptions, and decisions |
+| Recipes, cookware, tags, and guest preferences | Historical workbook; tag data came from AnYiEE's project | Define recipe and tag-matching rules |
+| Prices, daily supply, and commission records | Manually recorded by the author during gameplay and compiled into empirical expectations | Daily supply supports resource evaluation; prices support separate economic analysis |
+| Trends, owned dishes, and cookware conditions | Workbook records and runtime inputs | Define the scenario for the current query or planning task |
 
-As parsed by `nCookware`, the workbook contains 62 ingredient records, 164 dish records, and 58 rare guests; 163 dishes are marked as owned. `Total Daily Quantity` represents empirical daily supply. Minimum supply slack is the model criterion obtained by subtracting assumed daily demand from that supply; the calculation uses no live player-inventory data.
+`Total Daily Quantity` supplies the given parameter $`q_i`$ from Chapter 1. The separate price analysis uses quantity weighting. For ingredient $`i`$, let $`\mathcal O_i`$ be the included procurement-channel records, $`\pi_{i\ell}`$ the unit purchase price in record $`\ell`$, and $`w_{i\ell}`$ the corresponding quantity. Then:
 
-Historical observations and quantity-weighted calculations account for price variation, but complete sampling dates, sample counts, and source versions were not retained. Purchase-price formulas also carry risks from row-based association errors and some cached formula errors. The available price and supply data therefore describe historical empirical conditions and are insufficient to establish reliable demand distributions, confidence intervals, or shortage probabilities. Fields, estimation conventions, and source coverage are detailed in the [data provenance notes (Chinese)](docs/data-provenance.md).
+```math
+\bar\pi_i=
+\frac{\sum_{\ell\in\mathcal O_i}w_{i\ell}\pi_{i\ell}}
+{\sum_{\ell\in\mathcal O_i}w_{i\ell}},
+\qquad \sum_{\ell\in\mathcal O_i}w_{i\ell}>0.
+```
+
+$`\pi_{i\ell}`$ and $`\bar\pi_i`$ are measured in in-game currency per ingredient unit, and $`w_{i\ell}`$ in ingredient units. Prices and quantities must cover the same source scope. Commission quantities included in the denominator without a corresponding cash-payment term are assigned zero cash purchase cost under this convention. Time and opportunity costs are excluded.
+
+Complete sampling dates, sample counts, and source versions were not retained, and purchase-price formulas carry risks from row-based association errors and some cached formula errors. The available data describe historical empirical conditions and are insufficient to estimate reliable demand distributions, confidence intervals, or shortage probabilities. Fields and estimation conventions are detailed in the [data provenance notes (Chinese)](docs/data-provenance.md).
+
+### 2.2 Rationale for modeling choices
+
+Early requirements included ranking by actual profit. The subsequent PLAN sequence evaluates preference satisfaction, ingredient consumption, and supply pressure, with price and profit retained as separate analyses. Historical requirements and tradeoffs are documented in the [requirements and design evolution (Chinese)](docs/prompt-journey.md).
+
+| Choice | Rationale and applicable conditions |
+| --- | --- |
+| Measure ingredient units and supply separately | Unit counts represent the quantities used in preparation. Purchase costs and acquisition difficulty may vary among ingredients with equal counts, so daily supply provides a separate measure of resource pressure. |
+| Cap coverage and specify priorities | Express the preparation preference for conserving ingredients after meeting the target preferences. The cap and comparison order follow the project requirements; their suitability for other preparation preferences remains to be evaluated. |
+| Default to 5 daily orders per guest | Convert per-dish use into daily demand under a scenario assumption. The available records lack empirical order probabilities; equal order allocation in the historical model is also an assumption. |
+
+The PLAN sequence focuses on dishes and additions. Drinks, full satisfaction, and cash profit have not been modeled jointly; guest budget is a display field. Chapter 1 defines each version's decisions, objective changes, and candidate scope.
+
+<a id="en-algorithms"></a>
+
+## 3. Solution algorithms and computational optimization
+
+The programs enumerate, prune, and compare plans within the candidate scopes defined in Chapter 1. This chapter distinguishes complete enumeration within a given ingredient pool, reductions applied before candidate generation, and exact comparisons among retained candidates. The analysis assumes normal data: base recipes use 1–5 ingredient units and supply values are finite.
+
+### 3.1 Enumerating combinations from a given ingredient pool
+
+For guest $`g`$ and dish $`d`$, let the actual enumeration pool be $`(i_1,\ldots,i_{n_{g,d}})`$, with size $`n_{g,d}`$. A base recipe uses 1–5 ingredient units and leaves $`s_d`$ free slots. For $`k`$ additions, DFS selects nondecreasing indices, permitting repeated ingredients while generating each multiset once. Before pruning, the number of combinations is:
+
+```math
+\begin{gathered}
+s_d=5-\sum_i b_i(d),\qquad 0\le k\le s_d,\\
+1\le j_1\le\cdots\le j_k\le n_{g,d}\quad(k\ge1),\\
+N_{g,d}=\sum_{k=0}^{s_d}\binom{n_{g,d}+k-1}{k}
+=\binom{n_{g,d}+s_d}{s_d}\quad(n_{g,d}\ge1).
+\end{gathered}
+```
+
+An empty pool can generate only the zero-addition combination. When 「Large portion」 is required and is absent from the dish's original tags, the webpage restricts enumeration to $`k=s_d`$. It partitions dishes into static batches and uses at most 8 Web Workers in parallel; the Python entry points use CPUs. These counts apply to filtered, deduplicated pools, with admission conditions and subsequent filters further restricting output.
+
+### 3.2 The liked-match estimate in Python DFS
+
+The original Python code estimates the liked matches that remaining slots can provide and terminates branches with insufficient estimates. Let $`T_0(d)`$ contain the dish, cookware, and price tags before overrides and trends; $`\delta_\ell`$ is the direct liked-tag count of ingredient $`\ell`$, and $`\Delta_j`$ is the largest increment available from index $`j`$ onward:
+
+```math
+\begin{gathered}
+\beta_{g,d}=|T_0(d)\cap\mathcal L_g|
++\eta_{\mathrm{large}}+\eta_{\mathrm L}+\eta_{\mathrm D},\\
+\delta_\ell=|T(i_\ell)\cap\mathcal L_g|,\qquad
+\Delta_j=\max_{\ell\ge j}\delta_\ell.
+\end{gathered}
+```
+
+Set $`\Delta_{n_{g,d}+1}=0`$ for the empty suffix. Each of the three $`\eta`$ terms equals 1 when its condition holds and 0 otherwise: the large-portion term requires the guest to like 「Large portion」 and free slots to remain; each trend term requires the guest to like that trend tag and a direct base or enumerated-ingredient tag to match its anchors. State $`(j,r,\gamma)`$ records the next minimum index, the remaining unit count, and the accumulated estimate. Initially, $`\gamma=\beta_{g,d}`$; choosing $`\ell\ge j`$ gives state $`(\ell,r-1,\gamma+\delta_\ell)`$.
+
+```math
+B(j,r,\gamma)=\gamma+r\Delta_j,\qquad
+B(j,r,\gamma)<S_{\min}\ \Longrightarrow\ \text{prune}.
+```
+
+The dish-level precheck uses $`\beta_{g,d}+s_d\Delta_1`$. This estimate counts repeated liked tags and ignores dislike penalties. It is a safe upper bound when its initial terms and increments cover every possible newly acquired like. The original trend-reachability check uses only direct tags and can miss a trend triggered by 「Large portion」 generated when all five slots are filled. Relevant-ingredient filtering and the cutoff of at most three neutral fillers also limit the candidate scope. At each leaf, final tags are recalculated and checked for dislikes and the minimum score; details appear in the [optimization model and algorithm boundaries (Chinese)](docs/design.md).
+
+### 3.3 Dominance filtering and lexicographic selection for one guest
+
+The single-guest `plan_for_guest` function caches the criteria of generated candidates, maintains a nondominated frontier, and selects the best plan. Writing all three criteria in the maximization direction, candidate $`a`$ dominates $`b`$ when:
+
+```math
+\begin{gathered}
+\mathbf f_g(p)=\left(U(H_g^{\mathrm L}(p)),-C(p),R(p)\right),\\
+f_{g,j}(a)\ge f_{g,j}(b)\quad(j=1,2,3),\qquad
+\exists j:\ f_{g,j}(a)>f_{g,j}(b).
+\end{gathered}
+```
+
+Here $`f_{g,j}`$ is component $`j`$ of the objective vector. A dominated candidate has a strictly worse lexicographic objective and can therefore be removed within the retained candidate set. Uncapped `singlePLAN` uses $`H_g^{\mathrm L}(p)`$ in place of $`U(H_g^{\mathrm L}(p))`$. Define $`\mathrm{best}_g(\mathcal P)`$ to select a plan from nonempty candidate set $`\mathcal P`$ by $`\mathbf f_g`$. If all three criteria tie, it compares selling price in descending order, then dish name and addition string in ascending order. The normal `nCookware` path scans candidates directly to retain the best per cookware type, without constructing this Pareto frontier.
+
+### 3.4 Threshold search and state reuse for the historical multiple-plan model
+
+`detailedPLAN` selects a plan for each target tag. With $`J_g`$, $`m_g>0`$, and $`K>0`$ fixed, define the order share per tag as $`\alpha=K/m_g`$. One plan is selected from $`\mathcal C_{g,t}`$ for each tag. The first objective adds across tags, so all tied minimum-unit candidates can be retained separately for each tag:
+
+```math
+\begin{gathered}
+\mathcal M_{g,t}=\left\{p\in\mathcal C_{g,t}:C(p)=\min_{p'\in\mathcal C_{g,t}}C(p')\right\},\\
+\min E_{\mathrm{old}}=\alpha\sum_{t\in J_g}\min_{p\in\mathcal C_{g,t}}C(p).
+\end{gathered}
+```
+
+The program further merges candidates with identical total ingredient-count vectors. Plans with tied counts but different ingredients remain in the combination search because their supply effects differ. Let $`\lambda`$ be the minimum daily supply-slack threshold in units/day, and define the feasibility indicator $`F_g(\lambda)\in\{0,1\}`$. Select one plan from each $`\mathcal M_{g,t}`$: the indicator is 1 if some combination reaches the minimum-slack threshold, and 0 otherwise. Integer ingredient counts convert a finite threshold condition into capacity bounds:
+
+```math
+\begin{gathered}
+u_i^{\max}(\lambda)=\left\lfloor\frac{q_i-\lambda}{\alpha}\right\rfloor,\\
+R_{\mathrm{old}}\ge\lambda\ \Longleftrightarrow
+\forall i,\ u_i=0\ \lor\ u_i\le u_i^{\max}(\lambda).
+\end{gathered}
+```
+
+Capacity bounds apply only to used ingredients. Lowering $`\lambda`$ relaxes every capacity, so $`\lambda_1\le\lambda_2`$ implies $`F_g(\lambda_2)=1\Rightarrow F_g(\lambda_1)=1`$. Let $`\mathcal I_g`$ contain ingredients that can occur in retained candidates. The five-unit limit per plan gives $`u_i\le5m_g`$, allowing minimum slack to be searched on a finite grid:
+
+```math
+\begin{gathered}
+\Lambda_g=\{-\infty\}\cup\{q_i-\alpha u:i\in\mathcal I_g,\ u=0,\ldots,5m_g\},\\
+\lambda^\star=\max\{\lambda\in\Lambda_g:F_g(\lambda)=1\}.
+\end{gathered}
+```
+
+The outer binary search locates the highest feasible threshold. The code rounds grid values to 10 decimal places and computes capacities with $`\lfloor(q_i-\lambda)/\alpha+10^{-12}\rfloor`$; $`-\infty`$ is the sentinel for unrestricted capacity. The equivalences above use exact arithmetic, while the original implementation's boundary decisions also reflect these floating-point operations.
+
+Each threshold test first removes candidates that individually exceed capacity, then orders the tags in $`J_g`$ as $`t_1,\ldots,t_{m_g}`$ by increasing candidate count. DFS state $`(r,\mathbf u)`$ records the first $`r`$ processed tags and their accumulated ingredient counts. Writing $`\mathbf c(p)=(c_i(p))_i`$, choosing a plan for the next tag gives:
+
+```math
+(r,\mathbf u)\longrightarrow(r+1,\mathbf u+\mathbf c(p)).
+```
+
+A branch is pruned as soon as any used ingredient exceeds capacity; nonnegative counts ensure later choices cannot remove the excess. Identical states have identical remaining problems, so the program caches feasibility, with a separate cache for each threshold. Binary search reduces the number of threshold tests; each test still contains a combinatorial search.
+
+After finding $`\lambda^\star`$, the program further maximizes the complete ascending slack vector of used ingredients under those capacities. Let $`\boldsymbol\Phi(r,\mathbf u)`$ be the best terminal vector reachable from the state; a state with no feasible successor is marked infeasible. The following maximum considers only capacity-compliant transitions:
+
+```math
+\begin{gathered}
+\boldsymbol\rho(\mathbf u)=\mathrm{sort}_{\uparrow}\big((q_i-\alpha u_i)_{i:u_i>0}\big),\\
+\boldsymbol\Phi(m_g,\mathbf u)=\boldsymbol\rho(\mathbf u),\\
+\boldsymbol\Phi(r,\mathbf u)=\max_{p\in\mathcal M_{g,t_{r+1}}}^{\mathrm{lex}}
+\boldsymbol\Phi(r+1,\mathbf u+\mathbf c(p)).
+\end{gathered}
+```
+
+Each used ingredient type contributes one component. The program caches the best vector, then reconstructs the first combination attaining it in a fixed candidate order. Variable-length vectors follow Python tuple comparison: the larger first differing component wins; when one is a complete prefix of the other, the longer vector wins. The cached state set can still grow substantially. This historical threshold-search route is not called by the normal `nCookware` workflow.
+
+### 3.5 Precomputation and enumeration for shared cookware
+
+Shared cookware selection reuses the best candidate for each guest and cookware type. Set $`v=\mathrm{nCookware}`$. For guest $`g`$, cookware $`h`$, and equipment set $`S`$, use Chapter 1's equipment-restricted candidate sets and this chapter's best function. The best function is defined only for nonempty sets: only existing single-cookware results enter these expressions, and the second applies to guests with feasible plans:
+
+```math
+\begin{gathered}
+p_{g,h}^{\star}=\mathrm{best}_g\left(\mathcal C_g^v(\{h\})\right),\\
+p_g^{\star}(S)=\mathrm{best}_g\left(\{p_{g,h}^{\star}:h\in S\}\right).
+\end{gathered}
+```
+
+For fixed $`S`$, plans and supply calculations are independent across guests, the missing-plan penalty for that set is constant, and each feasible guest's candidate set is the union of single-cookware sets. Selecting the best per cookware type before comparing them therefore preserves the optimal objective. Independent guest optima also attain the best aggregate objective:
+
+```math
+\max_{(p_g)\in\prod_{g\in G_S}\mathcal C_g^v(S)}^{\mathrm{lex}}
+\sum_{g\in G_S}\mathbf f_g(p_g)
+=\sum_{g\in G_S}\mathbf f_g(p_g^{\star}(S)).
+```
+
+This decomposition requires a fixed equipment set, the retained candidate scopes, and no shared inventory or other coupling constraints across guests. For $`1\le n\le|H|`$, the outer search enumerates all $`\binom{|H|}{n}`$ sets containing exactly $`n`$ cookware types and compares them by Chapter 1's aggregate objective and missing-plan penalties. Selecting all available cookware yields one set.
+
+Let $`N_{\mathrm{cand}}`$ be the total number of candidates actually returned across all guests. Treating each criterion evaluation as constant cost, comparison work after candidate generation and the size of the best table are, respectively:
+
+```math
+O\left(N_{\mathrm{cand}}+\binom{|H|}{n}|G|n\right),\qquad O(|G||H|).
+```
+
+The first expression excludes candidate-generation DFS, and the second counts only the guest-by-cookware best table. Relevant-ingredient filtering, equivalence representatives, and filler cutoffs determine the actual candidate scope. Uniform performance benchmarks and cross-device comparisons remain unavailable. Call relationships appear in the [architecture guide (Chinese)](docs/architecture.md), with the full optimality boundaries in the [optimization model and algorithm boundaries (Chinese)](docs/design.md).
 
 <a id="en-verification"></a>
 
-## 4. Case analysis and verification scope
+## 4. Cases and verification
 
-The following cases explain the effects of eligibility rules, objective changes, and candidate simplification. Illustrative comparisons and constructed counterexamples examine model logic; existing program-run records are presented separately in Section 4.4.
+### 4.1 How objective settings affect selection
 
-### 4.1 From the mechanism figure to candidate eligibility
+Fix guest $`g`$ and threshold $`S_{\min}=3`$. Let $`p_{\mathrm P},p_{\mathrm Q}`$ be two legal candidates with $`H_g^{\mathrm D}(p_{\mathrm P})=H_g^{\mathrm D}(p_{\mathrm Q})=0`$. The table shows the first two objective components, which determine the choice in this example:
 
-In Figure 1, rice ball with honey matches 3 of Reimu's likes and 0 dislikes; rice ball with pork matches 2 likes and 0 dislikes. Under the default `nCookware` conditions, the former meets the liked-tag threshold and the latter does not. Stinky tofu with honey triggers a recipe prohibition and is excluded before scoring in this planning workflow.
-
-In the separate trend scenario, the same rice ball with honey gains 「Liked trend」 because it contains 「Sweet」. It matches 4 likes and 0 dislikes, for a raw score of 4, while still using 2 ingredient units and retaining utility 3 under `cover3`. Both trend conditions were checked using the original workbook and candidate-generation functions.
-
-This case shows the two stages of preparation-conflict checking and preference-based eligibility. After qualification, rice ball with honey must be compared with the other eligible candidates under the objective function to determine the final choice.
-
-### 4.2 How capped coverage changes the choice
-
-Consider two illustrative candidates that are both legal and match no dislikes:
-
-| Candidate | Liked matches | Ingredient units per dish | Uncapped coverage priority | After capping at 3 |
+| Plan | Liked matches $`H_g^{\mathrm L}(p)`$ | Ingredient units $`C(p)`$ | Uncapped coverage priority | After capping at 3 |
 | --- | --- | --- | --- | --- |
-| P | 3 | 2 | Lower coverage than Q | Both have coverage benefit 3; preferred for using fewer units |
-| Q | 4 | 3 | Preferred for higher coverage | The extra match adds no coverage benefit, and ingredient use is higher |
+| $`p_{\mathrm P}`$ | 3 | 2 | Lower coverage | Both have coverage benefit 3; preferred for using fewer units |
+| $`p_{\mathrm Q}`$ | 4 | 3 | Preferred for higher coverage | The extra match adds no coverage benefit, and ingredient use is higher |
 
-After capping, both plans have the same first-objective benefit, so ingredient units determine the choice; supply slack is compared only when unit counts tie. This illustrative case shows how evaluation policy affects selection. Savings during actual gameplay require measurement.
+After capping, the choice changes from $`p_{\mathrm Q}`$ to $`p_{\mathrm P}`$. This example shows how objective settings affect selection; savings during actual gameplay require measurement.
 
-### 4.3 Tag equivalence does not imply equivalent resource effects
+### 4.2 Resource differences between ingredients with identical tags
 
-Consider ingredients A and B with identical tags and daily supplies of 10 and 9 units, respectively. The base recipe already uses A×1 and needs one additional ingredient with the same tag set. Assume 5 dishes are prepared per day and both additions are legal.
+Denote two ingredients by $`\mathrm A,\mathrm B`$, with $`T(\mathrm A)=T(\mathrm B)`$, and set $`q_{\mathrm A}=10`$, $`q_{\mathrm B}=9`$, and $`K=5`$. Both plans use the same dish, whose base recipe consists only of A×1. Plans $`p_{\mathrm A},p_{\mathrm B}`$ add one unit of A or B, respectively; assume both are legal.
 
-| Addition | Total use per dish | Minimum supply slack (units/day) |
+| Plan | Total use per dish | Minimum supply slack (units/day) |
 | --- | --- | --- |
-| A | A×2 | $`10-5\times2=0`$ |
-| B | A×1, B×1 | $`\min(10-5,9-5)=4`$ |
+| $`p_{\mathrm A}`$ | A×2 | $`R(p_{\mathrm A})=10-5\times2=0`$ |
+| $`p_{\mathrm B}`$ | A×1, B×1 | $`R(p_{\mathrm B})=\min(10-5,9-5)=4`$ |
 
-The choices have identical tags and ingredient counts. After accounting for the base recipe, distributing use across A and B yields greater minimum supply slack. This constructed counterexample shows that selecting the highest-supply ingredient as a tag-group representative can omit a combination with a better resource objective. The effect of candidate compression on the scope of optimality is discussed in the [optimization model and algorithm boundaries (Chinese)](docs/design.md).
+The choices have identical tags and ingredient counts, and distributing use across A and B yields greater minimum supply slack. This constructed counterexample shows that selecting the highest-supply ingredient as a tag-group representative can omit a combination with a better resource objective. Candidate compression is discussed in full in the [optimization model and algorithm boundaries (Chinese)](docs/design.md).
 
-### 4.4 Existing run evidence and supported conclusions
+### 4.3 Run evidence and verification scope
 
-| Existing check | Observation | Supported conclusion |
+| Check | Conditions and observations | Supported conclusion |
 | --- | --- | --- |
-| Trend comparison using original functions | Original workbook, Reimu, rice ball with honey: raw score 3 without trends and 4 with 「Sweet」 popular; both use 2 ingredient units, match 0 dislikes, and have capped utility 3 | The trend adds a match; the coverage cap affects only optimization utility |
+| Trend comparison using original functions | Original workbook, Reimu, rice ball with honey: raw score 3 without trends and 4 with 「Sweet」 popular; both use 2 ingredient units, match 0 dislikes, and have capped utility 3 | The original candidate-generation function agrees with the trend example in the mechanics figure |
 | Browser case using the complete workbook | 博丽灵梦, threshold 3, addition-subset filtering and equivalent-ingredient deduplication enabled: 4,372 candidates; 59 rows after searching for 「饭团」, and 59 rows in the XLSX export | Query and export behavior agree under the specified conditions |
-| Small Python comparison | 12 ingredients, 8 dishes, 3 guests, and 5 cookware types; no trends and 3 selected cookware types. Four runs across the original and copied programs produced matching XLSX contents except for time metadata | The distributed copy preserves the original computational behavior under the specified conditions |
+| Small Python comparison | 12 ingredients, 8 dishes, 3 guests, and 5 cookware types; no trends and 3 selected cookware types. Across 4 runs, the original and copied programs produced matching XLSX contents except for time metadata | The distributed copy preserves the original computational behavior under the specified conditions |
 
-Byte-level checks against the source files and original workbook, complete conditions, and export structures are documented in the [verification record (Chinese)](docs/verification.md). Existing checks cover reproducibility under specified conditions. Controlled comparisons against manual preparation or other strategies and a full Python output comparison across all 58 guests remain pending. Claims of higher actual returns, lower shortage risk, or global optimality require independent evidence.
+Byte-level checks against the source files and original workbook, complete run conditions, and export structures are documented in the [verification record (Chinese)](docs/verification.md).
+
+<a id="en-limits"></a>
+
+Existing evidence covers reproducibility under specified conditions. Controlled comparisons against manual preparation or other strategies and a full Python output comparison across all 58 guests remain pending. Higher actual returns and lower shortage risk require independent verification.
+
+Further research can examine sensitivity to order volumes and supply, shared inventory constraints across guests, and differences between compressed candidates and complete enumeration on small instances.
 
 <a id="en-methods"></a>
 
-## 5. Solution methods and reproduction entry points
-
-### 5.1 Making the model computable
-
-Programs generate candidates, compute criteria, compare plans, and export results. Development-time efficiency concerns centered on combinatorial enumeration and repeated computation, with the requirement that acceleration preserve result meaning under fixed rules and objectives. Current implementations use CPUs. The browser and Python scripts are independent entry points sharing the workbook, with separately defined evaluation rules and candidate scopes.
-
-| Computation | Methods used | Implications for solution scope |
-| --- | --- | --- |
-| Browser candidate enumeration | Static partitioning by dish across up to 8 Web Workers; enumeration of additions with repetition and candidate filtering | Computation runs on the browser CPU; the HTTP service only serves static files |
-| Python candidate generation | Tag-equivalent grouping, relevant-addition filtering, DFS, and score upper bounds | Equivalent representative selection and the three-candidate neutral-filler cutoff restrict candidate scope |
-| Historical multiple-tag combinations | Binary search, DFS, capacity pruning, and state caching with $`\lambda`$ as the minimum-slack threshold | Feasibility at a higher threshold implies feasibility at a lower threshold; each check still requires combinatorial search |
-| Shared cookware comparison | Precompute and reuse per-guest, per-cookware results before enumerating equipment sets | Reusing subproblems reduces repeated computation while set evaluation follows the specified objective |
-
-Applicable branches and data flows are described in the [system architecture (Chinese)](docs/architecture.md). Uniform performance benchmarks and cross-device comparisons remain to be added. Current records document the solution methods and their applicable scope.
+## 5. Running and reproducing results
 
 <a id="en-problem"></a>
 <a id="en-running"></a>
 
-### 5.2 Data and execution
+### 5.1 Data preparation and browser queries
 
-The root [东方夜雀食堂.xlsx](东方夜雀食堂.xlsx) is the complete original workbook with 13 sheets. Programs read saved cell results. After changing formulas or their inputs, recalculate and save the workbook in spreadsheet software supporting those formulas before running the programs.
+The browser and Python scripts are independent entry points sharing the root [东方夜雀食堂.xlsx](东方夜雀食堂.xlsx), each parsing data and producing its own outputs. Programs read saved cell results. After changing formulas or their inputs, recalculate and save the workbook in spreadsheet software supporting those formulas.
 
-Run the following commands from the repository root. The complete Python dependencies require Python 3.11 or later:
+Run all commands below from the repository root. The complete Python dependencies require Python 3.11 or later:
 
 ```sh
 python -m pip install -r requirements.txt
 ```
 
-The browser supports inspecting candidates by guest, score, and filter conditions and exporting CSV or single-sheet XLSX:
+Start the static web service:
 
 ```sh
 python -m http.server 8000 --bind 127.0.0.1
 ```
 
-Visit <http://127.0.0.1:8000>. The page automatically reads the workbook from the same directory and also accepts file imports. Operations and filter boundaries are described in the [browser guide (Chinese)](docs/web-guide.md).
+Visit <http://127.0.0.1:8000>. The page automatically reads the workbook from the same directory and also accepts manual XLSX imports. Query by guest, score, and filter conditions, then export CSV or XLSX containing the `结果` sheet. Operations and entry-point differences are described in the [browser guide (Chinese)](docs/web-guide.md).
 
-The single-guest and shared cookware planning entry point is:
+### 5.2 Python planning
+
+Run the single-guest and shared cookware planning entry point:
 
 ```sh
 python Python/singlePLAN_cover3_mixIng_nCookware.py
 ```
 
-The program requests liked-trend tags, disliked-trend tags, and a cookware count in sequence. An empty trend response specifies no corresponding condition; an empty cookware response selects all available types. It reads the root workbook by default and writes results to `稀客料理表/single_mixIng_nCookware/`. Explicit relative input and output paths are resolved from the script directory, `Python/`. Complete options, workbook fields, and output conventions are specified in the [input/output reference (Chinese)](docs/input-output.md).
+The program requests liked-trend tags, disliked-trend tags, and a cookware count in sequence. An empty trend response specifies no corresponding condition; an empty cookware response selects all available types. By default, it reads the root workbook and writes results to `稀客料理表/single_mixIng_nCookware/` under the repository root, producing an XLSX file containing the `Plans` sheet.
 
-Score and profit scripts provide separate analyses of historical data from the same workbook. The planning objectives remain coverage, ingredient units, and supply slack.
-
-<a id="en-limits"></a>
-
-## 6. Scope and discussion
-
-The project's conclusions apply to preparation comparisons under existing game rules. Evaluation policy, data, and candidate generation jointly determine the model's interpretive scope.
-
-- **Objective scope:** capped coverage and strict priorities express particular preparation preferences. The PLAN series does not jointly model drinks, full satisfaction, or cash profit; guest budget is a display field.
-- **Resource scope:** minimum supply slack is evaluated independently per guest and may be negative. The shared cookware model lacks a joint inventory constraint across guests; supply feasibility for an entire evening requires a separate check.
-- **Search scope:** tag-equivalent representative selection and the neutral-filler cutoff may omit concrete combinations. Objective comparison is restricted to retained candidates; global optimality over all legal combinations has not been established.
-- **Data and verification:** historical sampling and version information are incomplete, and price formulas have known risks. Controlled strategy comparisons, actual order distributions, and performance benchmarks are unavailable. The practical effects of parameter changes still require evaluation with fixed data and explicit conditions.
-- **Entry-point differences:** the browser and Python differ in prohibition handling, score filtering, equivalent substitutions, and other behavior. Results must be interpreted for the chosen entry point; specific trigger conditions are documented in the [browser guide (Chinese)](docs/web-guide.md).
-
-Open research questions include sensitivity to order volumes and supply, shared inventory constraints, and differences between compressed candidates and complete enumeration on small instances.
+Explicit relative input and output paths are resolved from the script directory, `Python/`. Parameters, fields, and naming rules are specified in the [input/output reference (Chinese)](docs/input-output.md). Score and profit scripts provide separate analysis entry points for the same workbook, producing score and profit tables, respectively.
 
 <a id="en-sources"></a>
 
-## 7. Author contributions, sources, and supplementary documentation
+## 6. Contributions and references
 
-| Work | Contribution and attribution |
+This is an unofficial personal modeling case study and supporting tool.
+
+| Contributor | Work and attribution |
 | --- | --- |
-| Problem definition and model choices | The author identified gameplay problems, clarified existing rule semantics, and specified decision units, evaluation order, filters, and cookware conditions |
-| Data recording and case acceptance | The author manually recorded prices, supply, and commission-related data and checked results using specific characters and parameter combinations |
-| Implementation and derivation | Much of the code, algorithm derivation, and some debugging were AI-assisted; the author clarified requirements, made tradeoffs, and evaluated results |
-| Tags and images | Tag data came from [AnYiEE's project](https://github.com/AnYiEE/touhou-mystia-izakaya-assistant); game artwork attribution, dependency licenses, and figure production are described in the [third-party notices (Chinese)](THIRD_PARTY_NOTICES.md) |
+| Author | Identified gameplay problems, clarified rules, and specified decision units, evaluation order, filters, and cookware conditions; manually recorded prices, supply, and commission data, and evaluated results through character and parameter cases |
+| AI assistance | Much of the code, algorithm derivation, and some debugging were AI-assisted; the author clarified requirements, selected model tradeoffs, and evaluated results |
+| Third-party material | Tag data came from [AnYiEE's project](https://github.com/AnYiEE/touhou-mystia-izakaya-assistant); game artwork attribution, dependency licenses, and figure production are described in the [third-party notices (Chinese)](THIRD_PARTY_NOTICES.md) |
 
-This is an unofficial personal modeling case study and supporting tool. Supplementary documents provide detailed rules, implementation information, and reproduction references:
+Detailed references are organized by purpose:
 
 | Document | Content |
 | --- | --- |
 | [Optimization model and algorithm boundaries (Chinese)](docs/design.md) | Variables, objectives, set evaluation, and candidate scope |
-| [Requirements and design retrospective (Chinese)](docs/prompt-journey.md) | Objective changes, tradeoffs, and case evidence drawn from historical requirements |
+| [Requirements and design retrospective (Chinese)](docs/prompt-journey.md) | Historical requirements, objective changes, tradeoffs, and case evidence |
 | [Data provenance (Chinese)](docs/data-provenance.md) | Manual observations, upstream material, and estimation conventions |
 | [Verification record (Chinese)](docs/verification.md) | Observation conditions, reproduction checks, and untested scope |
 | [System architecture (Chinese)](docs/architecture.md) | Execution boundaries, data flows, and file responsibilities |
-| [Input/output reference (Chinese)](docs/input-output.md) | Workbook structure, options, paths, and output formats |
+| [Input/output reference (Chinese)](docs/input-output.md) | Workbook fields, options, paths, and output formats |
 | [Browser guide (Chinese)](docs/web-guide.md) | Operations, filter semantics, and boundary behavior |
