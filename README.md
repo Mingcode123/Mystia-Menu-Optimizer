@@ -516,15 +516,6 @@ H_g^{\mathrm D}(p)=\sum_j z_j(T(p))z_j(\mathcal D_g).
 
 仅对达标组合构造用于展示的标签集合与候选对象，并保留原标签插入顺序和中文排序规则。高级过滤、子集过滤、采购向量与 Top-N 并列处理仍接收相同顺序的候选。主线程另缓存每行的检索文本，避免每次搜索重复拼接字符串。
 
-<details>
-<summary><strong>v1.0.0 · Initial Release — 逐组合构造标签集合</strong></summary>
-
-[版本说明与源码](https://github.com/Mingcode123/Mystia-Menu-Optimizer/releases/tag/v1.0.0)
-
-初始实现对每个加料组合创建集合，重新规范化料理标签、加入食材标签，再执行覆盖、流行与评分。这一结构直接对应集合模型，便于核对规则；大量未达标组合也需要承担字符串处理和对象分配成本。当前实现将固定数据预编译，并将展示对象的构造延后至准入判定之后。组合枚举与候选过滤的设计继续保留。
-
-</details>
-
 ### 3.2 Python DFS 的喜爱命中估计
 
 原 Python 在搜索中估计剩余格子能带来的喜爱命中，提前终止估计值不足的分支。令 $`T_0(d)`$ 为料理、厨具和售价产生、尚未应用覆盖与流行规则的标签；$`\delta_\ell`$ 为第 $`\ell`$ 种食材的直接喜爱标签数，$`\Delta_j`$ 为从索引 $`j`$ 开始的最大增量：
@@ -566,15 +557,6 @@ U(H_g^{\mathrm L}(q))=3,\quad C(p)>C(q)
 2. **同一道料理内部：** 按加料件数递增枚举。某一层出现封顶方案时，完整枚举该层，再停止访问更大件数层；保留候选随后按完整目标比较。低于封顶收益的方案不触发这一停止条件。
 
 此优化用于四个 `singlePLAN_cover3*` 入口。默认候选池函数仍可返回完整原候选池；未封顶的 `singlePLAN` 和历史 `detailedPLAN` 保留各自搜索方式。针对重复料理名或含多重集键分隔符的食材名，程序沿用不加此界限的枚举，以保留既有缓存行为。Python 仍以 CPU 串行执行；该界限无需 GPU 或多进程。
-
-<details>
-<summary><strong>v1.0.0 · Initial Release — 先生成候选池，再比较最优方案</strong></summary>
-
-[版本说明与源码](https://github.com/Mingcode123/Mystia-Menu-Optimizer/releases/tag/v1.0.0)
-
-初始 `cover3` 实现先对每道料理枚举所有允许的加料件数，返回达标候选池，再进行单客或每厨具比较。喜爱命中估计用于提前排除无法达标的分支；候选生成阶段尚未利用已找到方案的封顶收益和件数界限。该实现保留为可运行的历史版本，用于结果对照。现有喜爱估计、单客 Pareto 比较和共同厨具分解继续使用。
-
-</details>
 
 ### 3.3 单客候选的支配过滤与词典序选择
 
@@ -684,6 +666,150 @@ O\left(N_{\mathrm{cand}}+\binom{|H|}{n}|G|n\right),\qquad O(|G||H|).
 以上均为同一台 Windows 设备上的三次配对计时。Python 使用 3.12.14，固定最低分 3、每客日订单量 5、无流行喜爱、流行厌恶「水产」及全部五种厨具。网页内核使用 Node.js 24.22.1，固定博丽灵梦、最低分 3、无流行、四项主要过滤／采购选项均开启、两项“考虑得分”关闭、Top-N 为 3；该测量排除读表、Worker 启动与消息传递、DOM 渲染及浏览器调度。两行计时范围不同，不能直接比较其绝对速度；设备和后台负载也会影响观测值。
 
 界面使用原游戏图标与像素边框整理分区，保留控件、说明文本和导出字段。“停止”操作改为立即终止当前 Worker 并失效旧消息，随后恢复操作按钮；完整计算结果的规则保持不变。验证条件、差分规模与未覆盖范围见[验证记录](docs/verification.md)。
+
+<details>
+<summary><strong>v1.0.0 · Initial Release — 第 3 章完整原文</strong></summary>
+
+以下完整保留 [v1.0.0 原文](https://github.com/Mingcode123/Mystia-Menu-Optimizer/blob/v1.0.0/README.md)；其中的实现说明与验证范围均对应该版本。
+
+## 3. 求解算法与计算优化
+
+程序在第一章定义的候选范围内执行枚举、剪枝和目标比较。本章区分给定食材池上的完整枚举、候选生成前的规约，以及保留候选上的精确比较。以下采用基础配方使用 1–5 件食材、供给值有限的正常数据条件。
+
+### 3.1 给定食材池的组合枚举
+
+对顾客 $`g`$ 和料理 $`d`$，令实际枚举食材池为 $`(i_1,\ldots,i_{n_{g,d}})`$，$`n_{g,d}`$ 为池大小。基础配方使用 1–5 件食材，剩余格数为 $`s_d`$。追加 $`k`$ 件时，DFS 按非递减索引选择食材，允许重复同一种食材，并使每个多重集只生成一次。剪枝前的组合数为：
+
+```math
+\begin{gathered}
+s_d=5-\sum_i b_i(d),\qquad 0\le k\le s_d,\\
+1\le j_1\le\cdots\le j_k\le n_{g,d}\quad(k\ge1),\\
+N_{g,d}=\sum_{k=0}^{s_d}\binom{n_{g,d}+k-1}{k}
+=\binom{n_{g,d}+s_d}{s_d}\quad(n_{g,d}\ge1).
+\end{gathered}
+```
+
+空池只可能生成零加料组合。网页在必含标签指定「大份」且料理原标签未含「大份」时，将枚举限制为 $`k=s_d`$。网页按料理静态分块，最多使用 8 个 Web Worker 并行；各 Python 入口使用 CPU 求解。上述计数针对筛选、去重后的池，实际输出还受准入与后续过滤影响。
+
+### 3.2 Python DFS 的喜爱命中估计
+
+原 Python 在搜索中估计剩余格子能带来的喜爱命中，提前终止估计值不足的分支。令 $`T_0(d)`$ 为料理、厨具和售价产生、尚未应用覆盖与流行规则的标签；$`\delta_\ell`$ 为第 $`\ell`$ 种食材的直接喜爱标签数，$`\Delta_j`$ 为从索引 $`j`$ 开始的最大增量：
+
+```math
+\begin{gathered}
+\beta_{g,d}=|T_0(d)\cap\mathcal L_g|
++\eta_{\mathrm{large}}+\eta_{\mathrm L}+\eta_{\mathrm D},\\
+\delta_\ell=|T(i_\ell)\cap\mathcal L_g|,\qquad
+\Delta_j=\max_{\ell\ge j}\delta_\ell.
+\end{gathered}
+```
+
+空后缀取 $`\Delta_{n_{g,d}+1}=0`$。三个 $`\eta`$ 均在相应条件满足时取 1，否则取 0：大份项要求顾客喜爱「大份」且有剩余格子；两个流行项分别要求顾客喜爱相应流行词条，且基础标签或枚举食材的直接标签能命中其锚点。状态 $`(j,r,\gamma)`$ 记录下一件的最小索引、还需选择的件数及累计估计；初始 $`\gamma=\beta_{g,d}`$，选择 $`\ell\ge j`$ 后转为 $`(\ell,r-1,\gamma+\delta_\ell)`$。
+
+```math
+B(j,r,\gamma)=\gamma+r\Delta_j,\qquad
+B(j,r,\gamma) < S_{\min}\ \Longrightarrow\ \text{prune}.
+```
+
+料理级预检使用 $`\beta_{g,d}+s_d\Delta_1`$。该估计重复累计喜爱标签并忽略厌恶扣分；在所有可能新增喜爱均被初始项与增量覆盖时，它构成安全上界。原实现的流行可达性检查仅看直接标签，可能漏计凑满五件生成「大份」后触发的流行。相关食材筛选和最多三种中性补位也限制候选范围。叶节点仍须重新计算最终标签并检查厌恶与最低分，边界见[优化模型与算法边界](docs/design.md)。
+
+### 3.3 单客候选的支配过滤与词典序选择
+
+单客 `plan_for_guest` 缓存已生成候选的评价值，维护非支配前沿，并从中确定最佳方案。将三个目标统一写成最大化方向，候选 $`a`$ 支配 $`b`$ 的条件为：
+
+```math
+\begin{gathered}
+\mathbf f_g(p)=\left(U(H_g^{\mathrm L}(p)),-C(p),R(p)\right),\\
+f_{g,j}(a)\ge f_{g,j}(b)\quad(j=1,2,3),\qquad
+\exists j:\ f_{g,j}(a)>f_{g,j}(b).
+\end{gathered}
+```
+
+其中 $`f_{g,j}`$ 为目标向量的第 $`j`$ 个分量。被支配者的词典序目标必然较差，因而可在保留候选内删除。未封顶的 `singlePLAN` 用 $`H_g^{\mathrm L}(p)`$ 替代 $`U(H_g^{\mathrm L}(p))`$。记 $`\mathrm{best}_g(\mathcal P)`$ 为从非空候选集 $`\mathcal P`$ 中按 $`\mathbf f_g`$ 选取方案的函数；三项全同后，依次采用售价降序、料理名升序、加料字符串升序的平局规则。`nCookware` 的正常路径直接扫描每厨具候选并保留 best，不构建该 Pareto 前沿。
+
+### 3.4 历史多方案的阈值搜索与状态复用
+
+`detailedPLAN` 需要为每个目标标签选择方案。固定 $`J_g`$、$`m_g>0`$ 与 $`K>0`$，令每标签订单份额 $`\alpha=K/m_g`$。每个标签从 $`\mathcal C_{g,t}`$ 中选择一个方案。由于第一目标按标签相加，可先保留各标签全部并列最少件数候选：
+
+```math
+\begin{gathered}
+\mathcal M_{g,t}=\left\{p\in\mathcal C_{g,t}:C(p)=\min_{p'\in\mathcal C_{g,t}}C(p')\right\},\\
+\min E_{\mathrm{old}}=\alpha\sum_{t\in J_g}\min_{p\in\mathcal C_{g,t}}C(p).
+\end{gathered}
+```
+
+程序进一步合并总用量向量相同的候选。并列件数但用料不同的方案继续参与组合，因为它们对供给余量的影响不同。令 $`\lambda`$ 为最低日供给余量阈值（件／日），$`F_g(\lambda)\in\{0,1\}`$ 为可行指示量：从每个 $`\mathcal M_{g,t}`$ 选取一个方案，若存在组合使最低余量达到阈值，则取 1，否则取 0。利用用量的整数性，有限阈值条件可转换为容量上界：
+
+```math
+\begin{gathered}
+u_i^{\max}(\lambda)=\left\lfloor\frac{q_i-\lambda}{\alpha}\right\rfloor,\\
+R_{\mathrm{old}}\ge\lambda\ \Longleftrightarrow
+\forall i,\ u_i=0\ \lor\ u_i\le u_i^{\max}(\lambda).
+\end{gathered}
+```
+
+容量仅约束实际使用的食材。降低 $`\lambda`$ 会放宽所有容量，因此 $`\lambda_1\le\lambda_2`$ 时有 $`F_g(\lambda_2)=1\Rightarrow F_g(\lambda_1)=1`$。令 $`\mathcal I_g`$ 为保留候选可能使用的食材集合；每份至多五件使 $`u_i\le5m_g`$，故最低余量可在有限网格上搜索：
+
+```math
+\begin{gathered}
+\Lambda_g=\{-\infty\}\cup\{q_i-\alpha u:i\in\mathcal I_g,\ u=0,\ldots,5m_g\},\\
+\lambda^\star=\max\{\lambda\in\Lambda_g:F_g(\lambda)=1\}.
+\end{gathered}
+```
+
+外层二分定位最高可行阈值。源码将网格值舍入到小数点后 10 位，并以 $`\lfloor(q_i-\lambda)/\alpha+10^{-12}\rfloor`$ 计算容量；$`-\infty`$ 为无容量限制的哨兵。上述等价推导采用精确算术，原实现的边界判定还受这些浮点处理影响。
+
+每次阈值测试先删除单份即超容量的候选，再按候选数从少到多将 $`J_g`$ 中的标签排序为 $`t_1,\ldots,t_{m_g}`$。DFS 状态 $`(r,\mathbf u)`$ 表示已处理前 $`r`$ 个标签及其累计用量；记 $`\mathbf c(p)=(c_i(p))_i`$，选择下一标签方案后的转移为：
+
+```math
+(r,\mathbf u)\longrightarrow(r+1,\mathbf u+\mathbf c(p)).
+```
+
+任一已用食材超容量即剪枝；非负用量保证后续选择无法消除超额。相同状态具有相同的剩余问题，程序缓存其可行性；不同阈值分别建立缓存。二分减少阈值测试次数，单次判定仍包含组合搜索。
+
+找到 $`\lambda^\star`$ 后，程序在其容量下进一步最大化实际使用食材的完整升序余量向量。令 $`\boldsymbol\Phi(r,\mathbf u)`$ 为该状态可达到的最佳终态向量；无可行后继时标记无解。以下最大值仅遍历满足容量的转移：
+
+```math
+\begin{gathered}
+\boldsymbol\rho(\mathbf u)=\mathrm{sort}_{\uparrow}\big((q_i-\alpha u_i)_{i:u_i>0}\big),\\
+\boldsymbol\Phi(m_g,\mathbf u)=\boldsymbol\rho(\mathbf u),\\
+\boldsymbol\Phi(r,\mathbf u)=\max_{p\in\mathcal M_{g,t_{r+1}}}^{\mathrm{lex}}
+\boldsymbol\Phi(r+1,\mathbf u+\mathbf c(p)).
+\end{gathered}
+```
+
+每种实际使用的食材贡献一个分量。程序缓存最佳向量，再按固定候选顺序重建首个达到该向量的组合。变长向量按 Python 元组规则比较：首个不同分量较大者优先，完整前缀相同时较长者优先。缓存状态仍可能大量增长；该历史路线的阈值搜索未被 `nCookware` 正常主流程调用。
+
+### 3.5 共同厨具的预计算与集合枚举
+
+共同厨具求解先复用每客每厨具的最佳候选。取 $`v=\mathrm{nCookware}`$。对顾客 $`g`$、厨具 $`h`$ 和设备集合 $`S`$，沿用第一章的设备限制候选集与本章 best 函数；best 仅对非空集定义，下式只纳入存在候选的单厨具结果，第二式用于有解顾客：
+
+```math
+\begin{gathered}
+p_{g,h}^{\star}=\mathrm{best}_g\left(\mathcal C_g^v(\{h\})\right),\\
+p_g^{\star}(S)=\mathrm{best}_g\left(\{p_{g,h}^{\star}:h\in S\}\right).
+\end{gathered}
+```
+
+固定 $`S`$ 后，各客方案与逐客供给独立，该集合内的无解惩罚为常量，有解顾客的候选集为各单厨具集合的并集。因此，先取每厨具 best 再比较具有相同最优目标；各客独立最优也给出汇总目标的最优值：
+
+```math
+\max_{(p_g)\in\prod_{g\in G_S}\mathcal C_g^v(S)}^{\mathrm{lex}}
+\sum_{g\in G_S}\mathbf f_g(p_g)
+=\sum_{g\in G_S}\mathbf f_g(p_g^{\star}(S)).
+```
+
+这一分解依赖固定设备集合、实际保留候选及无共享库存等跨客耦合约束。对 $`1\le n\le|H|`$，外层枚举全部 $`\binom{|H|}{n}`$ 个恰好含 $`n`$ 种厨具的集合，按第一章的汇总目标与无解惩罚比较；全部厨具可用且选满时只有一个集合。
+
+令 $`N_{\mathrm{cand}}`$ 为所有顾客实际返回的候选总数。在单次指标求值成本固定的计量下，候选生成后的比较成本及 best 表容量分别为：
+
+```math
+O\left(N_{\mathrm{cand}}+\binom{|H|}{n}|G|n\right),\qquad O(|G||H|).
+```
+
+前者不含候选 DFS 的生成成本，后者仅计每客每厨具 best 表。相关筛选、等价代表与补位截断决定实际候选范围；现有记录尚无统一性能基准或跨设备对照。具体调用关系见[系统架构](docs/architecture.md)，完整最优性边界见[优化模型与算法边界](docs/design.md)。
+
+</details>
 
 <a id="zh-verification"></a>
 
@@ -1355,15 +1481,6 @@ Here $`\mathbf 1`$ is an event indicator; $`\lor`$ and $`\land`$ denote componen
 
 Display tag sets and candidate objects are materialized only for qualifying combinations, preserving original tag insertion order and Chinese collation. Upgrade filtering, subset filtering, procurement vectors, and Top-N ties continue to receive candidates in the same order. The main thread also caches each row's search text to avoid repeated string construction.
 
-<details>
-<summary><strong>v1.0.0 · Initial Release — constructing tag sets for every combination</strong></summary>
-
-[Release notes and source](https://github.com/Mingcode123/Mystia-Menu-Optimizer/releases/tag/v1.0.0)
-
-The initial implementation created a set for every addition combination, normalized dish tags again, added ingredient tags, and evaluated overrides, trends, and score. This structure mapped directly to the set model and made rule checks straightforward; combinations later rejected still incurred string-processing and allocation costs. The current implementation precompiles fixed data and defers display-object construction until after admission. The enumeration and candidate-filtering designs remain in use.
-
-</details>
-
 ### 3.2 The liked-match estimate in Python DFS
 
 The original Python code estimates the liked matches that remaining slots can provide and terminates branches with insufficient estimates. Let $`T_0(d)`$ contain the dish, cookware, and price tags before overrides and trends; $`\delta_\ell`$ is the direct liked-tag count of ingredient $`\ell`$, and $`\Delta_j`$ is the largest increment available from index $`j`$ onward:
@@ -1405,15 +1522,6 @@ The bound operates at two levels:
 2. **Within a dish:** addition counts are enumerated in increasing order. When a layer contains a capped-utility plan, that layer is fully enumerated before larger layers are skipped; retained candidates are subsequently compared by the complete objective. Plans below the utility cap do not trigger this stopping condition.
 
 This optimization applies to the four `singlePLAN_cover3*` entries. The candidate-pool function still returns the full original pool by default; uncapped `singlePLAN` and historical `detailedPLAN` retain their search methods. Inputs with duplicate dish names or ingredient names containing multiset-key delimiters use enumeration without this bound, preserving existing cache behavior. Python remains sequential on the CPU; the bound requires neither a GPU nor multiprocessing.
-
-<details>
-<summary><strong>v1.0.0 · Initial Release — generating candidate pools before selecting the best plan</strong></summary>
-
-[Release notes and source](https://github.com/Mingcode123/Mystia-Menu-Optimizer/releases/tag/v1.0.0)
-
-The initial `cover3` implementation enumerated every allowed addition count for each dish, returned its qualifying candidate pool, and then compared plans per guest or cookware. Liked-match estimates removed branches unable to qualify; candidate generation did not yet use the capped utility and count of an incumbent. This implementation remains available as a runnable historical version for result comparisons. Existing liked-match estimates, single-guest Pareto comparison, and shared-cookware decomposition remain in use.
-
-</details>
 
 ### 3.3 Dominance filtering and lexicographic selection for one guest
 
@@ -1523,6 +1631,150 @@ Performance optimization is compared against `v1.0.0` using complete results, ro
 Each row reports three paired timings on the same Windows machine. Python 3.12.14 uses minimum score 3, five daily orders per guest, no liked trend, the Aquatic disliked trend, and all five cookware types. The browser kernel runs under Node.js 24.22.1 for Reimu, minimum score 3, no trends, all four primary filtering/procurement options enabled, both score-aware options disabled, and Top-N 3. This measurement excludes workbook loading, worker startup and message passing, DOM rendering, and browser scheduling. The two rows have different timing scopes and do not support a direct comparison of absolute speed; hardware and background workloads also affect observations.
 
 The interface uses original game icons and pixel borders to organize panels while retaining controls, explanatory text, and export fields. Stop now terminates current workers immediately, invalidates stale messages, and restores controls; completed calculations retain their result rules. Conditions, differential-test counts, and untested scope appear in the [verification record (Chinese)](docs/verification.md).
+
+<details>
+<summary><strong>v1.0.0 · Initial Release — Chapter 3 in full</strong></summary>
+
+Complete original text from [v1.0.0](https://github.com/Mingcode123/Mystia-Menu-Optimizer/blob/v1.0.0/README.md). Implementation details and verification limits below describe that release.
+
+## 3. Solution algorithms and computational optimization
+
+The programs enumerate, prune, and compare plans within the candidate scopes defined in Chapter 1. This chapter distinguishes complete enumeration within a given ingredient pool, reductions applied before candidate generation, and exact comparisons among retained candidates. The analysis assumes normal data: base recipes use 1–5 ingredient units and supply values are finite.
+
+### 3.1 Enumerating combinations from a given ingredient pool
+
+For guest $`g`$ and dish $`d`$, let the actual enumeration pool be $`(i_1,\ldots,i_{n_{g,d}})`$, with size $`n_{g,d}`$. A base recipe uses 1–5 ingredient units and leaves $`s_d`$ free slots. For $`k`$ additions, DFS selects nondecreasing indices, permitting repeated ingredients while generating each multiset once. Before pruning, the number of combinations is:
+
+```math
+\begin{gathered}
+s_d=5-\sum_i b_i(d),\qquad 0\le k\le s_d,\\
+1\le j_1\le\cdots\le j_k\le n_{g,d}\quad(k\ge1),\\
+N_{g,d}=\sum_{k=0}^{s_d}\binom{n_{g,d}+k-1}{k}
+=\binom{n_{g,d}+s_d}{s_d}\quad(n_{g,d}\ge1).
+\end{gathered}
+```
+
+An empty pool can generate only the zero-addition combination. When 「Large portion」 is required and is absent from the dish's original tags, the webpage restricts enumeration to $`k=s_d`$. It partitions dishes into static batches and uses at most 8 Web Workers in parallel; the Python entry points use CPUs. These counts apply to filtered, deduplicated pools, with admission conditions and subsequent filters further restricting output.
+
+### 3.2 The liked-match estimate in Python DFS
+
+The original Python code estimates the liked matches that remaining slots can provide and terminates branches with insufficient estimates. Let $`T_0(d)`$ contain the dish, cookware, and price tags before overrides and trends; $`\delta_\ell`$ is the direct liked-tag count of ingredient $`\ell`$, and $`\Delta_j`$ is the largest increment available from index $`j`$ onward:
+
+```math
+\begin{gathered}
+\beta_{g,d}=|T_0(d)\cap\mathcal L_g|
++\eta_{\mathrm{large}}+\eta_{\mathrm L}+\eta_{\mathrm D},\\
+\delta_\ell=|T(i_\ell)\cap\mathcal L_g|,\qquad
+\Delta_j=\max_{\ell\ge j}\delta_\ell.
+\end{gathered}
+```
+
+Set $`\Delta_{n_{g,d}+1}=0`$ for the empty suffix. Each of the three $`\eta`$ terms equals 1 when its condition holds and 0 otherwise: the large-portion term requires the guest to like 「Large portion」 and free slots to remain; each trend term requires the guest to like that trend tag and a direct base or enumerated-ingredient tag to match its anchors. State $`(j,r,\gamma)`$ records the next minimum index, the remaining unit count, and the accumulated estimate. Initially, $`\gamma=\beta_{g,d}`$; choosing $`\ell\ge j`$ gives state $`(\ell,r-1,\gamma+\delta_\ell)`$.
+
+```math
+B(j,r,\gamma)=\gamma+r\Delta_j,\qquad
+B(j,r,\gamma) < S_{\min}\ \Longrightarrow\ \text{prune}.
+```
+
+The dish-level precheck uses $`\beta_{g,d}+s_d\Delta_1`$. This estimate counts repeated liked tags and ignores dislike penalties. It is a safe upper bound when its initial terms and increments cover every possible newly acquired like. The original trend-reachability check uses only direct tags and can miss a trend triggered by 「Large portion」 generated when all five slots are filled. Relevant-ingredient filtering and the cutoff of at most three neutral fillers also limit the candidate scope. At each leaf, final tags are recalculated and checked for dislikes and the minimum score; details appear in the [optimization model and algorithm boundaries (Chinese)](docs/design.md).
+
+### 3.3 Dominance filtering and lexicographic selection for one guest
+
+The single-guest `plan_for_guest` function caches the criteria of generated candidates, maintains a nondominated frontier, and selects the best plan. Writing all three criteria in the maximization direction, candidate $`a`$ dominates $`b`$ when:
+
+```math
+\begin{gathered}
+\mathbf f_g(p)=\left(U(H_g^{\mathrm L}(p)),-C(p),R(p)\right),\\
+f_{g,j}(a)\ge f_{g,j}(b)\quad(j=1,2,3),\qquad
+\exists j:\ f_{g,j}(a)>f_{g,j}(b).
+\end{gathered}
+```
+
+Here $`f_{g,j}`$ is component $`j`$ of the objective vector. A dominated candidate has a strictly worse lexicographic objective and can therefore be removed within the retained candidate set. Uncapped `singlePLAN` uses $`H_g^{\mathrm L}(p)`$ in place of $`U(H_g^{\mathrm L}(p))`$. Define $`\mathrm{best}_g(\mathcal P)`$ to select a plan from nonempty candidate set $`\mathcal P`$ by $`\mathbf f_g`$. If all three criteria tie, it compares selling price in descending order, then dish name and addition string in ascending order. The normal `nCookware` path scans candidates directly to retain the best per cookware type, without constructing this Pareto frontier.
+
+### 3.4 Threshold search and state reuse for the historical multiple-plan model
+
+`detailedPLAN` selects a plan for each target tag. With $`J_g`$, $`m_g>0`$, and $`K>0`$ fixed, define the order share per tag as $`\alpha=K/m_g`$. One plan is selected from $`\mathcal C_{g,t}`$ for each tag. The first objective adds across tags, so all tied minimum-unit candidates can be retained separately for each tag:
+
+```math
+\begin{gathered}
+\mathcal M_{g,t}=\left\{p\in\mathcal C_{g,t}:C(p)=\min_{p'\in\mathcal C_{g,t}}C(p')\right\},\\
+\min E_{\mathrm{old}}=\alpha\sum_{t\in J_g}\min_{p\in\mathcal C_{g,t}}C(p).
+\end{gathered}
+```
+
+The program further merges candidates with identical total ingredient-count vectors. Plans with tied counts but different ingredients remain in the combination search because their supply effects differ. Let $`\lambda`$ be the minimum daily supply-slack threshold in units/day, and define the feasibility indicator $`F_g(\lambda)\in\{0,1\}`$. Select one plan from each $`\mathcal M_{g,t}`$: the indicator is 1 if some combination reaches the minimum-slack threshold, and 0 otherwise. Integer ingredient counts convert a finite threshold condition into capacity bounds:
+
+```math
+\begin{gathered}
+u_i^{\max}(\lambda)=\left\lfloor\frac{q_i-\lambda}{\alpha}\right\rfloor,\\
+R_{\mathrm{old}}\ge\lambda\ \Longleftrightarrow
+\forall i,\ u_i=0\ \lor\ u_i\le u_i^{\max}(\lambda).
+\end{gathered}
+```
+
+Capacity bounds apply only to used ingredients. Lowering $`\lambda`$ relaxes every capacity, so $`\lambda_1\le\lambda_2`$ implies $`F_g(\lambda_2)=1\Rightarrow F_g(\lambda_1)=1`$. Let $`\mathcal I_g`$ contain ingredients that can occur in retained candidates. The five-unit limit per plan gives $`u_i\le5m_g`$, allowing minimum slack to be searched on a finite grid:
+
+```math
+\begin{gathered}
+\Lambda_g=\{-\infty\}\cup\{q_i-\alpha u:i\in\mathcal I_g,\ u=0,\ldots,5m_g\},\\
+\lambda^\star=\max\{\lambda\in\Lambda_g:F_g(\lambda)=1\}.
+\end{gathered}
+```
+
+The outer binary search locates the highest feasible threshold. The code rounds grid values to 10 decimal places and computes capacities with $`\lfloor(q_i-\lambda)/\alpha+10^{-12}\rfloor`$; $`-\infty`$ is the sentinel for unrestricted capacity. The equivalences above use exact arithmetic, while the original implementation's boundary decisions also reflect these floating-point operations.
+
+Each threshold test first removes candidates that individually exceed capacity, then orders the tags in $`J_g`$ as $`t_1,\ldots,t_{m_g}`$ by increasing candidate count. DFS state $`(r,\mathbf u)`$ records the first $`r`$ processed tags and their accumulated ingredient counts. Writing $`\mathbf c(p)=(c_i(p))_i`$, choosing a plan for the next tag gives:
+
+```math
+(r,\mathbf u)\longrightarrow(r+1,\mathbf u+\mathbf c(p)).
+```
+
+A branch is pruned as soon as any used ingredient exceeds capacity; nonnegative counts ensure later choices cannot remove the excess. Identical states have identical remaining problems, so the program caches feasibility, with a separate cache for each threshold. Binary search reduces the number of threshold tests; each test still contains a combinatorial search.
+
+After finding $`\lambda^\star`$, the program further maximizes the complete ascending slack vector of used ingredients under those capacities. Let $`\boldsymbol\Phi(r,\mathbf u)`$ be the best terminal vector reachable from the state; a state with no feasible successor is marked infeasible. The following maximum considers only capacity-compliant transitions:
+
+```math
+\begin{gathered}
+\boldsymbol\rho(\mathbf u)=\mathrm{sort}_{\uparrow}\big((q_i-\alpha u_i)_{i:u_i>0}\big),\\
+\boldsymbol\Phi(m_g,\mathbf u)=\boldsymbol\rho(\mathbf u),\\
+\boldsymbol\Phi(r,\mathbf u)=\max_{p\in\mathcal M_{g,t_{r+1}}}^{\mathrm{lex}}
+\boldsymbol\Phi(r+1,\mathbf u+\mathbf c(p)).
+\end{gathered}
+```
+
+Each used ingredient type contributes one component. The program caches the best vector, then reconstructs the first combination attaining it in a fixed candidate order. Variable-length vectors follow Python tuple comparison: the larger first differing component wins; when one is a complete prefix of the other, the longer vector wins. The cached state set can still grow substantially. This historical threshold-search route is not called by the normal `nCookware` workflow.
+
+### 3.5 Precomputation and enumeration for shared cookware
+
+Shared cookware selection reuses the best candidate for each guest and cookware type. Set $`v=\mathrm{nCookware}`$. For guest $`g`$, cookware $`h`$, and equipment set $`S`$, use Chapter 1's equipment-restricted candidate sets and this chapter's best function. The best function is defined only for nonempty sets: only existing single-cookware results enter these expressions, and the second applies to guests with feasible plans:
+
+```math
+\begin{gathered}
+p_{g,h}^{\star}=\mathrm{best}_g\left(\mathcal C_g^v(\{h\})\right),\\
+p_g^{\star}(S)=\mathrm{best}_g\left(\{p_{g,h}^{\star}:h\in S\}\right).
+\end{gathered}
+```
+
+For fixed $`S`$, plans and supply calculations are independent across guests, the missing-plan penalty for that set is constant, and each feasible guest's candidate set is the union of single-cookware sets. Selecting the best per cookware type before comparing them therefore preserves the optimal objective. Independent guest optima also attain the best aggregate objective:
+
+```math
+\max_{(p_g)\in\prod_{g\in G_S}\mathcal C_g^v(S)}^{\mathrm{lex}}
+\sum_{g\in G_S}\mathbf f_g(p_g)
+=\sum_{g\in G_S}\mathbf f_g(p_g^{\star}(S)).
+```
+
+This decomposition requires a fixed equipment set, the retained candidate scopes, and no shared inventory or other coupling constraints across guests. For $`1\le n\le|H|`$, the outer search enumerates all $`\binom{|H|}{n}`$ sets containing exactly $`n`$ cookware types and compares them by Chapter 1's aggregate objective and missing-plan penalties. Selecting all available cookware yields one set.
+
+Let $`N_{\mathrm{cand}}`$ be the total number of candidates actually returned across all guests. Treating each criterion evaluation as constant cost, comparison work after candidate generation and the size of the best table are, respectively:
+
+```math
+O\left(N_{\mathrm{cand}}+\binom{|H|}{n}|G|n\right),\qquad O(|G||H|).
+```
+
+The first expression excludes candidate-generation DFS, and the second counts only the guest-by-cookware best table. Relevant-ingredient filtering, equivalence representatives, and filler cutoffs determine the actual candidate scope. Uniform performance benchmarks and cross-device comparisons remain unavailable. Call relationships appear in the [architecture guide (Chinese)](docs/architecture.md), with the full optimality boundaries in the [optimization model and algorithm boundaries (Chinese)](docs/design.md).
+
+</details>
 
 <a id="en-verification"></a>
 

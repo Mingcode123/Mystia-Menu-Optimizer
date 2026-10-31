@@ -50,9 +50,21 @@ Worker 由脚本字符串和 Blob URL 创建，通过浏览器内部消息传递
 结果搜索将每行的搜索文本缓存在 `WeakMap` 中，重复查询复用该文本；缓存独立于导出对象。“停止”直接终止当前 Worker，并更新运行标识，使已排队的旧任务消息失效。取消后恢复计算按钮，不将尚未完成的局部结果发布为完整结果。
 
 <details>
-<summary>v1.0.0 · Initial Release — 标签计算与停止机制</summary>
+<summary><strong>v1.0.0 · Initial Release — 网页执行完整原文</strong></summary>
 
-基准版对每个枚举组合重新规范化料理标签、构造标签集合及候选计数键。当前实现将固定数据预编译，并将对象构造延后至条件判断通过之后。基准版通过向 Worker 发送 `STOP` 请求取消同步搜索，请求可能在计算结束后才得到处理；当前实现由主线程直接终止 Worker。
+以下完整保留 [v1.0.0 原文](https://github.com/Mingcode123/Mystia-Menu-Optimizer/blob/v1.0.0/docs/architecture.md)；其中的实现说明与验证范围均对应该版本。
+
+## 网页执行
+
+1. 页面请求同目录的 `东方夜雀食堂.xlsx`，或读取文件选择器指定的 XLSX。
+2. SheetJS 读取单元格，解析函数构建食材、料理、稀客与供给数据。
+3. 主线程接收角色与筛选条件，按料理划分任务，创建最多 8 个 Web Worker。
+4. Worker 枚举追加食材，计算最终标签并执行候选过滤，分批返回结果与进度。
+5. 主线程维护结果集合、搜索条件和排序状态，输出 CSV 或含 `结果` 工作表的 XLSX。
+
+Worker 由脚本字符串和 Blob URL 创建，通过浏览器内部消息传递任务、进度与候选。“停止”操作同样采用消息机制；Worker 执行同步搜索时，停止请求可能延后处理。
+
+角色与料理图像由名称映射加载，仅参与结果展示。标签枚举和供给比较不读取图像，八列候选导出也不包含图像。网页选表及导出条件见[网页指南](web-guide.md)。
 
 </details>
 
@@ -79,9 +91,23 @@ Worker 由脚本字符串和 Blob URL 创建，通过浏览器内部消息传递
 Python 仍按顾客顺序在 CPU 上执行，没有新增多进程或 GPU 依赖。单客入口保留原有 Pareto 比较，`nCookware` 主流程继续直接比较每客每厨具候选；历史多方案求解函数的调用范围不变。
 
 <details>
-<summary>v1.0.0 · Initial Release — cover3 搜索范围</summary>
+<summary><strong>v1.0.0 · Initial Release — nCookware 主入口完整原文</strong></summary>
 
-基准版在既有标签上界与食材筛选条件下枚举各料理的全部加料件数层，再比较候选。当前实现使用相同目标和准入规则，增加效用已封顶时的件数界限。原始覆盖目标的 `singlePLAN.py`、历史多方案 `detailedPLAN.py` 以及评分、利润和菜单工具保持原实现。
+以下完整保留 [v1.0.0 原文](https://github.com/Mingcode123/Mystia-Menu-Optimizer/blob/v1.0.0/docs/architecture.md)；其中的实现说明与验证范围均对应该版本。
+
+### nCookware 主入口
+
+[singlePLAN_cover3_mixIng_nCookware.py](../Python/singlePLAN_cover3_mixIng_nCookware.py) 在单个文件中实现数据对象、Excel 解析、标签处理、候选搜索、厨具比较、交互输入与 XLSX 写出。其执行顺序为：
+
+1. 解析命令行参数，将工作目录切换至脚本所在的 `Python/`。
+2. 使用 `openpyxl` 读取工作簿中已保存的单元格值。
+3. 获取流行喜爱、流行厌恶及可用厨具数量。
+4. 生成并保存每客每厨具的候选，枚举共同厨具集合并比较总体评价值。
+5. 根据流行与厨具条件确定输出路径，写出含 14 列的 `Plans` 工作表。
+
+厨具选择由 `choose_best_cookware_combo_global()` 执行。文件内另有历史多方案函数，主入口采用上述单客候选与厨具集合的计算路径。
+
+候选生成结合深度优先搜索、标签等价分组和相关加料筛选。等价代表优先依据原始日供给选择；基础食材耗用随后计入候选的最低供给余量。该过程未完整求解等价组内的资源分配，中性补位候选也存在最多前三项的截断。相应数学目标与候选范围见[模型与算法](design.md)。
 
 </details>
 
