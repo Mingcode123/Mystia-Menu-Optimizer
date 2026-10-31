@@ -25,7 +25,7 @@
 3. **将最终标签与顾客偏好匹配。** 每位顾客分别有喜爱、厌恶的标签。同名标签出现在方案中，即命中该项偏好；同一种标签只计一次。例如，图中饭团加蜂蜜对博丽灵梦命中「饱腹」「实惠」「甜」三项喜爱，没有命中厌恶，得分为 3−0=3。
 
 | 术语 | 定义 |
-| --- | --- |
+| :---: | :---: |
 | 食材（Ingredient） | 海苔、蜂蜜等制作材料；配方规定的用量计为基础食材，额外追加的部分计为加料。同种食材可以同时承担这两种用途。 |
 | 料理（Dish） | 按配方制作的菜品，如饭团；具有自身预设标签、指定厨具和配方禁忌。 |
 | 加料（Addition） | 满足基础配方后，在剩余格子中额外使用的食材，如饭团中的蜂蜜；合法加料保留所选料理，并带入食材标签。 |
@@ -51,7 +51,9 @@
 
 备菜决策包含两个层次：确定一份料理的制作方案，以及在满足条件的方案之间作出选择。各版本共享食材用量与标签匹配的基本定义；候选生成规则、订单假设和优化目标分别由具体模型规定。
 
-**对象与记号：** 令 $`g`$ 表示顾客，$`d`$ 表示料理，$`i`$ 表示食材，$`t`$ 表示标签，$`p`$ 表示制作方案。候选与偏好集合采用花体，向量采用粗体；下标标识对象，括号上标 $`(r)`$ 标识过滤阶段，正体角标标识固定类别。$`v`$ 为模型版本索引，$`\star`$ 标识按对应目标选出的最优保留方案。
+**对象与记号：** 令 $`g`$ 表示顾客（Guest），$`d`$ 表示料理（Dish），$`i`$ 表示食材（Ingredient），$`t`$ 表示标签（Tag），$`p`$ 表示制作方案（Plan）。
+
+候选与偏好集合采用花体，向量采用粗体；下标标识对象，括号上标 $`(r)`$ 标识过滤阶段，正体角标标识固定类别。$`v`$ 为模型版本索引（Version），$`\star`$ 标识按对应目标选出的最优保留方案。
 
 | 符号 | 定义 | 单位或类型 |
 | :---: | :---: | :---: |
@@ -115,7 +117,7 @@ S_g(p)=H_g^{\mathrm L}(p)-H_g^{\mathrm D}(p)
 网页提供以下选项：
 
 | 网页选项 | 开启后的作用 | 作用范围 |
-| --- | --- | --- |
+| :---: | :---: | :---: |
 | 等价食材去重（仅加料） | 将标签相同且非空的食材归为一组，每组只枚举一个代表。 | 枚举前的加料食材池 |
 | 食材高级过滤 | 删除可由指定基础加料方案替代的高级方案；对应替代方案须已在达标候选中，且不含高级加料。 | 同一道料理的达标候选 |
 | 加料子集过滤 | 若已保留的达标方案中，每种加料件数均不多于当前方案，则删除当前方案。 | 同一道料理经过高级过滤后的候选 |
@@ -444,7 +446,7 @@ S\subseteq H,\qquad |S|=n
 根目录工作簿共 13 张表。按 `nCookware` 的解析口径，其中包含 62 条食材记录、164 道料理记录和 58 位稀客；163 道料理标记为持有。
 
 | 数据类别 | 来源 | 用途 |
-| --- | --- | --- |
+| :---: | :---: | :---: |
 | 配方、厨具、标签与人物偏好 | 历史工作簿；标签资料来自 AnYiEE 的项目 | 确定配方与标签匹配规则 |
 | 价格、日供给与委托记录 | 作者在游戏中手工记录，并整理经验期望 | 日供给用于资源评价；价格用于独立经济分析 |
 | 流行、持有料理与厨具条件 | 工作簿记录及运行时输入 | 定义本次查询或规划的情境 |
@@ -467,7 +469,7 @@ $`\pi_{i\ell}`$ 与 $`\bar\pi_i`$ 的单位为游戏货币／件，$`w_{i\ell}`$
 早期需求包含按实际利润排序。后续 PLAN 主线围绕喜好满足、食材消耗和供给压力建立评价，价格与利润保留为独立分析支线；历史需求与取舍过程见[需求与设计决策演进](docs/prompt-journey.md)。
 
 | 选择 | 依据与适用条件 |
-| --- | --- |
+| :---: | :---: |
 | 食材件数与供给分别计量 | 件数对应制作中的实际用量；同件数食材的采购金额与取得难度可能不同，因此另用日供给评价资源压力。 |
 | 覆盖封顶与明确优先级 | 表达达到目标偏好后节约用料的备菜需求。封顶值与比较顺序由项目需求设定，其对其他备菜偏好的适用性仍待验证。 |
 | 每客日订单默认 5 | 用于将单份用量换算为日需求，属于情境假设；现有记录缺少实测订单概率，历史模型的订单均分也基于假设。 |
@@ -675,7 +677,7 @@ O\left(N_{\mathrm{cand}}+\binom{|H|}{n}|G|n\right),\qquad O(|G||H|).
 性能优化以 `v1.0.0` 为对照，检查完整结果、行序与输出结构。Python 覆盖四个优化入口、门槛与流行边界、每客每厨具结果及共同配置；XLSX 逐成员比较仅规范化创建和修改时间，保留单元格、公式、样式、尺寸及合并范围检查。网页对照包括选项组合、全部角色、位集边界和流行链；完整工作簿的三次基准均得到相同的 145 行结果及顺序。
 
 | 测量范围 | v1.0.0 中位数 | 当前实现中位数 | 中位数之比 |
-| :--- | ---: | ---: | ---: |
+| :---: | :---: | :---: | :---: |
 | Python `nCookware` 完整运行：启动、读表、58 客规划、五厨具选择及写表 | 106.25 s | 4.15 s | 25.6× |
 | 网页候选搜索内核：164 道料理、61 种食材、单 Worker 顺序执行 | 50.42 s | 19.52 s | 2.58× |
 
@@ -726,7 +728,7 @@ python Python/singlePLAN_cover3_mixIng_nCookware.py
 按控制台提示依次输入：
 
 | 提示 | 本例输入 | 含义 |
-| --- | --- | --- |
+| :---: | :---: | :---: |
 | 流行喜爱锚点 | 直接按 Enter | 不设置流行喜爱条件 |
 | 流行厌恶锚点 | 输入 `水产`，再按 Enter | 含「水产」的最终标签触发「流行·厌恶」 |
 | 允许使用的厨具数量 | 输入 `5`，再按 Enter | 使用料理台、油锅、烧烤架、煮锅和蒸锅 |
@@ -754,7 +756,7 @@ python Python/singlePLAN_cover3_mixIng_nCookware.py
 以下摘录 8 条代表性记录；完整 58 条记录及来源见[案例附录](docs/case-study.md)。
 
 | 角色 | 料理 | 厨具 | 总食材 | 件数 | 原表行 |
-| --- | --- | --- | --- | ---: | ---: |
+| :---: | :---: | :---: | :---: | :---: | :---: |
 | <img src="HTML/izakaya_icons_pack/customer_rare/007_%E5%8D%9A%E4%B8%BD%E7%81%B5%E6%A2%A6.png" width="46" height="46" alt="博丽灵梦"><br>博丽灵梦 | <img src="HTML/izakaya_icons_pack/recipe/007_%E9%A5%AD%E5%9B%A2.png" width="52" height="52" alt="饭团"><br>饭团 | 料理台 | 蜂蜜、海苔 | 2 | 8 |
 | <img src="HTML/izakaya_icons_pack/customer_rare/015_%E7%90%AA%E9%9C%B2%E8%AF%BA.png" width="46" height="46" alt="琪露诺"><br>琪露诺 | <img src="HTML/izakaya_icons_pack/recipe/032_%E5%87%89%E8%8F%9C%E9%9B%95%E8%8A%B1.png" width="52" height="52" alt="凉菜雕花"><br>凉菜雕花 | 料理台 | 蜂蜜、萝卜 | 2 | 13 |
 | <img src="HTML/izakaya_icons_pack/customer_rare/000_%E8%8E%89%E6%A0%BC%E9%9C%B2.png" width="46" height="46" alt="莉格露"><br>莉格露 | <img src="HTML/izakaya_icons_pack/recipe/097_%E7%8B%AE%E5%AD%90%E5%A4%B4.png" width="52" height="52" alt="狮子头"><br>狮子头 | 煮锅 | 葡萄、牛肉、鸡蛋 | 3 | 2 |
@@ -771,7 +773,7 @@ python Python/singlePLAN_cover3_mixIng_nCookware.py
 历史第 8 行为博丽灵梦选择饭团与料理台，使用蜂蜜、海苔各一件。对照原配方，海苔是基础原料，蜂蜜为追加食材。
 
 | 环节 | 原数据及规则 | 核算结果 |
-| --- | --- | --- |
+| :---: | :---: | :---: |
 | 基础料理 | 饭团自带「素」「家常」「饱腹」「和风」「实惠」；海苔用于满足配方，其「素」「鲜」不自动并入料理 | 命中灵梦喜爱「饱腹」「实惠」，厌恶 0，基础得分 2；原始得分表 `Scores!A987:F987` 保存相同结果 |
 | 加入蜂蜜 | `食材!B39:G39` 中蜂蜜提供「甜」；料理台作为厨具标签参与最终标签形成 | 新增喜爱命中「甜」，总喜爱命中 3，厌恶 0 |
 | 应用流行条件 | 最终标签不含「水产」，且未设置流行喜爱锚点 | 本方案不获得「流行·厌恶」或「流行·喜爱」 |
@@ -796,7 +798,7 @@ R(p)=\min(47-5\times1,\ 68-5\times1)=42.
 同一料理的两个达标候选可说明目标取舍。下表由原候选函数在本节条件下重新计算，两者均无厌恶命中：
 
 | 方案 | 净分 $`S_g(p)`$ | 封顶收益 $`U(H_g^{\mathrm L}(p))`$ | 件数 $`C(p)`$ | 最低余量 $`R(p)`$（件／日） |
-| --- | ---: | ---: | ---: | ---: |
+| :---: | :---: | :---: | :---: | :---: |
 | 饭团＋蜂蜜 | 3 | 3 | 2 | 42 |
 | 饭团＋可可豆 | 4 | 3 | 2 | 10 |
 
@@ -817,7 +819,7 @@ R(p)=\min(47-5\times1,\ 68-5\times1)=42.
 本项目为非官方个人建模案例与辅助工具。
 
 | 参与方 | 工作与归属 |
-| --- | --- |
+| :---: | :---: |
 | 作者 | 提出游玩问题、梳理规则，确定决策单位、评价顺序及筛选与厨具条件；手工记录价格、供给和委托数据，并通过角色与参数案例验收结果 |
 | AI 辅助 | 大量代码、算法推导和部分调试使用 AI 辅助；需求澄清、模型取舍与结果验收由作者负责 |
 | 第三方资料 | 标签资料来自 [AnYiEE 的项目](https://github.com/AnYiEE/touhou-mystia-izakaya-assistant)；游戏图像归属、依赖许可及图示制作方式见[第三方声明](THIRD_PARTY_NOTICES.md) |
@@ -825,7 +827,7 @@ R(p)=\min(47-5\times1,\ 68-5\times1)=42.
 详细资料按用途分列：
 
 | 文档 | 内容 |
-| --- | --- |
+| :---: | :---: |
 | [完整历史菜单](docs/case-study.md) | 58 条保存方案、来源与复现核对 |
 | [优化模型与算法边界](docs/design.md) | 变量、目标、集合评价与候选范围 |
 | [需求与设计决策演进](docs/prompt-journey.md) | 历史需求、目标变化、取舍与案例依据 |
@@ -864,7 +866,7 @@ Preparation and evaluation follow three steps:
 3. **Match the final tags against guest preferences.** Each guest has separate liked and disliked tags. A tag present in the plan matches the preference with the same name; each distinct tag counts once. In the figure, rice ball with honey matches Reimu's 「Filling」「Affordable」「Sweet」 and no dislikes, giving a score of 3−0=3.
 
 | Term | Definition |
-| --- | --- |
+| :---: | :---: |
 | Ingredient | A preparation material such as seaweed or honey. The recipe's specified quantity counts as required ingredients; any extra quantity counts as additions. The same ingredient can serve both roles. |
 | Dish | A menu item made according to a recipe, such as rice ball, with its own preset tags, specified cookware, and recipe prohibitions. |
 | Addition | An ingredient used in a remaining slot beyond the base recipe, such as honey added to rice ball; legal additions preserve the selected dish and contribute ingredient tags. |
@@ -890,7 +892,9 @@ Preparation models build on plans, ingredient quantities, and tag matching, dist
 
 Preparation decisions have two levels: specifying how to prepare one dish and choosing among plans that satisfy the requirements. The versions share basic definitions of ingredient use and tag matching; each model specifies its own candidate-generation rules, order assumptions, and optimization objectives.
 
-**Objects and notation:** Let $`g`$ denote a guest, $`d`$ a dish, $`i`$ an ingredient, $`t`$ a tag, and $`p`$ a preparation plan. Candidate and preference sets use calligraphic letters, and vectors use boldface. Subscripts identify objects, parenthesized superscripts $`(r)`$ identify filtering stages, and upright subscripts or superscripts identify fixed categories. $`v`$ indexes model versions, and $`\star`$ marks the best retained plan under the corresponding objective.
+**Objects and notation:** Let $`g`$ denote a guest, $`d`$ a dish, $`i`$ an ingredient, $`t`$ a tag, and $`p`$ a preparation plan.
+
+Candidate and preference sets use calligraphic letters, and vectors use boldface. Subscripts identify objects, parenthesized superscripts $`(r)`$ identify filtering stages, and upright subscripts or superscripts identify fixed categories. $`v`$ indexes model versions, and $`\star`$ marks the best retained plan under the corresponding objective.
 
 | Symbol | Definition | Unit or type |
 | :---: | :---: | :---: |
@@ -954,7 +958,7 @@ Given a rare guest, imported dishes and ingredients, current trend conditions, a
 The webpage provides the following options:
 
 | Webpage option | Effect when enabled | Scope |
-| --- | --- | --- |
+| :---: | :---: | :---: |
 | Equivalent-ingredient deduplication (additions only) | Group ingredients with identical nonempty tag sets and enumerate one representative per class. | Addition ingredient pool before enumeration |
 | Ingredient-upgrade filter | Remove an advanced plan when its designated base-addition alternative is already a qualified candidate and contains no advanced additions. | Qualified candidates for the same dish |
 | Addition-subset filter | Remove the current plan if a previously retained qualified plan uses no more of any added ingredient. | Candidates for the same dish after the upgrade filter |
@@ -1283,7 +1287,7 @@ The mathematical notation extends across versions, with candidate sets determine
 The root workbook contains 13 sheets. As parsed by `nCookware`, it includes 62 ingredient records, 164 dish records, and 58 rare guests; 163 dishes are marked as owned.
 
 | Data category | Source | Use |
-| --- | --- | --- |
+| :---: | :---: | :---: |
 | Recipes, cookware, tags, and guest preferences | Historical workbook; tag data came from AnYiEE's project | Define recipe and tag-matching rules |
 | Prices, daily supply, and commission records | Manually recorded by the author during gameplay and compiled into empirical expectations | Daily supply supports resource evaluation; prices support separate economic analysis |
 | Trends, owned dishes, and cookware conditions | Workbook records and runtime inputs | Define the scenario for the current query or planning task |
@@ -1306,7 +1310,7 @@ Complete sampling dates, sample counts, and source versions were not retained, a
 Early requirements included ranking by actual profit. The subsequent PLAN sequence evaluates preference satisfaction, ingredient consumption, and supply pressure, with price and profit retained as separate analyses. Historical requirements and tradeoffs are documented in the [requirements and design evolution (Chinese)](docs/prompt-journey.md).
 
 | Choice | Rationale and applicable conditions |
-| --- | --- |
+| :---: | :---: |
 | Measure ingredient units and supply separately | Unit counts represent the quantities used in preparation. Purchase costs and acquisition difficulty may vary among ingredients with equal counts, so daily supply provides a separate measure of resource pressure. |
 | Cap coverage and specify priorities | Express the preparation preference for conserving ingredients after meeting the target preferences. The cap and comparison order follow the project requirements; their suitability for other preparation preferences remains to be evaluated. |
 | Default to 5 daily orders per guest | Convert per-dish use into daily demand under a scenario assumption. The available records lack empirical order probabilities; equal order allocation in the historical model is also an assumption. |
@@ -1514,7 +1518,7 @@ The first expression excludes candidate-generation DFS, and the second counts on
 Performance optimization is compared against `v1.0.0` using complete results, row order, and output structure. Python checks cover the four optimized entries, threshold and trend boundaries, guest-by-cookware results, and shared configurations. XLSX members are compared with only creation and modification times normalized, retaining checks of cells, formulas, styles, dimensions, and merges. Browser checks cover option combinations, all guests, bitset boundaries, and trend chains; all three full-workbook benchmark runs produce the same 145 rows in the same order.
 
 | Measurement scope | v1.0.0 median | Current median | Ratio of medians |
-| :--- | ---: | ---: | ---: |
+| :---: | :---: | :---: | :---: |
 | Complete Python `nCookware` run: startup, workbook read, 58-guest planning, five-cookware selection, and workbook write | 106.25 s | 4.15 s | 25.6× |
 | Browser candidate-search kernel: 164 dishes, 61 ingredients, sequential execution of one worker | 50.42 s | 19.52 s | 2.58× |
 
@@ -1565,7 +1569,7 @@ python Python/singlePLAN_cover3_mixIng_nCookware.py
 Respond to the console prompts in this order:
 
 | Prompt | Input for this case | Meaning |
-| --- | --- | --- |
+| :---: | :---: | :---: |
 | Liked-trend anchors | Press Enter without typing | No liked-trend condition |
 | Disliked-trend anchors | Type `水产`, then press Enter | Final tags containing 「Aquatic」 trigger 「Disliked trend」 |
 | Allowed cookware count | Type `5`, then press Enter | Use the prep counter, frying pan, grill, pot, and steamer |
@@ -1593,7 +1597,7 @@ The historical artifact stores dishes, cookware, and total ingredient lists for 
 The following table presents 8 representative records. All 58 records and their sources appear in the [case appendix (Chinese)](docs/case-study.md).
 
 | Guest | Dish | Cookware | Total ingredients | Units | Source row |
-| --- | --- | --- | --- | ---: | ---: |
+| :---: | :---: | :---: | :---: | :---: | :---: |
 | <img src="HTML/izakaya_icons_pack/customer_rare/007_%E5%8D%9A%E4%B8%BD%E7%81%B5%E6%A2%A6.png" width="46" height="46" alt="博丽灵梦"><br>博丽灵梦 | <img src="HTML/izakaya_icons_pack/recipe/007_%E9%A5%AD%E5%9B%A2.png" width="52" height="52" alt="饭团"><br>饭团 | 料理台 | 蜂蜜、海苔 | 2 | 8 |
 | <img src="HTML/izakaya_icons_pack/customer_rare/015_%E7%90%AA%E9%9C%B2%E8%AF%BA.png" width="46" height="46" alt="琪露诺"><br>琪露诺 | <img src="HTML/izakaya_icons_pack/recipe/032_%E5%87%89%E8%8F%9C%E9%9B%95%E8%8A%B1.png" width="52" height="52" alt="凉菜雕花"><br>凉菜雕花 | 料理台 | 蜂蜜、萝卜 | 2 | 13 |
 | <img src="HTML/izakaya_icons_pack/customer_rare/000_%E8%8E%89%E6%A0%BC%E9%9C%B2.png" width="46" height="46" alt="莉格露"><br>莉格露 | <img src="HTML/izakaya_icons_pack/recipe/097_%E7%8B%AE%E5%AD%90%E5%A4%B4.png" width="52" height="52" alt="狮子头"><br>狮子头 | 煮锅 | 葡萄、牛肉、鸡蛋 | 3 | 2 |
@@ -1610,7 +1614,7 @@ Total ingredients include the base recipe and additions, in the historical sheet
 Historical row 8 selects a rice ball and the prep counter for Hakurei Reimu, using one honey and one seaweed. The original recipe identifies seaweed as the base ingredient and honey as the addition.
 
 | Stage | Source data and rule | Calculated result |
-| --- | --- | --- |
+| :---: | :---: | :---: |
 | Base dish | The rice ball has 「Vegetarian」「Home-style」「Filling」「Japanese-style」「Affordable」. Seaweed satisfies the recipe; its 「Vegetarian」「Fresh」 tags do not automatically transfer to the dish | Reimu likes 「Filling」「Affordable」; 0 dislikes and base score 2. The original score table stores the same result in `Scores!A987:F987` |
 | Add honey | Honey supplies 「Sweet」 in `食材!B39:G39`; the prep counter also contributes its cookware tag to the final tag set | 「Sweet」 adds one liked match, bringing the total to 3 likes and 0 dislikes |
 | Apply the trend condition | The final tags do not contain 「Aquatic」, and no liked-trend anchor is set | This plan gains neither 「Disliked trend」 nor 「Liked trend」 |
@@ -1635,7 +1639,7 @@ Under these conditions, the historical plan meets the 3-point threshold, uses 2 
 Two eligible candidates for the same dish illustrate the objective tradeoff. The original candidate function recalculated the following plans under this case's conditions; neither has disliked matches:
 
 | Plan | Net score $`S_g(p)`$ | Capped benefit $`U(H_g^{\mathrm L}(p))`$ | Units $`C(p)`$ | Minimum slack $`R(p)`$ (units/day) |
-| --- | ---: | ---: | ---: | ---: |
+| :---: | :---: | :---: | :---: | :---: |
 | Rice ball + honey | 3 | 3 | 2 | 42 |
 | Rice ball + cocoa beans | 4 | 3 | 2 | 10 |
 
@@ -1656,7 +1660,7 @@ Reproducibility applies to the stated inputs and candidate scope. Gameplay retur
 This is an unofficial personal modeling case study and supporting tool.
 
 | Contributor | Work and attribution |
-| --- | --- |
+| :---: | :---: |
 | Author | Identified gameplay problems, clarified rules, and specified decision units, evaluation order, filters, and cookware conditions; manually recorded prices, supply, and commission data, and evaluated results through character and parameter cases |
 | AI assistance | Much of the code, algorithm derivation, and some debugging were AI-assisted; the author clarified requirements, selected model tradeoffs, and evaluated results |
 | Third-party material | Tag data came from [AnYiEE's project](https://github.com/AnYiEE/touhou-mystia-izakaya-assistant); game artwork attribution, dependency licenses, and figure production are described in the [third-party notices (Chinese)](THIRD_PARTY_NOTICES.md) |
@@ -1664,7 +1668,7 @@ This is an unofficial personal modeling case study and supporting tool.
 Detailed references are organized by purpose:
 
 | Document | Content |
-| --- | --- |
+| :---: | :---: |
 | [Complete historical menu](docs/case-study.md) | 58 stored plans, source records, and reproduction checks |
 | [Optimization model and algorithm boundaries (Chinese)](docs/design.md) | Variables, objectives, set evaluation, and candidate scope |
 | [Requirements and design retrospective (Chinese)](docs/prompt-journey.md) | Historical requirements, objective changes, tradeoffs, and case evidence |
