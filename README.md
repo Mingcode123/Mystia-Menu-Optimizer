@@ -51,9 +51,9 @@
 
 备菜决策包含两个层次：确定一份料理的制作方案，以及在满足条件的方案之间作出选择。各版本共享食材用量与标签匹配的基本定义；候选生成规则、订单假设和优化目标分别由具体模型规定。
 
-**对象与记号：** 令 $`g`$ 表示顾客（Guest），$`d`$ 表示料理（Dish），$`i`$ 表示食材（Ingredient），$`t`$ 表示标签（Tag），$`p`$ 表示制作方案（Plan）。
+**对象与记号：** 令 $`g`$ 表示顾客(Guest)，$`d`$ 表示料理(Dish)，$`i`$ 表示食材(Ingredient)，$`t`$ 表示标签(Tag)，$`p`$ 表示制作方案(Plan)。
 
-候选与偏好集合采用花体，向量采用粗体；下标标识对象，括号上标 $`(r)`$ 标识过滤阶段，正体角标标识固定类别。$`v`$ 为模型版本索引（Version），$`\star`$ 标识按对应目标选出的最优保留方案。
+候选与偏好集合采用花体，向量采用粗体；下标标识对象，括号上标 $`(r)`$ 标识过滤阶段，正体角标标识固定类别。$`v`$ 为模型版本索引(Version)，$`\star`$ 标识按对应目标选出的最优保留方案。
 
 | 符号 | 定义 | 单位或类型 |
 | :---: | :---: | :---: |
@@ -892,9 +892,7 @@ Preparation models build on plans, ingredient quantities, and tag matching, dist
 
 Preparation decisions have two levels: specifying how to prepare one dish and choosing among plans that satisfy the requirements. The versions share basic definitions of ingredient use and tag matching; each model specifies its own candidate-generation rules, order assumptions, and optimization objectives.
 
-**Objects and notation:** Let $`g`$ denote a guest, $`d`$ a dish, $`i`$ an ingredient, $`t`$ a tag, and $`p`$ a preparation plan.
-
-Candidate and preference sets use calligraphic letters, and vectors use boldface. Subscripts identify objects, parenthesized superscripts $`(r)`$ identify filtering stages, and upright subscripts or superscripts identify fixed categories. $`v`$ indexes model versions, and $`\star`$ marks the best retained plan under the corresponding objective.
+**Objects and notation:** Let $`g`$ denote a guest, $`d`$ a dish, $`i`$ an ingredient, $`t`$ a tag, and $`p`$ a preparation plan. Candidate and preference sets use calligraphic letters, and vectors use boldface. Subscripts identify objects, parenthesized superscripts $`(r)`$ identify filtering stages, and upright subscripts or superscripts identify fixed categories. $`v`$ indexes model versions, and $`\star`$ marks the best retained plan under the corresponding objective.
 
 | Symbol | Definition | Unit or type |
 | :---: | :---: | :---: |
