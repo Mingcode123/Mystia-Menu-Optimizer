@@ -711,7 +711,9 @@ python -m http.server 8000 --bind 127.0.0.1
 
 [![HTML 完整查询界面：博丽灵梦，流行厌恶水产，264 条未搜索候选；三张原始截图按左侧参数栏对齐拼接](https://raw.githubusercontent.com/Mingcode123/Mystia-Menu-Optimizer/16e379956891d5b89b97de54e37d149cd5cdd22e/docs/images/web-case-overview.png)](https://raw.githubusercontent.com/Mingcode123/Mystia-Menu-Optimizer/16e379956891d5b89b97de54e37d149cd5cdd22e/docs/images/web-case-overview.png)
 
-*作者提供的实际网页截图，按左侧控件对齐拼接，保留原始像素。* [查看饭团方案局部放大](https://raw.githubusercontent.com/Mingcode123/Mystia-Menu-Optimizer/16e379956891d5b89b97de54e37d149cd5cdd22e/docs/images/web-case-results.png)。
+饭团方案局部放大：
+
+[![饭团方案局部放大](https://raw.githubusercontent.com/Mingcode123/Mystia-Menu-Optimizer/16e379956891d5b89b97de54e37d149cd5cdd22e/docs/images/web-case-results.png)](https://raw.githubusercontent.com/Mingcode123/Mystia-Menu-Optimizer/16e379956891d5b89b97de54e37d149cd5cdd22e/docs/images/web-case-results.png)
 
 在结果区搜索框输入“饭团”，页面显示 5 条记录，包含饭团、炙猪肉饭团和温暖饭团。搜索按文本包含关系筛选已计算结果，不重新生成候选。
 
@@ -1632,7 +1634,9 @@ The removal conditions for the two “Consider score” switches are defined und
 
 [![Complete HTML query: Reimu, disliked trend Aquatic, 264 unfiltered candidates; three original screenshots aligned by the left control panel](https://raw.githubusercontent.com/Mingcode123/Mystia-Menu-Optimizer/16e379956891d5b89b97de54e37d149cd5cdd22e/docs/images/web-case-overview.png)](https://raw.githubusercontent.com/Mingcode123/Mystia-Menu-Optimizer/16e379956891d5b89b97de54e37d149cd5cdd22e/docs/images/web-case-overview.png)
 
-*Actual webpage screenshots supplied by the author, aligned by the left control panel and stitched at original pixel resolution.* [View the rice-ball records in detail](https://raw.githubusercontent.com/Mingcode123/Mystia-Menu-Optimizer/16e379956891d5b89b97de54e37d149cd5cdd22e/docs/images/web-case-results.png). The interface retains its Chinese labels.
+Rice-ball plan detail:
+
+[![Rice-ball plan detail](https://raw.githubusercontent.com/Mingcode123/Mystia-Menu-Optimizer/16e379956891d5b89b97de54e37d149cd5cdd22e/docs/images/web-case-results.png)](https://raw.githubusercontent.com/Mingcode123/Mystia-Menu-Optimizer/16e379956891d5b89b97de54e37d149cd5cdd22e/docs/images/web-case-results.png)
 
 Entering `饭团` (rice ball) in the results search box displayed 5 records, including 饭团, 炙猪肉饭团, and 温暖饭团. Search filters existing results by text containment without regenerating candidates.
 
