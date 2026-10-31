@@ -51,49 +51,56 @@
 
 备菜决策包含两个层次：确定一份料理的制作方案，以及在满足条件的方案之间作出选择。各版本共享食材用量与标签匹配的基本定义；候选生成规则、订单假设和优化目标分别由具体模型规定。
 
-**对象与记号：** 令 <img src="docs/formulas/inline-51728216ba238792.svg" alt="g" width="9.1572" align="middle"> 表示顾客(Guest)，<img src="docs/formulas/inline-a30a8e3869f444ee.svg" alt="d" width="9.4281" align="middle"> 表示料理(Dish)，<img src="docs/formulas/inline-be098300053e6dfb.svg" alt="i" width="6.0807" align="middle"> 表示食材(Ingredient)，<img src="docs/formulas/inline-ad66c02da2f44768.svg" alt="t" width="6.7821" align="middle"> 表示标签(Tag)，<img src="docs/formulas/inline-74ab86906e20d3e1.svg" alt="p" width="10.1136" align="middle"> 表示制作方案(Plan)。
+**对象与记号：** 令 $`g`$ 表示顾客(Guest)，$`d`$ 表示料理(Dish)，$`i`$ 表示食材(Ingredient)，$`t`$ 表示标签(Tag)，$`p`$ 表示制作方案(Plan)。
 
-候选与偏好集合采用花体，向量采用粗体；下标标识对象，括号上标 <img src="docs/formulas/inline-2a49d63a8daa6592.svg" alt="(r)" width="18.4701" align="middle"> 标识过滤阶段，正体角标标识固定类别。<img src="docs/formulas/inline-51b50d180c75c937.svg" alt="v" width="8.8543" align="middle"> 为模型版本索引(Version)，<img src="docs/formulas/inline-d08c9c8f923c371a.svg" alt="\star" width="9.7948" align="middle"> 标识按对应目标选出的最优保留方案。
+候选与偏好集合采用花体，向量采用粗体；下标标识对象，括号上标 $`(r)`$ 标识过滤阶段，正体角标标识固定类别。$`v`$ 为模型版本索引(Version)，$`\star`$ 标识按对应目标选出的最优保留方案。
 
 | 符号 | 定义 | 单位或类型 |
 | :---: | :---: | :---: |
-| <img src="docs/formulas/inline-12bc1fd9d44164ed.svg" alt="b_i(d)" width="31.1024" align="middle"> | Base：料理配方规定的食材用量，给定参数 | 件／份 |
-| <img src="docs/formulas/inline-94c139ea95400034.svg" alt="a_i(p)" width="32.4624" align="middle">、<img src="docs/formulas/inline-76b78fcdd5bd7df0.svg" alt="\mathbf A(p)" width="33.3186" align="middle"> | Addition：追加食材的件数及完整加料向量，决策量 | 件／份；向量 |
-| <img src="docs/formulas/inline-12b55a3dbf3f4a37.svg" alt="c_i(p)" width="30.9865" align="middle">、<img src="docs/formulas/inline-1c253c2658ea915c.svg" alt="C(p)" width="31.9129" align="middle"> | Count：单种食材的总用量及方案的总食材件数 | 件／份 |
-| <img src="docs/formulas/inline-340454bc7c8bfdfd.svg" alt="T(i)" width="28.8227" align="middle">、<img src="docs/formulas/inline-68e33f0c1b8342af.svg" alt="T(p)" width="31.3317" align="middle"> | 食材自身的标签集合及方案的最终标签集合 | 集合 |
-| <img src="docs/formulas/inline-dff365bedb03a76a.svg" alt="\mathcal L_g,\mathcal D_g" width="43.5206" align="middle"> | 顾客的喜爱、厌恶标签集合 | 集合 |
-| <img src="docs/formulas/inline-97d8dc015b918abb.svg" alt="H_g^{\mathrm L}(p),H_g^{\mathrm D}(p)" width="91.9569" align="middle"> | 最终标签命中的喜爱、厌恶项数 | 项 |
-| <img src="docs/formulas/inline-3f45127840f6fcf1.svg" alt="S_g(p),S_{\min}" width="72.2872" align="middle"> | 方案净分、指定的最低净分 | 分 |
-| <img src="docs/formulas/inline-d664789216f3edcd.svg" alt="R_{\mathrm T},E_{\mathrm T}" width="48.2322" align="middle"> | 用户指定的必含、排除标签 | 集合 |
-| <img src="docs/formulas/inline-03b462f46967b9dd.svg" alt="q_i" width="11.6673" align="middle"> | 食材的经验日供给量，来自工作簿 TDQ | 件／日 |
-| <img src="docs/formulas/inline-2066578204af0ef9.svg" alt="K" width="15.1985" align="middle"> | 每位顾客的假设日订单量；Python 规划默认取 5 | 单／日 |
+| $`b_i(d)`$ | Base：料理配方规定的食材用量，给定参数 | 件／份 |
+| $`a_i(p)`$、$`\mathbf A(p)`$ | Addition：追加食材的件数及完整加料向量，决策量 | 件／份；向量 |
+| $`c_i(p)`$、$`C(p)`$ | Count：单种食材的总用量及方案的总食材件数 | 件／份 |
+| $`T(i)`$、$`T(p)`$ | 食材自身的标签集合及方案的最终标签集合 | 集合 |
+| $`\mathcal L_g,\mathcal D_g`$ | 顾客的喜爱、厌恶标签集合 | 集合 |
+| $`H_g^{\mathrm L}(p),H_g^{\mathrm D}(p)`$ | 最终标签命中的喜爱、厌恶项数 | 项 |
+| $`S_g(p),S_{\min}`$ | 方案净分、指定的最低净分 | 分 |
+| $`R_{\mathrm T},E_{\mathrm T}`$ | 用户指定的必含、排除标签 | 集合 |
+| $`q_i`$ | 食材的经验日供给量，来自工作簿 TDQ | 件／日 |
+| $`K`$ | 每位顾客的假设日订单量；Python 规划默认取 5 | 单／日 |
 
 **方案与制作约束：** 一份方案由所选料理与加料件数组成。基础食材和加料共同占用最多五个格子，重复使用同种食材逐件计数：
 
-<p align="center">
-<img src="docs/formulas/block-a6e79c570f8fd13d.svg" alt="\begin{gathered}&#10;p=(d,\mathbf A),\quad \mathbf A=(a_i)_i,\quad a_i\in\mathbb Z_{\ge0},\\&#10;c_i(p)=b_i(d)+a_i(p),\quad C(p)=\sum_i c_i(p)\le5.&#10;\end{gathered}" width="339.0781">
-</p>
+```math
+\begin{gathered}
+p=(d,\mathbf A),\quad \mathbf A=(a_i)_i,\quad a_i\in\mathbb Z_{\ge0},\\
+c_i(p)=b_i(d)+a_i(p),\quad C(p)=\sum_i c_i(p)\le5.
+\end{gathered}
+```
 
-基础食材满足配方并占用格数，其标签不自动并入料理；加料带入食材标签。<img src="docs/formulas/inline-68e33f0c1b8342af.svg" alt="T(p)" width="31.3317" align="middle"> 表示当前版本依据料理、厨具、售价、加料及覆盖、流行等规则得到的最终标签集合，同名标签只保留一次。顾客对流行词条的喜恶固定，当期触发条件决定方案是否获得相应标签。配方禁忌与候选处理范围须按所用入口解释，HTML 与 Python 的具体行为见[网页使用说明](docs/web-guide.md)及[优化模型与算法边界](docs/design.md)。
+基础食材满足配方并占用格数，其标签不自动并入料理；加料带入食材标签。$`T(p)`$ 表示当前版本依据料理、厨具、售价、加料及覆盖、流行等规则得到的最终标签集合，同名标签只保留一次。顾客对流行词条的喜恶固定，当期触发条件决定方案是否获得相应标签。配方禁忌与候选处理范围须按所用入口解释，HTML 与 Python 的具体行为见[网页使用说明](docs/web-guide.md)及[优化模型与算法边界](docs/design.md)。
 
 **匹配与得分：** 喜爱命中数、厌恶命中数和净分定义为：
 
-<p align="center">
-<img src="docs/formulas/block-0dc4f133cef0dc60.svg" alt="\begin{gathered}&#10;H_g^{\mathrm L}(p)=\left&#124;T(p)\cap\mathcal L_g\right&#124;,\\&#10;H_g^{\mathrm D}(p)=\left&#124;T(p)\cap\mathcal D_g\right&#124;,\\&#10;S_g(p)=H_g^{\mathrm L}(p)-H_g^{\mathrm D}(p)&#10;\end{gathered}" width="181.4389">
-</p>
+```math
+\begin{gathered}
+H_g^{\mathrm L}(p)=\left|T(p)\cap\mathcal L_g\right|,\\
+H_g^{\mathrm D}(p)=\left|T(p)\cap\mathcal D_g\right|,\\
+S_g(p)=H_g^{\mathrm L}(p)-H_g^{\mathrm D}(p)
+\end{gathered}
+```
 
-净分描述方案与顾客偏好的匹配情况；是否达标、达标后如何比较，属于各版本的准入与评价政策。<img src="docs/formulas/inline-932be834af2d956b.svg" alt="\mathrm{lex}" width="20.8122" align="middle"> 表示词典序：先比较目标向量的第一项，只有相同时才比较下一项。
+净分描述方案与顾客偏好的匹配情况；是否达标、达标后如何比较，属于各版本的准入与评价政策。$`\mathrm{lex}`$ 表示词典序：先比较目标向量的第一项，只有相同时才比较下一项。
 
 <details>
 <summary>与机制图及补充文档的符号对照</summary>
 
 | 本章记号 | 机制图及补充文档中的记号 | 含义 |
 | :---: | :---: | :---: |
-| <img src="docs/formulas/inline-94c139ea95400034.svg" alt="a_i(p)" width="32.4624" align="middle"> | <img src="docs/formulas/inline-53ec52a799055bb1.svg" alt="x_i" width="13.7918" align="middle"> | 加料件数 |
-| <img src="docs/formulas/inline-1c253c2658ea915c.svg" alt="C(p)" width="31.9129" align="middle"> | <img src="docs/formulas/inline-a7d1f3e8a07b31bc.svg" alt="L(p)" width="30.2845" align="middle"> | 总食材件数 |
-| <img src="docs/formulas/inline-dff365bedb03a76a.svg" alt="\mathcal L_g,\mathcal D_g" width="43.5206" align="middle"> | <img src="docs/formulas/inline-5f5ab2ae53d464a4.svg" alt="P_g,N_g" width="42.5338" align="middle"> | 喜爱、厌恶集合 |
-| <img src="docs/formulas/inline-97d8dc015b918abb.svg" alt="H_g^{\mathrm L}(p),H_g^{\mathrm D}(p)" width="91.9569" align="middle"> | <img src="docs/formulas/inline-c145e721bd9f5771.svg" alt="h_g(p),a_g(p)" width="76.5022" align="middle"> | 喜爱、厌恶命中数 |
-| <img src="docs/formulas/inline-3f45127840f6fcf1.svg" alt="S_g(p),S_{\min}" width="72.2872" align="middle"> | <img src="docs/formulas/inline-45e9bb78f0716c94.svg" alt="s_g(p),\tau" width="49.8771" align="middle"> | 净分、最低净分 |
+| $`a_i(p)`$ | $`x_i`$ | 加料件数 |
+| $`C(p)`$ | $`L(p)`$ | 总食材件数 |
+| $`\mathcal L_g,\mathcal D_g`$ | $`P_g,N_g`$ | 喜爱、厌恶集合 |
+| $`H_g^{\mathrm L}(p),H_g^{\mathrm D}(p)`$ | $`h_g(p),a_g(p)`$ | 喜爱、厌恶命中数 |
+| $`S_g(p),S_{\min}`$ | $`s_g(p),\tau`$ | 净分、最低净分 |
 
 </details>
 
@@ -124,11 +131,14 @@
 
 **约束与判定：** 基础配方与加料总件数不超过五件；用户还可设置必含标签、排除标签和最低净分。基础配方不足五件、追加后总用料达到五件时，网页加入「大份」；料理自身已有的「大份」也会保留。
 
-令 <img src="docs/formulas/inline-c91502f93de426a7.svg" alt="\mathcal B_d^{\mathrm{web}}" width="31.2229" align="middle"> 为网页针对料理 <img src="docs/formulas/inline-a30a8e3869f444ee.svg" alt="d" width="9.4281" align="middle"> 实际枚举的方案池；它受原配方处理及等价去重选项影响。未指定的标签条件取空集。进入后续过滤的达标候选为：
+令 $`\mathcal B_d^{\mathrm{web}}`$ 为网页针对料理 $`d`$ 实际枚举的方案池；它受原配方处理及等价去重选项影响。未指定的标签条件取空集。进入后续过滤的达标候选为：
 
-<p align="center">
-<img src="docs/formulas/block-04d39852148d33d1.svg" alt="\mathcal C_{g,d}^{(0)}=&#10;\left\{p\in\mathcal B_d^{\mathrm{web}}:&#10;S_g(p)\ge S_{\min},\quad R_{\mathrm T}\subseteq T(p),\quad E_{\mathrm T}\cap T(p)=\varnothing&#10;\right\}" width="498.7291">
-</p>
+```math
+\mathcal C_{g,d}^{(0)}=
+\left\{p\in\mathcal B_d^{\mathrm{web}}:
+S_g(p)\ge S_{\min},\quad R_{\mathrm T}\subseteq T(p),\quad E_{\mathrm T}\cap T(p)=\varnothing
+\right\}
+```
 
 这是最低净分条件：门槛为 3 时，4 分、5 分仍可通过；喜爱命中也可以抵消厌恶扣分。原网页的配方处理范围与 Python 分支不同，见[网页使用说明](docs/web-guide.md)。该集合记为第 0 阶段的候选；后面的过滤只比较已通过本步的方案。
 
@@ -138,11 +148,13 @@
 
 定义等价关系及等价组：
 
-<p align="center">
-<img src="docs/formulas/block-ee4af984290f43a1.svg" alt="i\sim j\quad\Longleftrightarrow\quad&#10;i=j\ \lor\ \left(T(i)=T(j)\ne\varnothing\right),\qquad&#10;E(i)=\{j:j\sim i\}" width="510.2429">
-</p>
+```math
+i\sim j\quad\Longleftrightarrow\quad
+i=j\ \lor\ \left(T(i)=T(j)\ne\varnothing\right),\qquad
+E(i)=\{j:j\sim i\}
+```
 
-无标签食材各自成组，不合并为同一组。令 <img src="docs/formulas/inline-bd116d50716e0d74.svg" alt="I_d" width="13.9901" align="middle"> 为按该料理禁用食材名过滤后的加料池，则该料理可用的等价组为 <img src="docs/formulas/inline-67f4ee3616dc639f.svg" alt="E_d(i)=E(i)\cap I_d" width="118.0609" align="middle">。开启去重时，每个非空组只选一个代表进入枚举池：优先采用原程序预设的代表名单，其次按中文名称顺序选择；未开启时枚举完整的 <img src="docs/formulas/inline-bd116d50716e0d74.svg" alt="I_d" width="13.9901" align="middle">。
+无标签食材各自成组，不合并为同一组。令 $`I_d`$ 为按该料理禁用食材名过滤后的加料池，则该料理可用的等价组为 $`E_d(i)=E(i)\cap I_d`$。开启去重时，每个非空组只选一个代表进入枚举池：优先采用原程序预设的代表名单，其次按中文名称顺序选择；未开启时枚举完整的 $`I_d`$。
 
 等价去重在枚举前压缩**加料食材池**，基础配方保持原样，同一代表可重复追加。标签相同的食材即使供给量不同，也属于同一组；采购推荐阶段另行处理组内供给差异。
 
@@ -150,101 +162,127 @@
 
 **目的：** 在满足准入条件的前提下，优先保留由标签较少的食材构成的方案。“高级”是基于食材标签包含关系的分类，其判定仅使用标签集合。
 
-在该料理实际用于枚举的食材池中，对食材 <img src="docs/formulas/inline-be098300053e6dfb.svg" alt="i" width="6.0807" align="middle"> 寻找满足下式的基础替代 <img src="docs/formulas/inline-50a8852bc2f69c06.svg" alt="j" width="8.4399" align="middle">：
+在该料理实际用于枚举的食材池中，对食材 $`i`$ 寻找满足下式的基础替代 $`j`$：
 
-<p align="center">
-<img src="docs/formulas/block-32caf243e300e415.svg" alt="\varnothing\ne T(j)\subsetneq T(i)" width="127.7399">
-</p>
+```math
+\varnothing\ne T(j)\subsetneq T(i)
+```
 
-原程序从识别出的替代项中选标签数最少者，同数量时按中文名称顺序选择，记为 <img src="docs/formulas/inline-20f5c814eecea199.svg" alt="B_d(i)" width="35.4556" align="middle">（Base representative）；没有替代项时取 <img src="docs/formulas/inline-1b0dd7c234d8e695.svg" alt="B_d(i)=i" width="62.5364" align="middle">。将方案的**所有加料同时**映射到这些代表，得到基础加料向量：
+原程序从识别出的替代项中选标签数最少者，同数量时按中文名称顺序选择，记为 $`B_d(i)`$（Base representative）；没有替代项时取 $`B_d(i)=i`$。将方案的**所有加料同时**映射到这些代表，得到基础加料向量：
 
-<p align="center">
-<img src="docs/formulas/block-6c35401f6cb5339e.svg" alt="\begin{gathered}&#10;a_j^{\mathrm{base}}(p)=\sum_{i:B_d(i)=j}a_i(p),\\&#10;\mathbf A^{\mathrm{base}}(p)=(a_j^{\mathrm{base}}(p))_j,\\&#10;p^{\mathrm{base}}=(d,\mathbf A^{\mathrm{base}}(p)).&#10;\end{gathered}" width="179.6140">
-</p>
+```math
+\begin{gathered}
+a_j^{\mathrm{base}}(p)=\sum_{i:B_d(i)=j}a_i(p),\\
+\mathbf A^{\mathrm{base}}(p)=(a_j^{\mathrm{base}}(p))_j,\\
+p^{\mathrm{base}}=(d,\mathbf A^{\mathrm{base}}(p)).
+\end{gathered}
+```
 
-当 <img src="docs/formulas/inline-937af39d8489ea40.svg" alt="\mathbf A^{\mathrm{base}}(p)\ne \mathbf A(p)" width="109.8832" align="middle"> 时，该方案被视为含高级加料。开启高级过滤后，删除条件为：
+当 $`\mathbf A^{\mathrm{base}}(p)\ne \mathbf A(p)`$ 时，该方案被视为含高级加料。开启高级过滤后，删除条件为：
 
-<p align="center">
-<img src="docs/formulas/block-9e548de981b0e66b.svg" alt="\begin{gathered}&#10;\mathbf A^{\mathrm{base}}(p)\ne \mathbf A(p),\qquad p^{\mathrm{base}}\in\mathcal C_{g,d}^{(0)},\\&#10;\mathbf A^{\mathrm{base}}(p^{\mathrm{base}})=\mathbf A(p^{\mathrm{base}}),\qquad&#10;\left(F_{\mathrm U}=0\ \lor\ S_g(p^{\mathrm{base}})\ge S_g(p)\right).&#10;\end{gathered}" width="457.1962">
-</p>
+```math
+\begin{gathered}
+\mathbf A^{\mathrm{base}}(p)\ne \mathbf A(p),\qquad p^{\mathrm{base}}\in\mathcal C_{g,d}^{(0)},\\
+\mathbf A^{\mathrm{base}}(p^{\mathrm{base}})=\mathbf A(p^{\mathrm{base}}),\qquad
+\left(F_{\mathrm U}=0\ \lor\ S_g(p^{\mathrm{base}})\ge S_g(p)\right).
+\end{gathered}
+```
 
-<img src="docs/formulas/inline-e1c80b5b55944843.svg" alt="F_{\mathrm U}" width="19.3512" align="middle"> 是该过滤的“考虑得分”开关：开启为 1，关闭为 0。关闭时，只要对应的非高级基础方案也达标，就删除当前高级方案；开启时，还要求基础方案得分不低于当前方案。若基础方案未生成、未达标或不满足其他准入条件，则保留当前方案。
+$`F_{\mathrm U}`$ 是该过滤的“考虑得分”开关：开启为 1，关闭为 0。关闭时，只要对应的非高级基础方案也达标，就删除当前高级方案；开启时，还要求基础方案得分不低于当前方案。若基础方案未生成、未达标或不满足其他准入条件，则保留当前方案。
 
-例如，某食材的标签为「甜」，另一食材为「甜」「高级」；只有前者被选为后者的基础代表、且整套替代方案达标时，后者方案才进入上述删除判断。比较范围限于**指定基础映射生成的整套加料替代**，基础配方保持原样。此步保留的集合记为 <img src="docs/formulas/inline-f7ee1b77a1f6cedb.svg" alt="\mathcal C_{g,d}^{(1)}" width="24.8523" align="middle">；未启用高级过滤时，它等于 <img src="docs/formulas/inline-4d9d05e294ded4de.svg" alt="\mathcal C_{g,d}^{(0)}" width="24.8523" align="middle">。
+例如，某食材的标签为「甜」，另一食材为「甜」「高级」；只有前者被选为后者的基础代表、且整套替代方案达标时，后者方案才进入上述删除判断。比较范围限于**指定基础映射生成的整套加料替代**，基础配方保持原样。此步保留的集合记为 $`\mathcal C_{g,d}^{(1)}`$；未启用高级过滤时，它等于 $`\mathcal C_{g,d}^{(0)}`$。
 
 #### 1.2.5 加料子集过滤：比较能否少加食材
 
 **目的：** 若保留方案仅使用当前方案的一部分加料即可达标，则按用户政策省略更多加料的方案。比较采用食材的**件数向量**，逐项记录每种食材的追加数量：
 
-<p align="center">
-<img src="docs/formulas/block-59192e3896342d22.svg" alt="\mathbf A(p&#x27;)\preceq \mathbf A(p)\quad\Longleftrightarrow\quad&#10;\forall i,\ a_i(p&#x27;)\le a_i(p)" width="312.2607">
-</p>
+```math
+\mathbf A(p')\preceq \mathbf A(p)\quad\Longleftrightarrow\quad
+\forall i,\ a_i(p')\le a_i(p)
+```
 
-输入为高级过滤之后的同料理候选 <img src="docs/formulas/inline-f7ee1b77a1f6cedb.svg" alt="\mathcal C_{g,d}^{(1)}" width="24.8523" align="middle">；先按加料件数升序、得分降序、加料名称键顺序排列。依次处理时，以 <img src="docs/formulas/inline-c9119d0cc70f94a9.svg" alt="\mathcal K" width="13.2060" align="middle"> 表示此前已保留的方案，当前方案的删除条件为：
+输入为高级过滤之后的同料理候选 $`\mathcal C_{g,d}^{(1)}`$；先按加料件数升序、得分降序、加料名称键顺序排列。依次处理时，以 $`\mathcal K`$ 表示此前已保留的方案，当前方案的删除条件为：
 
-<p align="center">
-<img src="docs/formulas/block-86ac204100b12908.svg" alt="\exists p&#x27;\in\mathcal K:\quad&#10;\mathbf A(p&#x27;)\preceq \mathbf A(p)\quad\land\quad&#10;\left(F_{\mathrm S}=0\ \lor\ S_g(p&#x27;)\ge S_g(p)\right)" width="454.9973">
-</p>
+```math
+\exists p'\in\mathcal K:\quad
+\mathbf A(p')\preceq \mathbf A(p)\quad\land\quad
+\left(F_{\mathrm S}=0\ \lor\ S_g(p')\ge S_g(p)\right)
+```
 
-<img src="docs/formulas/inline-f05c56416827d4a7.svg" alt="F_{\mathrm S}" width="17.0027" align="middle"> 是子集过滤的“考虑得分”开关：关闭时，已保留的达标子集存在即可；开启时，子集得分还须不低于当前方案。未被删除的方案加入 <img src="docs/formulas/inline-c9119d0cc70f94a9.svg" alt="\mathcal K" width="13.2060" align="middle">，供后续比较。零加料方案若达标，也可以成为子集；实际判定包含向量相等的情形。
+$`F_{\mathrm S}`$ 是子集过滤的“考虑得分”开关：关闭时，已保留的达标子集存在即可；开启时，子集得分还须不低于当前方案。未被删除的方案加入 $`\mathcal K`$，供后续比较。零加料方案若达标，也可以成为子集；实际判定包含向量相等的情形。
 
-例如，“蜂蜜×1”是“蜂蜜×2”的加料子集，反向不成立。若两者均达标且前者已保留，关闭考虑得分时可删除后者；开启时需进一步比较净分。高级过滤比较相同件数下的食材身份替代；子集过滤比较减少既有加料用量的组合。两者均据比较结果删减候选，不改写保留方案。子集过滤后保留的集合记为 <img src="docs/formulas/inline-9c15b1bceca81cec.svg" alt="\mathcal C_{g,d}^{(2)}" width="24.8523" align="middle">；未启用此项时，它等于 <img src="docs/formulas/inline-f7ee1b77a1f6cedb.svg" alt="\mathcal C_{g,d}^{(1)}" width="24.8523" align="middle">。
+例如，“蜂蜜×1”是“蜂蜜×2”的加料子集，反向不成立。若两者均达标且前者已保留，关闭考虑得分时可删除后者；开启时需进一步比较净分。高级过滤比较相同件数下的食材身份替代；子集过滤比较减少既有加料用量的组合。两者均据比较结果删减候选，不改写保留方案。子集过滤后保留的集合记为 $`\mathcal C_{g,d}^{(2)}`$；未启用此项时，它等于 $`\mathcal C_{g,d}^{(1)}`$。
 
 #### 1.2.6 采购推荐：按供给向量确定保留边界
 
-**目的：** 在 <img src="docs/formulas/inline-9c15b1bceca81cec.svg" alt="\mathcal C_{g,d}^{(2)}" width="24.8523" align="middle"> 中，优先考虑供给较充足的用料组合。此时还没有每日订单量假设，也不从供给中扣减消耗；比较在每道料理内部进行。
+**目的：** 在 $`\mathcal C_{g,d}^{(2)}`$ 中，优先考虑供给较充足的用料组合。此时还没有每日订单量假设，也不从供给中扣减消耗；比较在每道料理内部进行。
 
-**有效供给值：** 沿用经验日供给量 <img src="docs/formulas/inline-03b462f46967b9dd.svg" alt="q_i" width="11.6673" align="middle">，令 <img src="docs/formulas/inline-c5ed1180c444ad01.svg" alt="M(i)\subseteq E(i)" width="85.0791" align="middle"> 为程序全局分组记录中，与该食材对应且有已知供给值的成员。网页使用：
+**有效供给值：** 沿用经验日供给量 $`q_i`$，令 $`M(i)\subseteq E(i)`$ 为程序全局分组记录中，与该食材对应且有已知供给值的成员。网页使用：
 
-<p align="center">
-<img src="docs/formulas/block-06539d6cb09e1efe.svg" alt="\widetilde q_i=&#10;\begin{cases}&#10;\dfrac{1}{&#124;M(i)&#124;}\sum_{j\in M(i)}q_j,&amp; &#124;M(i)&#124;&gt;0,\\&#10;q_i,&amp; &#124;M(i)&#124;=0\text{ and }q_i\text{ is known},\\&#10;0,&amp;\text{otherwise}.&#10;\end{cases}" width="421.1851">
-</p>
+```math
+\widetilde q_i=
+\begin{cases}
+\dfrac{1}{|M(i)|}\sum_{j\in M(i)}q_j,& |M(i)|>0,\\
+q_i,& |M(i)|=0\text{ and }q_i\text{ is known},\\
+0,&\text{otherwise}.
+\end{cases}
+```
 
 单成员组有值时，上式就是自身供给；无组内记录时先回退到食材自身的供给记录，仍缺失才取 0。均值取自全局组，不只取该料理允许的成员；即使未开启等价去重，采购比较仍使用这一有效值。
 
-**比较向量：** 每份方案中，每一件基础食材和加料各贡献一次有效供给值，按升序组成向量 <img src="docs/formulas/inline-fe75e0097cd3f36a.svg" alt="\mathbf V(p)" width="33.8068" align="middle">（Vector）：
+**比较向量：** 每份方案中，每一件基础食材和加料各贡献一次有效供给值，按升序组成向量 $`\mathbf V(p)`$（Vector）：
 
-<p align="center">
-<img src="docs/formulas/block-a64ed4e77cbbce10.svg" alt="\mathbf V(p)=\mathrm{sort}_{\uparrow}&#10;\left(\biguplus_i\{\widetilde q_i\}^{c_i(p)}\right)" width="204.9316">
-</p>
+```math
+\mathbf V(p)=\mathrm{sort}_{\uparrow}
+\left(\biguplus_i\{\widetilde q_i\}^{c_i(p)}\right)
+```
 
-这里 <img src="docs/formulas/inline-e98973b4ca606038.svg" alt="\biguplus" width="13.4770" align="middle"> 表示保留重复元素的拼接，<img src="docs/formulas/inline-1605f94b190a11cb.svg" alt="\{\widetilde q_i\}^{c_i(p)}" width="50.6857" align="middle"> 表示该值重复 <img src="docs/formulas/inline-12b55a3dbf3f4a37.svg" alt="c_i(p)" width="30.9865" align="middle"> 次。排名从最小分量开始比较，在第一个不同位置取值较大者优先；前缀相同时，将较短向量缺少的分量视为 <img src="docs/formulas/inline-5d38adbeeffb7080.svg" alt="+\infty" width="28.3263" align="middle">。因此：
+这里 $`\biguplus`$ 表示保留重复元素的拼接，$`\{\widetilde q_i\}^{c_i(p)}`$ 表示该值重复 $`c_i(p)`$ 次。排名从最小分量开始比较，在第一个不同位置取值较大者优先；前缀相同时，将较短向量缺少的分量视为 $`+\infty`$。因此：
 
-<p align="center">
-<img src="docs/formulas/block-7e44b7bc4847dd08.svg" alt="(4,12)\succ(3,100),\qquad&#10;(4,12)\succ(4,10),\qquad&#10;(4)\succ(4,12)" width="426.6953">
-</p>
+```math
+(4,12)\succ(3,100),\qquad
+(4,12)\succ(4,10),\qquad
+(4)\succ(4,12)
+```
 
-该词典序规则从最低供给值开始逐项比较。原实现用 <img src="docs/formulas/inline-83a2204fe13b539e.svg" alt="10^{-9}" width="30.1041" align="middle"> 作为数值比较容差；向量并列时按加料件数、加料名称键稳定排序。
+该词典序规则从最低供给值开始逐项比较。原实现用 $`10^{-9}`$ 作为数值比较容差；向量并列时按加料件数、加料名称键稳定排序。
 
-**Top-N 与并列：** 设过滤后有 <img src="docs/formulas/inline-b1bd71f878d995c6.svg" alt="m_{g,d}" width="29.8726" align="middle"> 个候选，将其按上述顺序记为 <img src="docs/formulas/inline-05f381c49d19a21c.svg" alt="p_1,\ldots,p_{m_{g,d}}" width="82.4605" align="middle">，<img src="docs/formulas/inline-08ace3bf40646212.svg" alt="N\ge1" width="43.2193" align="middle"> 为用户指定的排名阈值。为说明去重如何影响边界，定义方案权重 <img src="docs/formulas/inline-6e3703ce4bb5e958.svg" alt="W(p)" width="36.4567" align="middle">（Weight）：
+**Top-N 与并列：** 设过滤后有 $`m_{g,d}`$ 个候选，将其按上述顺序记为 $`p_1,\ldots,p_{m_{g,d}}`$，$`N\ge1`$ 为用户指定的排名阈值。为说明去重如何影响边界，定义方案权重 $`W(p)`$（Weight）：
 
-<p align="center">
-<img src="docs/formulas/block-fa53f1681d29482c.svg" alt="W(p)=&#10;\begin{cases}&#10;1,&amp;\text{equivalence deduplication off},\\&#10;\prod_{i:a_i(p)&gt;0}&#124;E_d(i)&#124;^{a_i(p)},&amp;\text{equivalence deduplication on}.&#10;\end{cases}" width="479.1887">
-</p>
+```math
+W(p)=
+\begin{cases}
+1,&\text{equivalence deduplication off},\\
+\prod_{i:a_i(p)>0}|E_d(i)|^{a_i(p)},&\text{equivalence deduplication on}.
+\end{cases}
+```
 
-无加料时空乘积为 1。边界位置记为 <img src="docs/formulas/inline-a0d4c4438485bc0c.svg" alt="k_{\mathrm{cut}}" width="24.2833" align="middle">，最终保留集合为：
+无加料时空乘积为 1。边界位置记为 $`k_{\mathrm{cut}}`$，最终保留集合为：
 
-<p align="center">
-<img src="docs/formulas/block-66ad30f7e64de1d1.svg" alt="\begin{gathered}&#10;k_{\mathrm{cut}}=\min\left\{k:\sum_{j=1}^{k}W(p_j)\ge N\right\},\\&#10;\mathcal R_{g,d}=\{p_j:\mathbf V(p_j)\succeq \mathbf V(p_{k_{\mathrm{cut}}})\}&#10;\end{gathered}" width="261.4334">
-</p>
+```math
+\begin{gathered}
+k_{\mathrm{cut}}=\min\left\{k:\sum_{j=1}^{k}W(p_j)\ge N\right\},\\
+\mathcal R_{g,d}=\{p_j:\mathbf V(p_j)\succeq \mathbf V(p_{k_{\mathrm{cut}}})\}
+\end{gathered}
+```
 
-若累计权重不足 <img src="docs/formulas/inline-91222128ebc40738.svg" alt="N" width="14.9435" align="middle">，取 <img src="docs/formulas/inline-5d9c1a7df33320ea.svg" alt="k_{\mathrm{cut}}=m_{g,d}" width="74.8853" align="middle">；无候选时输出为空。未去重时，边界就是第 <img src="docs/formulas/inline-dd6bfce9d4b063b2.svg" alt="\min(N,m_{g,d})" width="87.3738" align="middle"> 个方案；去重时按该料理可用等价组大小累积权重。**Top-N 的截点由累计方案权重确定，再保留供给向量不低于该截点的全部候选，包括所有并列项。最终输出行数由截点和并列情况共同决定。**
+若累计权重不足 $`N`$，取 $`k_{\mathrm{cut}}=m_{g,d}`$；无候选时输出为空。未去重时，边界就是第 $`\min(N,m_{g,d})`$ 个方案；去重时按该料理可用等价组大小累积权重。**Top-N 的截点由累计方案权重确定，再保留供给向量不低于该截点的全部候选，包括所有并列项。最终输出行数由截点和并列情况共同决定。**
 
-权重用于补偿等价去重对排名截点的影响，其乘积计算与无序方案计数存在差异。例如，同一两成员组重复追加两件时，权重为 <img src="docs/formulas/inline-f063c29576c887ff.svg" alt="2^2=4" width="43.6921" align="middle">，而无序组合实际只有三种。因此，该权重不是去重前方案数的精确还原，开关去重前后的 Top-N 结果也未建立严格等价关系。
+权重用于补偿等价去重对排名截点的影响，其乘积计算与无序方案计数存在差异。例如，同一两成员组重复追加两件时，权重为 $`2^2=4`$，而无序组合实际只有三种。因此，该权重不是去重前方案数的精确还原，开关去重前后的 Top-N 结果也未建立严格等价关系。
 
 **输出名称：** 同时开启采购推荐与等价去重时，最终显示的加料还会替换为全局等价组中已知原始供给量最大的成员：
 
-<p align="center">
-<img src="docs/formulas/block-919480bf90ba5b0e.svg" alt="i_{\mathrm{out}}\in\arg\max_{j\in M(i)}q_j" width="135.0522">
-</p>
+```math
+i_{\mathrm{out}}\in\arg\max_{j\in M(i)}q_j
+```
 
 没有已知供给值时保留当前代表，并列按代表优先级与名称顺序处理。**排名采用组均值，输出名称采用组内最大值**，基础配方不替换。该输出步骤按全局组选择，未再次按料理禁用名单检查；使用条件见[网页使用说明](docs/web-guide.md)。
 
-未启用采购推荐时，保留全部 <img src="docs/formulas/inline-9c15b1bceca81cec.svg" alt="\mathcal C_{g,d}^{(2)}" width="24.8523" align="middle">。按输出名称替换前的方案表示，各过滤阶段满足：
+未启用采购推荐时，保留全部 $`\mathcal C_{g,d}^{(2)}`$。按输出名称替换前的方案表示，各过滤阶段满足：
 
-<p align="center">
-<img src="docs/formulas/block-410c77c049855311.svg" alt="\mathcal C_{g,d}^{(0)}\supseteq\mathcal C_{g,d}^{(1)}\supseteq\mathcal C_{g,d}^{(2)}\supseteq\mathcal R_{g,d}" width="188.4408">
-</p>
+```math
+\mathcal C_{g,d}^{(0)}\supseteq\mathcal C_{g,d}^{(1)}\supseteq\mathcal C_{g,d}^{(2)}\supseteq\mathcal R_{g,d}
+```
 
 等价去重先压缩食材池，上述集合关系再描述枚举后的候选删减。HTML 模型由此包含**准入条件、两种方案删减政策、食材等价近似与采购排序**，输出满足用户条件的备选方案。后续 Python 版本在各自候选范围内引入自动选定方案的优化目标。
 
@@ -254,55 +292,67 @@
 
 **约束与假设：** Python PLAN 在评分准入中增加“无厌恶命中”条件，因此沿用上一节的净分门槛即可得到：
 
-<p align="center">
-<img src="docs/formulas/block-22ccb73cd1932693.svg" alt="H_g^{\mathrm D}(p)=0,\qquad S_g(p)\ge S_{\min}&#10;\quad\Longrightarrow\quad H_g^{\mathrm L}(p)\ge S_{\min}" width="399.6142">
-</p>
+```math
+H_g^{\mathrm D}(p)=0,\qquad S_g(p)\ge S_{\min}
+\quad\Longrightarrow\quad H_g^{\mathrm L}(p)\ge S_{\min}
+```
 
 配方禁忌、持有料理及候选规约按对应 Python 版本执行。各版本的候选集合分别由自身处理规则定义，HTML 与 Python 候选之间未规定包含关系。
 
-**新增决策与订单假设：** 对目标标签 <img src="docs/formulas/inline-e5a3e9f6e9394d95.svg" alt="t\in \mathcal L_g" width="43.0757" align="middle">，令 <img src="docs/formulas/inline-812fd16cdc7dd06d.svg" alt="\mathcal C_{g,t}" width="22.8120" align="middle"> 为包含该标签、通过准入，并按原程序逐料理、逐目标标签应用升级／子集过滤后汇集的候选。定义：
+**新增决策与订单假设：** 对目标标签 $`t\in \mathcal L_g`$，令 $`\mathcal C_{g,t}`$ 为包含该标签、通过准入，并按原程序逐料理、逐目标标签应用升级／子集过滤后汇集的候选。定义：
 
-<p align="center">
-<img src="docs/formulas/block-102cf02fa9f7825e.svg" alt="J_g=\left\{t\in \mathcal L_g:\mathcal C_{g,t}\ne\varnothing\right\},\qquad&#10;m_g=&#124;J_g&#124;,\qquad p_t\in\mathcal C_{g,t}\quad(t\in J_g)" width="482.1758">
-</p>
+```math
+J_g=\left\{t\in \mathcal L_g:\mathcal C_{g,t}\ne\varnothing\right\},\qquad
+m_g=|J_g|,\qquad p_t\in\mathcal C_{g,t}\quad(t\in J_g)
+```
 
-决策为方案族 <img src="docs/formulas/inline-517ee1b17abb2bf5.svg" alt="(p_t)_{t\in J_g}" width="47.4759" align="middle">，同一方案可被多个标签选中。<img src="docs/formulas/inline-e906c2dc912b6677.svg" alt="m_g" width="20.5354" align="middle"> 按有候选的目标标签计数。沿用假设日订单量 <img src="docs/formulas/inline-2066578204af0ef9.svg" alt="K" width="15.1985" align="middle">，并假设订单在这些目标标签间均分，每类承担 <img src="docs/formulas/inline-ff8480d317651a48.svg" alt="K/m_g" width="41.5930" align="middle"> 单。若 <img src="docs/formulas/inline-dbca9d7ee48089cc.svg" alt="m_g=0" width="49.7769" align="middle">，不生成规划。
+决策为方案族 $`(p_t)_{t\in J_g}`$，同一方案可被多个标签选中。$`m_g`$ 按有候选的目标标签计数。沿用假设日订单量 $`K`$，并假设订单在这些目标标签间均分，每类承担 $`K/m_g`$ 单。若 $`m_g=0`$，不生成规划。
 
-沿用 <img src="docs/formulas/inline-12b55a3dbf3f4a37.svg" alt="c_i(p)" width="30.9865" align="middle"> 和原始日供给 <img src="docs/formulas/inline-03b462f46967b9dd.svg" alt="q_i" width="11.6673" align="middle">，令 <img src="docs/formulas/inline-90e6a8084bc3afcc.svg" alt="u_i" width="13.8216" align="middle"> 为各标签所选方案对食材的累计用量。预期日食材件数 <img src="docs/formulas/inline-757594083ee7f31b.svg" alt="E_{\mathrm{old}}" width="27.4898" align="middle"> 与最低供给余量 <img src="docs/formulas/inline-12c50787a4e5d004.svg" alt="R_{\mathrm{old}}" width="27.8002" align="middle"> 为：
+沿用 $`c_i(p)`$ 和原始日供给 $`q_i`$，令 $`u_i`$ 为各标签所选方案对食材的累计用量。预期日食材件数 $`E_{\mathrm{old}}`$ 与最低供给余量 $`R_{\mathrm{old}}`$ 为：
 
-<p align="center">
-<img src="docs/formulas/block-a61ecf65e98da2ef.svg" alt="\begin{gathered}&#10;u_i=\sum_{t\in J_g}c_i(p_t),\\&#10;E_{\mathrm{old}}=\frac{K}{m_g}\sum_i u_i,\\&#10;R_{\mathrm{old}}=\min_{i:u_i&gt;0}\left(q_i-\frac{K}{m_g}u_i\right)&#10;\end{gathered}" width="193.8832">
-</p>
+```math
+\begin{gathered}
+u_i=\sum_{t\in J_g}c_i(p_t),\\
+E_{\mathrm{old}}=\frac{K}{m_g}\sum_i u_i,\\
+R_{\mathrm{old}}=\min_{i:u_i>0}\left(q_i-\frac{K}{m_g}u_i\right)
+\end{gathered}
+```
 
 后二者单位均为件／日。模型从日供给中扣除假设订单对应的食材消耗，以计算余量；订单均分属于建模假设，尚无对应的实测订单概率估计。
 
 **目标函数：**
 
-<p align="center">
-<img src="docs/formulas/block-ab2d7726bdf389c5.svg" alt="\min_{\substack{p_t\in\mathcal C_{g,t}\\t\in J_g}}^{\mathrm{lex}}&#10;\left(E_{\mathrm{old}},\;-R_{\mathrm{old}}\right)" width="147.0717">
-</p>
+```math
+\min_{\substack{p_t\in\mathcal C_{g,t}\\t\in J_g}}^{\mathrm{lex}}
+\left(E_{\mathrm{old}},\;-R_{\mathrm{old}}\right)
+```
 
-固定 <img src="docs/formulas/inline-e906c2dc912b6677.svg" alt="m_g" width="20.5354" align="middle"> 后，最少预期件数可按标签拆分，因此程序先保留每个标签全部并列最少件数候选，再比较组合的供给压力。最低余量相同时，继续比较完整的升序余量向量。旧分支的阈值二分与 DFS 用于这一组合求解；它们属于求解方法，目标仍是上式。
+固定 $`m_g`$ 后，最少预期件数可按标签拆分，因此程序先保留每个标签全部并列最少件数候选，再比较组合的供给压力。最低余量相同时，继续比较完整的升序余量向量。旧分支的阈值二分与 DFS 用于这一组合求解；它们属于求解方法，目标仍是上式。
 
 ### 1.4 singlePLAN：将每标签方案改为每客一个方案
 
-**问题与变化：** `singlePLAN.py` 将决策从方案族 <img src="docs/formulas/inline-517ee1b17abb2bf5.svg" alt="(p_t)_{t\in J_g}" width="47.4759" align="middle"> 改为单个 <img src="docs/formulas/inline-74ab86906e20d3e1.svg" alt="p" width="10.1136" align="middle">：同一位顾客的全部假设订单采用这一套方案。同时，目标顺序改为**喜爱命中最多，其次食材件数最少，最后最低供给余量最大**。
+**问题与变化：** `singlePLAN.py` 将决策从方案族 $`(p_t)_{t\in J_g}`$ 改为单个 $`p`$：同一位顾客的全部假设订单采用这一套方案。同时，目标顺序改为**喜爱命中最多，其次食材件数最少，最后最低供给余量最大**。
 
-**约束与假设：** 保留制作条件、净分门槛和无厌恶准入；决策变量改为一套方案 <img src="docs/formulas/inline-74ab86906e20d3e1.svg" alt="p" width="10.1136" align="middle">，同一顾客的 <img src="docs/formulas/inline-2066578204af0ef9.svg" alt="K" width="15.1985" align="middle"> 单全部使用它。
+**约束与假设：** 保留制作条件、净分门槛和无厌恶准入；决策变量改为一套方案 $`p`$，同一顾客的 $`K`$ 单全部使用它。
 
 **用量与余量：** 同一方案承担该顾客的全部假设日订单，食材需求与余量为：
 
-<p align="center">
-<img src="docs/formulas/block-ef1e5e2ca13002c6.svg" alt="\begin{gathered}&#10;\frac{K}{m_g}\sum_{t\in J_g}c_i(p_t)&#10;\quad\longrightarrow\quad Kc_i(p),\\&#10;R(p)=\min_{i:c_i(p)&gt;0}\left(q_i-Kc_i(p)\right)&#10;\end{gathered}" width="228.2302">
-</p>
+```math
+\begin{gathered}
+\frac{K}{m_g}\sum_{t\in J_g}c_i(p_t)
+\quad\longrightarrow\quad Kc_i(p),\\
+R(p)=\min_{i:c_i(p)>0}\left(q_i-Kc_i(p)\right)
+\end{gathered}
+```
 
-<img src="docs/formulas/inline-f7128c7ebd80e206.svg" alt="R(p)" width="31.6606" align="middle"> 的单位仍为件／日。<img src="docs/formulas/inline-2066578204af0ef9.svg" alt="K" width="15.1985" align="middle"> 固定时，最小化每份件数 <img src="docs/formulas/inline-1c253c2658ea915c.svg" alt="C(p)" width="31.9129" align="middle"> 等价于最小化该客人的日件数 <img src="docs/formulas/inline-2475d248308f25a7.svg" alt="KC(p)" width="46.4002" align="middle">；原实现直接比较每份件数。
+$`R(p)`$ 的单位仍为件／日。$`K`$ 固定时，最小化每份件数 $`C(p)`$ 等价于最小化该客人的日件数 $`KC(p)`$；原实现直接比较每份件数。
 
-**目标函数：** 令 <img src="docs/formulas/inline-8ba71ebc648e3643.svg" alt="\mathcal C_g^{\mathrm{single}}" width="38.4631" align="middle"> 表示该版本生成并保留的合格候选：
+**目标函数：** 令 $`\mathcal C_g^{\mathrm{single}}`$ 表示该版本生成并保留的合格候选：
 
-<p align="center">
-<img src="docs/formulas/block-06b9f48f85bc6dd9.svg" alt="\max_{p\in\mathcal C_g^{\mathrm{single}}}^{\mathrm{lex}}&#10;\left(H_g^{\mathrm L}(p),\;-C(p),\;R(p)\right)" width="228.4976">
-</p>
+```math
+\max_{p\in\mathcal C_g^{\mathrm{single}}}^{\mathrm{lex}}
+\left(H_g^{\mathrm L}(p),\;-C(p),\;R(p)\right)
+```
 
 这一步同时改变了订单分配方式与第一优先级。此前先控制一组方案的预计消耗；现在先追求单份方案的更多喜爱命中，再在同覆盖下节约食材、缓解供给压力。三项均相同时，原程序依次用售价、料理名和加料字符串处理平局。
 
@@ -312,59 +362,73 @@
 
 **约束与假设：** 沿用单客单方案、无厌恶准入、最低净分及假设订单量。覆盖收益封顶用于合格方案之间的排序，准入门槛保持原设定。
 
-**新增效用与目标函数：** 以 <img src="docs/formulas/inline-e36a6767abc58511.svg" alt="U(h)" width="32.7311" align="middle"> 表示命中数为 <img src="docs/formulas/inline-797ef090e61e6c4c.svg" alt="h" width="9.6513" align="middle"> 时用于方案比较的覆盖收益（Utility），候选集合相应记为 <img src="docs/formulas/inline-6da9d339b6d755ee.svg" alt="\mathcal C_g^{\mathrm{cover3}}" width="41.7105" align="middle">：
+**新增效用与目标函数：** 以 $`U(h)`$ 表示命中数为 $`h`$ 时用于方案比较的覆盖收益（Utility），候选集合相应记为 $`\mathcal C_g^{\mathrm{cover3}}`$：
 
-<p align="center">
-<img src="docs/formulas/block-5e6e5b93b6ad8afb.svg" alt="\begin{gathered}&#10;U(h)=\min(h,3),\\&#10;\left(H_g^{\mathrm L}(p),-C(p),R(p)\right)&#10;\quad\longrightarrow\quad&#10;\left(U(H_g^{\mathrm L}(p)),-C(p),R(p)\right)&#10;\end{gathered}" width="429.0553">
-</p>
+```math
+\begin{gathered}
+U(h)=\min(h,3),\\
+\left(H_g^{\mathrm L}(p),-C(p),R(p)\right)
+\quad\longrightarrow\quad
+\left(U(H_g^{\mathrm L}(p)),-C(p),R(p)\right)
+\end{gathered}
+```
 
-<p align="center">
-<img src="docs/formulas/block-68219a58764ad072.svg" alt="\max_{p\in\mathcal C_g^{\mathrm{cover3}}}^{\mathrm{lex}}&#10;\left(U(H_g^{\mathrm L}(p)),\;-C(p),\;R(p)\right)" width="259.0913">
-</p>
+```math
+\max_{p\in\mathcal C_g^{\mathrm{cover3}}}^{\mathrm{lex}}
+\left(U(H_g^{\mathrm L}(p)),\;-C(p),\;R(p)\right)
+```
 
-最终标签 <img src="docs/formulas/inline-68e33f0c1b8342af.svg" alt="T(p)" width="31.3317" align="middle">、命中数 <img src="docs/formulas/inline-683063808c74c381.svg" alt="H_g^{\mathrm L}(p)" width="41.5443" align="middle"> 和原始净分 <img src="docs/formulas/inline-89e72371142cc976.svg" alt="S_g(p)" width="35.6032" align="middle"> 沿用此前定义，封顶函数仅计算用于排序的收益。图 1 中「甜」流行时，饭团加蜂蜜对灵梦的原始得分为 4，而 <img src="docs/formulas/inline-c1893638fdccd1d1.svg" alt="U(4)=3" width="61.2613" align="middle">。
+最终标签 $`T(p)`$、命中数 $`H_g^{\mathrm L}(p)`$ 和原始净分 $`S_g(p)`$ 沿用此前定义，封顶函数仅计算用于排序的收益。图 1 中「甜」流行时，饭团加蜂蜜对灵梦的原始得分为 4，而 $`U(4)=3`$。
 
-门槛 <img src="docs/formulas/inline-6de0be9d77809a12.svg" alt="S_{\min}" width="29.3042" align="middle"> 控制能否进入候选，封顶函数 <img src="docs/formulas/inline-c25d99961fd00ef1.svg" alt="U" width="12.6959" align="middle"> 控制进入后如何比较。在默认 <img src="docs/formulas/inline-90c739fab2cb64f1.svg" alt="S_{\min}=3" width="58.4052" align="middle"> 且无厌恶的条件下，合格候选均有 <img src="docs/formulas/inline-db17e0cf22e06618.svg" alt="U=3" width="41.3178" align="middle">，因此该版本实际表达为：**先达标，再省料，再考虑供给余量**。准入门槛与收益上限独立设定，降低门槛时仍沿用原收益上限。
+门槛 $`S_{\min}`$ 控制能否进入候选，封顶函数 $`U`$ 控制进入后如何比较。在默认 $`S_{\min}=3`$ 且无厌恶的条件下，合格候选均有 $`U=3`$，因此该版本实际表达为：**先达标，再省料，再考虑供给余量**。准入门槛与收益上限独立设定，降低门槛时仍沿用原收益上限。
 
 ### 1.6 输出格式分支：mixedingredients
 
 **问题与变化：** `singlePLAN_cover3_mixedingredients.py` 调整结果的阅读和使用方式，将基础食材与加料合写为 `Ingredient1` 至 `Ingredient5`，按原输出约定排列并保留表格合并。
 
-该分支沿用 1.5 节的决策变量、目标及标签形成规则，仅合并展示基础与追加用量。<img src="docs/formulas/inline-5dd9783eefc69414.svg" alt="p,c_i(p),C(p),T(p),H_g^{\mathrm L}(p),S_g(p),R(p),U(H_g^{\mathrm L}(p))" width="328.5551" align="middle"> 的含义和计算保持原样，基础食材仍用于满足配方，加料带入食材标签。
+该分支沿用 1.5 节的决策变量、目标及标签形成规则，仅合并展示基础与追加用量。$`p,c_i(p),C(p),T(p),H_g^{\mathrm L}(p),S_g(p),R(p),U(H_g^{\mathrm L}(p))`$ 的含义和计算保持原样，基础食材仍用于满足配方，加料带入食材标签。
 
 ### 1.7 固定厨具分支：limitedCookware
 
 **问题与变化：** `singlePLAN_cover3_mixIng_limitedCookware.py` 在既定设备条件下为各客人选方案：由玩家指定排除哪些厨具，目标仍沿用 cover3。原文件默认排除烧烤架、蒸锅。
 
-**约束与决策：** 令 <img src="docs/formulas/inline-e5f586d3e49d6f59.svg" alt="\kappa(d)" width="28.7832" align="middle"> 表示料理所需厨具，<img src="docs/formulas/inline-76d8e738fa414fbe.svg" alt="S_0" width="15.9827" align="middle"> 表示排除指定设备后可用的厨具集合。以 <img src="docs/formulas/inline-51b50d180c75c937.svg" alt="v" width="8.8543" align="middle"> 表示当前设备模型的版本，<img src="docs/formulas/inline-f78becd5b7924ad5.svg" alt="\mathcal C_g^v" width="16.4131" align="middle"> 为该版本应用设备集合限制前的合格候选；定义限制操作：
+**约束与决策：** 令 $`\kappa(d)`$ 表示料理所需厨具，$`S_0`$ 表示排除指定设备后可用的厨具集合。以 $`v`$ 表示当前设备模型的版本，$`\mathcal C_g^v`$ 为该版本应用设备集合限制前的合格候选；定义限制操作：
 
-<p align="center">
-<img src="docs/formulas/block-30cea0d5e63bbea6.svg" alt="\mathcal C_g^v(S)=&#10;\left\{p=(d,\mathbf A)\in\mathcal C_g^v:\kappa(d)\in S\right\}" width="287.2365">
-</p>
+```math
+\mathcal C_g^v(S)=
+\left\{p=(d,\mathbf A)\in\mathcal C_g^v:\kappa(d)\in S\right\}
+```
 
-本节取 <img src="docs/formulas/inline-94ea785b6bb07974.svg" alt="v=\mathrm{limited}" width="77.9115" align="middle">、<img src="docs/formulas/inline-ff73825d72e59965.svg" alt="S=S_0" width="47.5049" align="middle">，在此子集中按 1.5 节的目标比较。<img src="docs/formulas/inline-76d8e738fa414fbe.svg" alt="S_0" width="15.9827" align="middle"> 作为固定输入限定候选范围，形成独立于输出格式调整的设备约束分支。
+本节取 $`v=\mathrm{limited}`$、$`S=S_0`$，在此子集中按 1.5 节的目标比较。$`S_0`$ 作为固定输入限定候选范围，形成独立于输出格式调整的设备约束分支。
 
 ### 1.8 共同厨具分支：nCookware
 
 **问题与变化：** `singlePLAN_cover3_mixIng_nCookware.py` 将设备集合本身纳入决策：给定可用厨具数量，程序选择具体设备，并为各顾客配置一套可用方案。该分支与 `limitedCookware` 分别从输入数据出发，处理共同选择设备与固定排除设备两类配置任务。
 
-**约束与决策：** 令 <img src="docs/formulas/inline-37ec03bd462d7e4d.svg" alt="G" width="13.0944" align="middle"> 为本次规划的顾客集合，<img src="docs/formulas/inline-220478fb1e12f300.svg" alt="H" width="14.9435" align="middle"> 为已拥有料理对应的可用厨具集合，<img src="docs/formulas/inline-5864f80948e3fda9.svg" alt="n" width="10.4164" align="middle"> 为本次采用的厨具种类数。设备集合从固定 <img src="docs/formulas/inline-76d8e738fa414fbe.svg" alt="S_0" width="15.9827" align="middle"> 改为待选择的 <img src="docs/formulas/inline-fb772c3cf3597178.svg" alt="S" width="11.3091" align="middle">：
+**约束与决策：** 令 $`G`$ 为本次规划的顾客集合，$`H`$ 为已拥有料理对应的可用厨具集合，$`n`$ 为本次采用的厨具种类数。设备集合从固定 $`S_0`$ 改为待选择的 $`S`$：
 
-<p align="center">
-<img src="docs/formulas/block-1a8ff6fa145173da.svg" alt="S\subseteq H,\qquad &#124;S&#124;=n" width="150.1594">
-</p>
+```math
+S\subseteq H,\qquad |S|=n
+```
 
-沿用 1.7 节的限制操作，此时 <img src="docs/formulas/inline-baabfefa98097bd4.svg" alt="v=\mathrm{nCookware}" width="106.1052" align="middle">。对给定 <img src="docs/formulas/inline-fb772c3cf3597178.svg" alt="S" width="11.3091" align="middle">，令 <img src="docs/formulas/inline-0c017602c84c19f9.svg" alt="p_g^\star(S)" width="37.8383" align="middle"> 为从 <img src="docs/formulas/inline-ee81fc33a280e95d.svg" alt="\mathcal C_g^v(S)" width="38.7670" align="middle"> 中按 cover3 目标选出的方案；有方案的顾客构成 <img src="docs/formulas/inline-23d693185a9f0dc1.svg" alt="G_S" width="20.6770" align="middle">，无方案人数为 <img src="docs/formulas/inline-dadc553defbb9c7b.svg" alt="z_S=&#124;G\setminus G_S&#124;" width="92.4504" align="middle">。
+沿用 1.7 节的限制操作，此时 $`v=\mathrm{nCookware}`$。对给定 $`S`$，令 $`p_g^\star(S)`$ 为从 $`\mathcal C_g^v(S)`$ 中按 cover3 目标选出的方案；有方案的顾客构成 $`G_S`$，无方案人数为 $`z_S=|G\setminus G_S|`$。
 
 **集合层目标：** 单客的评价顺序保留；新增外层比较，将各客评价汇总，并计入原程序的无解惩罚：
 
-<p align="center">
-<img src="docs/formulas/block-5c8c470b0b1eb586.svg" alt="\max_{S\subseteq H,\ &#124;S&#124;=n}^{\mathrm{lex}}&#10;\left(&#10;\begin{gathered}&#10;\sum_{g\in G_S}U(H_g^{\mathrm L}(p_g^\star(S))),\\&#10;-\left[\sum_{g\in G_S}C(p_g^\star(S))+10^9z_S\right],\\&#10;\sum_{g\in G_S}R(p_g^\star(S))-10^{18}z_S&#10;\end{gathered}&#10;\right)" width="320.7783">
-</p>
+```math
+\max_{S\subseteq H,\ |S|=n}^{\mathrm{lex}}
+\left(
+\begin{gathered}
+\sum_{g\in G_S}U(H_g^{\mathrm L}(p_g^\star(S))),\\
+-\left[\sum_{g\in G_S}C(p_g^\star(S))+10^9z_S\right],\\
+\sum_{g\in G_S}R(p_g^\star(S))-10^{18}z_S
+\end{gathered}
+\right)
+```
 
 在默认三分准入条件下，每位有方案的客人贡献 3 点封顶收益，第一项因而优先增加得到达标方案的客人数，再比较总用料与逐客余量。两项惩罚常数沿用原实现，用于评价存在无解客人的设备配置；这类配置仍可参与比较。
 
-厨具集合在顾客之间共同选择，<img src="docs/formulas/inline-f7128c7ebd80e206.svg" alt="R(p)" width="31.6606" align="middle"> 按每位顾客的假设订单独立计算。该模型未设置将所有顾客消耗合并扣减的共享库存约束。程序先复用每客每厨具的最佳保留候选，再枚举设备组合；旧多方案分支则在单客内部按标签均分订单并求解方案组合。
+厨具集合在顾客之间共同选择，$`R(p)`$ 按每位顾客的假设订单独立计算。该模型未设置将所有顾客消耗合并扣减的共享库存约束。程序先复用每客每厨具的最佳保留候选，再枚举设备组合；旧多方案分支则在单客内部按标签均分订单并求解方案组合。
 
 ### 1.9 版本关系与适用范围
 
@@ -387,13 +451,16 @@
 | 价格、日供给与委托记录 | 作者在游戏中手工记录，并整理经验期望 | 日供给用于资源评价；价格用于独立经济分析 |
 | 流行、持有料理与厨具条件 | 工作簿记录及运行时输入 | 定义本次查询或规划的情境 |
 
-`Total Daily Quantity` 对应第一章的给定供给参数 <img src="docs/formulas/inline-03b462f46967b9dd.svg" alt="q_i" width="11.6673" align="middle">。独立价格分析采用数量加权口径：对食材 <img src="docs/formulas/inline-be098300053e6dfb.svg" alt="i" width="6.0807" align="middle">，令 <img src="docs/formulas/inline-8ee35a952c2e475d.svg" alt="\mathcal O_i" width="17.1503" align="middle"> 为纳入计算的渠道记录集合，<img src="docs/formulas/inline-6fd67be04ffe6dbb.svg" alt="\pi_{i\ell}" width="18.6724" align="middle"> 为记录 <img src="docs/formulas/inline-22c961502fecff1e.svg" alt="\ell" width="8.0732" align="middle"> 的单位采购价，<img src="docs/formulas/inline-dd256be7cb51541c.svg" alt="w_{i\ell}" width="20.9598" align="middle"> 为对应数量，则：
+`Total Daily Quantity` 对应第一章的给定供给参数 $`q_i`$。独立价格分析采用数量加权口径：对食材 $`i`$，令 $`\mathcal O_i`$ 为纳入计算的渠道记录集合，$`\pi_{i\ell}`$ 为记录 $`\ell`$ 的单位采购价，$`w_{i\ell}`$ 为对应数量，则：
 
-<p align="center">
-<img src="docs/formulas/block-b953146c13dc9666.svg" alt="\bar\pi_i=&#10;\frac{\sum_{\ell\in\mathcal O_i}w_{i\ell}\pi_{i\ell}}&#10;{\sum_{\ell\in\mathcal O_i}w_{i\ell}},&#10;\qquad \sum_{\ell\in\mathcal O_i}w_{i\ell}&gt;0." width="271.5865">
-</p>
+```math
+\bar\pi_i=
+\frac{\sum_{\ell\in\mathcal O_i}w_{i\ell}\pi_{i\ell}}
+{\sum_{\ell\in\mathcal O_i}w_{i\ell}},
+\qquad \sum_{\ell\in\mathcal O_i}w_{i\ell}>0.
+```
 
-<img src="docs/formulas/inline-6fd67be04ffe6dbb.svg" alt="\pi_{i\ell}" width="18.6724" align="middle"> 与 <img src="docs/formulas/inline-af6f4b7200d18da6.svg" alt="\bar\pi_i" width="13.8080" align="middle"> 的单位为游戏货币／件，<img src="docs/formulas/inline-dd256be7cb51541c.svg" alt="w_{i\ell}" width="20.9598" align="middle"> 的单位为件；价格和数量须对应同一来源范围。若委托数量计入分母且无对应现金支出，该部分在此口径下计为零现金采购成本。该口径未计入时间与机会成本。
+$`\pi_{i\ell}`$ 与 $`\bar\pi_i`$ 的单位为游戏货币／件，$`w_{i\ell}`$ 的单位为件；价格和数量须对应同一来源范围。若委托数量计入分母且无对应现金支出，该部分在此口径下计为零现金采购成本。该口径未计入时间与机会成本。
 
 完整采样日期、次数和来源版本未留存，采购价公式还存在按行关联错位及部分错误缓存的风险。现有数据用于描述历史经验条件，尚不足以估计可靠的需求分布、置信区间或缺货概率。字段与估计口径见[数据来源说明](docs/data-provenance.md)。
 
@@ -417,70 +484,89 @@ PLAN 主线聚焦料理与加料，酒水、完整满意度和现金利润尚未
 
 ### 3.1 给定食材池的组合枚举
 
-对顾客 <img src="docs/formulas/inline-51728216ba238792.svg" alt="g" width="9.1572" align="middle"> 和料理 <img src="docs/formulas/inline-a30a8e3869f444ee.svg" alt="d" width="9.4281" align="middle">，令实际枚举食材池为 <img src="docs/formulas/inline-8ad64259219885b8.svg" alt="(i_1,\ldots,i_{n_{g,d}})" width="84.3780" align="middle">，<img src="docs/formulas/inline-76b85af9412e991b.svg" alt="n_{g,d}" width="25.5370" align="middle"> 为池大小。基础配方使用 1–5 件食材，剩余格数为 <img src="docs/formulas/inline-88ef60727dab8586.svg" alt="s_d" width="14.2988" align="middle">。追加 <img src="docs/formulas/inline-6dd0afcac6d66595.svg" alt="k" width="9.1093" align="middle"> 件时，DFS 按非递减索引选择食材，允许重复同一种食材，并使每个多重集只生成一次。剪枝前的组合数为：
+对顾客 $`g`$ 和料理 $`d`$，令实际枚举食材池为 $`(i_1,\ldots,i_{n_{g,d}})`$，$`n_{g,d}`$ 为池大小。基础配方使用 1–5 件食材，剩余格数为 $`s_d`$。追加 $`k`$ 件时，DFS 按非递减索引选择食材，允许重复同一种食材，并使每个多重集只生成一次。剪枝前的组合数为：
 
-<p align="center">
-<img src="docs/formulas/block-c61706a78ca6f2ef.svg" alt="\begin{gathered}&#10;s_d=5-\sum_i b_i(d),\qquad 0\le k\le s_d,\\&#10;1\le j_1\le\cdots\le j_k\le n_{g,d}\quad(k\ge1),\\&#10;N_{g,d}=\sum_{k=0}^{s_d}\binom{n_{g,d}+k-1}{k}&#10;=\binom{n_{g,d}+s_d}{s_d}\quad(n_{g,d}\ge1).&#10;\end{gathered}" width="412.2636">
-</p>
+```math
+\begin{gathered}
+s_d=5-\sum_i b_i(d),\qquad 0\le k\le s_d,\\
+1\le j_1\le\cdots\le j_k\le n_{g,d}\quad(k\ge1),\\
+N_{g,d}=\sum_{k=0}^{s_d}\binom{n_{g,d}+k-1}{k}
+=\binom{n_{g,d}+s_d}{s_d}\quad(n_{g,d}\ge1).
+\end{gathered}
+```
 
-空池只可能生成零加料组合。网页在必含标签指定「大份」且料理原标签未含「大份」时，将枚举限制为 <img src="docs/formulas/inline-734dbe47791dbc75.svg" alt="k=s_d" width="43.8828" align="middle">。网页按料理静态分块，最多使用 8 个 Web Worker 并行；各 Python 入口使用 CPU 求解。上述计数针对筛选、去重后的池，实际输出还受准入与后续过滤影响。
+空池只可能生成零加料组合。网页在必含标签指定「大份」且料理原标签未含「大份」时，将枚举限制为 $`k=s_d`$。网页按料理静态分块，最多使用 8 个 Web Worker 并行；各 Python 入口使用 CPU 求解。上述计数针对筛选、去重后的池，实际输出还受准入与后续过滤影响。
 
 
 #### 标签集合的位集求值
 
-网页 Worker 的枚举保持原有顺序，标签判定使用预编译位集。令 <img src="docs/formulas/inline-c76deb6bc966f6bd.svg" alt="\mathcal T" width="14.7522" align="middle"> 为本次计算涉及的全部规范化标签，为每个标签分配唯一位置。任意标签集合 <img src="docs/formulas/inline-ca7ea8e4550eb1c6.svg" alt="X\subseteq\mathcal T" width="50.3560" align="middle"> 对应指示向量：
+网页 Worker 的枚举保持原有顺序，标签判定使用预编译位集。令 $`\mathcal T`$ 为本次计算涉及的全部规范化标签，为每个标签分配唯一位置。任意标签集合 $`X\subseteq\mathcal T`$ 对应指示向量：
 
-<p align="center">
-<img src="docs/formulas/block-9eb6eb6a5b990bb7.svg" alt="\begin{gathered}&#10;\mathbf z(X)=\left(\mathbf 1_{\{t_j\in X\}}\right)_{j=1}^{&#124;\mathcal T&#124;},\\&#10;\mathbf z(X\cup Y)=\mathbf z(X)\lor\mathbf z(Y),\qquad&#10;\mathbf z(X\cap Y)=\mathbf z(X)\land\mathbf z(Y),\\&#10;H_g^{\mathrm L}(p)=\sum_j z_j(T(p))z_j(\mathcal L_g),\qquad&#10;H_g^{\mathrm D}(p)=\sum_j z_j(T(p))z_j(\mathcal D_g).&#10;\end{gathered}" width="473.5543">
-</p>
+```math
+\begin{gathered}
+\mathbf z(X)=\left(\mathbf 1_{\{t_j\in X\}}\right)_{j=1}^{|\mathcal T|},\\
+\mathbf z(X\cup Y)=\mathbf z(X)\lor\mathbf z(Y),\qquad
+\mathbf z(X\cap Y)=\mathbf z(X)\land\mathbf z(Y),\\
+H_g^{\mathrm L}(p)=\sum_j z_j(T(p))z_j(\mathcal L_g),\qquad
+H_g^{\mathrm D}(p)=\sum_j z_j(T(p))z_j(\mathcal D_g).
+\end{gathered}
+```
 
-其中 <img src="docs/formulas/inline-b9201d1f7ef9db02.svg" alt="\mathbf 1" width="8.3283" align="middle"> 为事件指示量，<img src="docs/formulas/inline-732f688fd699d03b.svg" alt="\lor" width="10.8628" align="middle"> 与 <img src="docs/formulas/inline-cd6040bfe22d0824.svg" alt="\land" width="10.8628" align="middle"> 表示逐位或、与运算。实现以 32 位字数组保存这些向量，长度随标签数量增长；位计数给出交集大小。料理固定标签与食材位集预先构建。每个组合先求并集，在满足加料凑满五件的条件时补入「大份」，再依次执行四组覆盖、流行喜爱附加、流行厌恶附加、必含／排除判定及净分计算。
+其中 $`\mathbf 1`$ 为事件指示量，$`\lor`$ 与 $`\land`$ 表示逐位或、与运算。实现以 32 位字数组保存这些向量，长度随标签数量增长；位计数给出交集大小。料理固定标签与食材位集预先构建。每个组合先求并集，在满足加料凑满五件的条件时补入「大份」，再依次执行四组覆盖、流行喜爱附加、流行厌恶附加、必含／排除判定及净分计算。
 
 仅对达标组合构造用于展示的标签集合与候选对象，并保留原标签插入顺序和中文排序规则。高级过滤、子集过滤、采购向量与 Top-N 并列处理仍接收相同顺序的候选。主线程另缓存每行的检索文本，避免每次搜索重复拼接字符串。
 
 <details>
-<summary><strong>v1.0.0 · Initial Release — 3.1 完整原文</strong></summary>
-
-原文出处：[v1.0.0](https://github.com/Mingcode123/Mystia-Menu-Optimizer/blob/v1.0.0/README.md)
+<summary><strong>点击展开旧版全文 — v1.0.0 · Initial Release，第 3.1 节</strong></summary>
 
 ### 3.1 给定食材池的组合枚举
 
-对顾客 <img src="docs/formulas/inline-51728216ba238792.svg" alt="g" width="9.1572" align="middle"> 和料理 <img src="docs/formulas/inline-a30a8e3869f444ee.svg" alt="d" width="9.4281" align="middle">，令实际枚举食材池为 <img src="docs/formulas/inline-8ad64259219885b8.svg" alt="(i_1,\ldots,i_{n_{g,d}})" width="84.3780" align="middle">，<img src="docs/formulas/inline-76b85af9412e991b.svg" alt="n_{g,d}" width="25.5370" align="middle"> 为池大小。基础配方使用 1–5 件食材，剩余格数为 <img src="docs/formulas/inline-88ef60727dab8586.svg" alt="s_d" width="14.2988" align="middle">。追加 <img src="docs/formulas/inline-6dd0afcac6d66595.svg" alt="k" width="9.1093" align="middle"> 件时，DFS 按非递减索引选择食材，允许重复同一种食材，并使每个多重集只生成一次。剪枝前的组合数为：
+对顾客 $`g`$ 和料理 $`d`$，令实际枚举食材池为 $`(i_1,\ldots,i_{n_{g,d}})`$，$`n_{g,d}`$ 为池大小。基础配方使用 1–5 件食材，剩余格数为 $`s_d`$。追加 $`k`$ 件时，DFS 按非递减索引选择食材，允许重复同一种食材，并使每个多重集只生成一次。剪枝前的组合数为：
 
-<p align="center">
-<img src="docs/formulas/block-c61706a78ca6f2ef.svg" alt="\begin{gathered}&#10;s_d=5-\sum_i b_i(d),\qquad 0\le k\le s_d,\\&#10;1\le j_1\le\cdots\le j_k\le n_{g,d}\quad(k\ge1),\\&#10;N_{g,d}=\sum_{k=0}^{s_d}\binom{n_{g,d}+k-1}{k}&#10;=\binom{n_{g,d}+s_d}{s_d}\quad(n_{g,d}\ge1).&#10;\end{gathered}" width="412.2636">
-</p>
+<div align="center">
 
-空池只可能生成零加料组合。网页在必含标签指定「大份」且料理原标签未含「大份」时，将枚举限制为 <img src="docs/formulas/inline-734dbe47791dbc75.svg" alt="k=s_d" width="43.8828" align="middle">。网页按料理静态分块，最多使用 8 个 Web Worker 并行；各 Python 入口使用 CPU 求解。上述计数针对筛选、去重后的池，实际输出还受准入与后续过滤影响。
+$`\displaystyle \begin{gathered} s_d=5-\sum_i b_i(d),\qquad 0\le k\le s_d,\\ 1\le j_1\le\cdots\le j_k\le n_{g,d}\quad(k\ge1),\\ N_{g,d}=\sum_{k=0}^{s_d}\binom{n_{g,d}+k-1}{k} =\binom{n_{g,d}+s_d}{s_d}\quad(n_{g,d}\ge1). \end{gathered}`$
+
+</div>
+
+空池只可能生成零加料组合。网页在必含标签指定「大份」且料理原标签未含「大份」时，将枚举限制为 $`k=s_d`$。网页按料理静态分块，最多使用 8 个 Web Worker 并行；各 Python 入口使用 CPU 求解。上述计数针对筛选、去重后的池，实际输出还受准入与后续过滤影响。
 
 </details>
 
 ### 3.2 Python DFS 的喜爱命中估计
 
-原 Python 在搜索中估计剩余格子能带来的喜爱命中，提前终止估计值不足的分支。令 <img src="docs/formulas/inline-bc1bf7e9df8b9082.svg" alt="T_0(d)" width="35.7504" align="middle"> 为料理、厨具和售价产生、尚未应用覆盖与流行规则的标签；<img src="docs/formulas/inline-2cab91b0f1920ffd.svg" alt="\delta_\ell" width="12.6641" align="middle"> 为第 <img src="docs/formulas/inline-22c961502fecff1e.svg" alt="\ell" width="8.0732" align="middle"> 种食材的直接喜爱标签数，<img src="docs/formulas/inline-26762c18d22c59e5.svg" alt="\Delta_j" width="18.6623" align="middle"> 为从索引 <img src="docs/formulas/inline-50a8852bc2f69c06.svg" alt="j" width="8.4399" align="middle"> 开始的最大增量：
+原 Python 在搜索中估计剩余格子能带来的喜爱命中，提前终止估计值不足的分支。令 $`T_0(d)`$ 为料理、厨具和售价产生、尚未应用覆盖与流行规则的标签；$`\delta_\ell`$ 为第 $`\ell`$ 种食材的直接喜爱标签数，$`\Delta_j`$ 为从索引 $`j`$ 开始的最大增量：
 
-<p align="center">
-<img src="docs/formulas/block-13ff7604ff0da4e5.svg" alt="\begin{gathered}&#10;\beta_{g,d}=&#124;T_0(d)\cap\mathcal L_g&#124;&#10;+\eta_{\mathrm{large}}+\eta_{\mathrm L}+\eta_{\mathrm D},\\&#10;\delta_\ell=&#124;T(i_\ell)\cap\mathcal L_g&#124;,\qquad&#10;\Delta_j=\max_{\ell\ge j}\delta_\ell.&#10;\end{gathered}" width="283.8410">
-</p>
+```math
+\begin{gathered}
+\beta_{g,d}=|T_0(d)\cap\mathcal L_g|
++\eta_{\mathrm{large}}+\eta_{\mathrm L}+\eta_{\mathrm D},\\
+\delta_\ell=|T(i_\ell)\cap\mathcal L_g|,\qquad
+\Delta_j=\max_{\ell\ge j}\delta_\ell.
+\end{gathered}
+```
 
-空后缀取 <img src="docs/formulas/inline-bb4cdc4386aafe88.svg" alt="\Delta_{n_{g,d}+1}=0" width="78.2926" align="middle">。三个 <img src="docs/formulas/inline-d34bfbda68261584.svg" alt="\eta" width="9.2687" align="middle"> 均在相应条件满足时取 1，否则取 0：大份项要求顾客喜爱「大份」且有剩余格子；两个流行项分别要求顾客喜爱相应流行词条，且基础标签或枚举食材的直接标签能命中其锚点。状态 <img src="docs/formulas/inline-d031e81a387373b4.svg" alt="(j,r,\gamma)" width="47.0372" align="middle"> 记录下一件的最小索引、还需选择的件数及累计估计；初始 <img src="docs/formulas/inline-bd3bcf23f4a3f40c.svg" alt="\gamma=\beta_{g,d}" width="55.1171" align="middle">，选择 <img src="docs/formulas/inline-4c8a07938ccb7d1a.svg" alt="\ell\ge j" width="35.8284" align="middle"> 后转为 <img src="docs/formulas/inline-aea9b582971104ff.svg" alt="(\ell,r-1,\gamma+\delta_\ell)" width="106.6668" align="middle">。
+空后缀取 $`\Delta_{n_{g,d}+1}=0`$。三个 $`\eta`$ 均在相应条件满足时取 1，否则取 0：大份项要求顾客喜爱「大份」且有剩余格子；两个流行项分别要求顾客喜爱相应流行词条，且基础标签或枚举食材的直接标签能命中其锚点。状态 $`(j,r,\gamma)`$ 记录下一件的最小索引、还需选择的件数及累计估计；初始 $`\gamma=\beta_{g,d}`$，选择 $`\ell\ge j`$ 后转为 $`(\ell,r-1,\gamma+\delta_\ell)`$。
 
-<p align="center">
-<img src="docs/formulas/block-a5218bd9a63d567d.svg" alt="B(j,r,\gamma)=\gamma+r\Delta_j,\qquad&#10;B(j,r,\gamma) &lt; S_{\min}\ \Longrightarrow\ \text{prune}." width="420.0765">
-</p>
+```math
+B(j,r,\gamma)=\gamma+r\Delta_j,\qquad
+B(j,r,\gamma) < S_{\min}\ \Longrightarrow\ \text{prune}.
+```
 
-料理级预检使用 <img src="docs/formulas/inline-b9874d8a56035ab3.svg" alt="\beta_{g,d}+s_d\Delta_1" width="76.5525" align="middle">。该估计重复累计喜爱标签并忽略厌恶扣分；在所有可能新增喜爱均被初始项与增量覆盖时，它构成安全上界。原实现的流行可达性检查仅看直接标签，可能漏计凑满五件生成「大份」后触发的流行。相关食材筛选和最多三种中性补位也限制候选范围。叶节点仍须重新计算最终标签并检查厌恶与最低分，边界见[优化模型与算法边界](docs/design.md)。
+料理级预检使用 $`\beta_{g,d}+s_d\Delta_1`$。该估计重复累计喜爱标签并忽略厌恶扣分；在所有可能新增喜爱均被初始项与增量覆盖时，它构成安全上界。原实现的流行可达性检查仅看直接标签，可能漏计凑满五件生成「大份」后触发的流行。相关食材筛选和最多三种中性补位也限制候选范围。叶节点仍须重新计算最终标签并检查厌恶与最低分，边界见[优化模型与算法边界](docs/design.md)。
 
 
 #### 封顶收益下的食材件数界限
 
-`cover3` 的第一目标至多为 3。设 <img src="docs/formulas/inline-2990c04ca0168488.svg" alt="q" width="8.4080" align="middle"> 为已通过准入的当前方案，沿用本章最大化方向的目标向量 <img src="docs/formulas/inline-b6e85818fa3f4eba.svg" alt="\mathbf f_g" width="12.1712" align="middle">。若其收益已封顶，任何用料更多的方案都无法在词典序比较中胜出：
+`cover3` 的第一目标至多为 3。设 $`q`$ 为已通过准入的当前方案，沿用本章最大化方向的目标向量 $`\mathbf f_g`$。若其收益已封顶，任何用料更多的方案都无法在词典序比较中胜出：
 
-<p align="center">
-<img src="docs/formulas/block-5758ec908006950e.svg" alt="U(H_g^{\mathrm L}(q))=3,\quad C(p)&gt;C(q)&#10;\quad\Longrightarrow\quad&#10;\mathbf f_g(q)&gt;_{\mathrm{lex}}\mathbf f_g(p)." width="417.4963">
-</p>
+```math
+U(H_g^{\mathrm L}(q))=3,\quad C(p)>C(q)
+\quad\Longrightarrow\quad
+\mathbf f_g(q)>_{\mathrm{lex}}\mathbf f_g(p).
+```
 
-搜索据此保留 <img src="docs/formulas/inline-3acce82c75333223.svg" alt="C(p)\le C(q)" width="85.1097" align="middle"> 的分支。相同件数的候选仍完整比较最低供给余量、售价、料理名和加料字符串，浮点比较规则保持原样。这一界限减少搜索访问量，候选的可行性定义与目标函数沿用第一章。
+搜索据此保留 $`C(p)\le C(q)`$ 的分支。相同件数的候选仍完整比较最低供给余量、售价、料理名和加料字符串，浮点比较规则保持原样。这一界限减少搜索访问量，候选的可行性定义与目标函数沿用第一章。
 
 界限应用于两个层次：
 
@@ -490,133 +576,162 @@ PLAN 主线聚焦料理与加料，酒水、完整满意度和现金利润尚未
 此优化用于四个 `singlePLAN_cover3*` 入口。默认候选池函数仍可返回完整原候选池；未封顶的 `singlePLAN` 和历史 `detailedPLAN` 保留各自搜索方式。针对重复料理名或含多重集键分隔符的食材名，程序沿用不加此界限的枚举，以保留既有缓存行为。Python 仍以 CPU 串行执行；该界限无需 GPU 或多进程。
 
 <details>
-<summary><strong>v1.0.0 · Initial Release — 3.2 完整原文</strong></summary>
-
-原文出处：[v1.0.0](https://github.com/Mingcode123/Mystia-Menu-Optimizer/blob/v1.0.0/README.md)
+<summary><strong>点击展开旧版全文 — v1.0.0 · Initial Release，第 3.2 节</strong></summary>
 
 ### 3.2 Python DFS 的喜爱命中估计
 
-原 Python 在搜索中估计剩余格子能带来的喜爱命中，提前终止估计值不足的分支。令 <img src="docs/formulas/inline-bc1bf7e9df8b9082.svg" alt="T_0(d)" width="35.7504" align="middle"> 为料理、厨具和售价产生、尚未应用覆盖与流行规则的标签；<img src="docs/formulas/inline-2cab91b0f1920ffd.svg" alt="\delta_\ell" width="12.6641" align="middle"> 为第 <img src="docs/formulas/inline-22c961502fecff1e.svg" alt="\ell" width="8.0732" align="middle"> 种食材的直接喜爱标签数，<img src="docs/formulas/inline-26762c18d22c59e5.svg" alt="\Delta_j" width="18.6623" align="middle"> 为从索引 <img src="docs/formulas/inline-50a8852bc2f69c06.svg" alt="j" width="8.4399" align="middle"> 开始的最大增量：
+原 Python 在搜索中估计剩余格子能带来的喜爱命中，提前终止估计值不足的分支。令 $`T_0(d)`$ 为料理、厨具和售价产生、尚未应用覆盖与流行规则的标签；$`\delta_\ell`$ 为第 $`\ell`$ 种食材的直接喜爱标签数，$`\Delta_j`$ 为从索引 $`j`$ 开始的最大增量：
 
-<p align="center">
-<img src="docs/formulas/block-13ff7604ff0da4e5.svg" alt="\begin{gathered}&#10;\beta_{g,d}=&#124;T_0(d)\cap\mathcal L_g&#124;&#10;+\eta_{\mathrm{large}}+\eta_{\mathrm L}+\eta_{\mathrm D},\\&#10;\delta_\ell=&#124;T(i_\ell)\cap\mathcal L_g&#124;,\qquad&#10;\Delta_j=\max_{\ell\ge j}\delta_\ell.&#10;\end{gathered}" width="283.8410">
-</p>
+<div align="center">
 
-空后缀取 <img src="docs/formulas/inline-bb4cdc4386aafe88.svg" alt="\Delta_{n_{g,d}+1}=0" width="78.2926" align="middle">。三个 <img src="docs/formulas/inline-d34bfbda68261584.svg" alt="\eta" width="9.2687" align="middle"> 均在相应条件满足时取 1，否则取 0：大份项要求顾客喜爱「大份」且有剩余格子；两个流行项分别要求顾客喜爱相应流行词条，且基础标签或枚举食材的直接标签能命中其锚点。状态 <img src="docs/formulas/inline-d031e81a387373b4.svg" alt="(j,r,\gamma)" width="47.0372" align="middle"> 记录下一件的最小索引、还需选择的件数及累计估计；初始 <img src="docs/formulas/inline-bd3bcf23f4a3f40c.svg" alt="\gamma=\beta_{g,d}" width="55.1171" align="middle">，选择 <img src="docs/formulas/inline-4c8a07938ccb7d1a.svg" alt="\ell\ge j" width="35.8284" align="middle"> 后转为 <img src="docs/formulas/inline-aea9b582971104ff.svg" alt="(\ell,r-1,\gamma+\delta_\ell)" width="106.6668" align="middle">。
+$`\displaystyle \begin{gathered} \beta_{g,d}=|T_0(d)\cap\mathcal L_g| +\eta_{\mathrm{large}}+\eta_{\mathrm L}+\eta_{\mathrm D},\\ \delta_\ell=|T(i_\ell)\cap\mathcal L_g|,\qquad \Delta_j=\max_{\ell\ge j}\delta_\ell. \end{gathered}`$
 
-<p align="center">
-<img src="docs/formulas/block-a5218bd9a63d567d.svg" alt="B(j,r,\gamma)=\gamma+r\Delta_j,\qquad&#10;B(j,r,\gamma) &lt; S_{\min}\ \Longrightarrow\ \text{prune}." width="420.0765">
-</p>
+</div>
 
-料理级预检使用 <img src="docs/formulas/inline-b9874d8a56035ab3.svg" alt="\beta_{g,d}+s_d\Delta_1" width="76.5525" align="middle">。该估计重复累计喜爱标签并忽略厌恶扣分；在所有可能新增喜爱均被初始项与增量覆盖时，它构成安全上界。原实现的流行可达性检查仅看直接标签，可能漏计凑满五件生成「大份」后触发的流行。相关食材筛选和最多三种中性补位也限制候选范围。叶节点仍须重新计算最终标签并检查厌恶与最低分，边界见[优化模型与算法边界](docs/design.md)。
+空后缀取 $`\Delta_{n_{g,d}+1}=0`$。三个 $`\eta`$ 均在相应条件满足时取 1，否则取 0：大份项要求顾客喜爱「大份」且有剩余格子；两个流行项分别要求顾客喜爱相应流行词条，且基础标签或枚举食材的直接标签能命中其锚点。状态 $`(j,r,\gamma)`$ 记录下一件的最小索引、还需选择的件数及累计估计；初始 $`\gamma=\beta_{g,d}`$，选择 $`\ell\ge j`$ 后转为 $`(\ell,r-1,\gamma+\delta_\ell)`$。
+
+<div align="center">
+
+$`\displaystyle B(j,r,\gamma)=\gamma+r\Delta_j,\qquad B(j,r,\gamma) < S_{\min}\ \Longrightarrow\ \text{prune}.`$
+
+</div>
+
+料理级预检使用 $`\beta_{g,d}+s_d\Delta_1`$。该估计重复累计喜爱标签并忽略厌恶扣分；在所有可能新增喜爱均被初始项与增量覆盖时，它构成安全上界。原实现的流行可达性检查仅看直接标签，可能漏计凑满五件生成「大份」后触发的流行。相关食材筛选和最多三种中性补位也限制候选范围。叶节点仍须重新计算最终标签并检查厌恶与最低分，边界见[优化模型与算法边界](docs/design.md)。
 
 </details>
 
 ### 3.3 单客候选的支配过滤与词典序选择
 
-单客 `plan_for_guest` 缓存已生成候选的评价值，维护非支配前沿，并从中确定最佳方案。将三个目标统一写成最大化方向，候选 <img src="docs/formulas/inline-d5a226cb51f40ca0.svg" alt="a" width="9.0934" align="middle"> 支配 <img src="docs/formulas/inline-7f39b76d05760509.svg" alt="b" width="7.7066" align="middle"> 的条件为：
+单客 `plan_for_guest` 缓存已生成候选的评价值，维护非支配前沿，并从中确定最佳方案。将三个目标统一写成最大化方向，候选 $`a`$ 支配 $`b`$ 的条件为：
 
-<p align="center">
-<img src="docs/formulas/block-fc88618d360310a6.svg" alt="\begin{gathered}&#10;\mathbf f_g(p)=\left(U(H_g^{\mathrm L}(p)),-C(p),R(p)\right),\\&#10;f_{g,j}(a)\ge f_{g,j}(b)\quad(j=1,2,3),\qquad&#10;\exists j:\ f_{g,j}(a)&gt;f_{g,j}(b).&#10;\end{gathered}" width="428.9967">
-</p>
+```math
+\begin{gathered}
+\mathbf f_g(p)=\left(U(H_g^{\mathrm L}(p)),-C(p),R(p)\right),\\
+f_{g,j}(a)\ge f_{g,j}(b)\quad(j=1,2,3),\qquad
+\exists j:\ f_{g,j}(a)>f_{g,j}(b).
+\end{gathered}
+```
 
-其中 <img src="docs/formulas/inline-c49ffcc77d0b1f91.svg" alt="f_{g,j}" width="22.1601" align="middle"> 为目标向量的第 <img src="docs/formulas/inline-50a8852bc2f69c06.svg" alt="j" width="8.4399" align="middle"> 个分量。被支配者的词典序目标必然较差，因而可在保留候选内删除。未封顶的 `singlePLAN` 用 <img src="docs/formulas/inline-683063808c74c381.svg" alt="H_g^{\mathrm L}(p)" width="41.5443" align="middle"> 替代 <img src="docs/formulas/inline-8d460ad04c6bb409.svg" alt="U(H_g^{\mathrm L}(p))" width="65.5985" align="middle">。记 <img src="docs/formulas/inline-b5ae851d0372a9a1.svg" alt="\mathrm{best}_g(\mathcal P)" width="59.2030" align="middle"> 为从非空候选集 <img src="docs/formulas/inline-72710a3bd2befae5.svg" alt="\mathcal P" width="13.3494" align="middle"> 中按 <img src="docs/formulas/inline-b6e85818fa3f4eba.svg" alt="\mathbf f_g" width="12.1712" align="middle"> 选取方案的函数；三项全同后，依次采用售价降序、料理名升序、加料字符串升序的平局规则。`nCookware` 的正常路径直接扫描每厨具候选并保留 best，不构建该 Pareto 前沿。
+其中 $`f_{g,j}`$ 为目标向量的第 $`j`$ 个分量。被支配者的词典序目标必然较差，因而可在保留候选内删除。未封顶的 `singlePLAN` 用 $`H_g^{\mathrm L}(p)`$ 替代 $`U(H_g^{\mathrm L}(p))`$。记 $`\mathrm{best}_g(\mathcal P)`$ 为从非空候选集 $`\mathcal P`$ 中按 $`\mathbf f_g`$ 选取方案的函数；三项全同后，依次采用售价降序、料理名升序、加料字符串升序的平局规则。`nCookware` 的正常路径直接扫描每厨具候选并保留 best，不构建该 Pareto 前沿。
 
 <details>
-<summary><strong>v1.0.0 · Initial Release — 3.3 完整原文</strong></summary>
-
-原文出处：[v1.0.0](https://github.com/Mingcode123/Mystia-Menu-Optimizer/blob/v1.0.0/README.md)
+<summary><strong>点击展开旧版全文 — v1.0.0 · Initial Release，第 3.3 节</strong></summary>
 
 ### 3.3 单客候选的支配过滤与词典序选择
 
-单客 `plan_for_guest` 缓存已生成候选的评价值，维护非支配前沿，并从中确定最佳方案。将三个目标统一写成最大化方向，候选 <img src="docs/formulas/inline-d5a226cb51f40ca0.svg" alt="a" width="9.0934" align="middle"> 支配 <img src="docs/formulas/inline-7f39b76d05760509.svg" alt="b" width="7.7066" align="middle"> 的条件为：
+单客 `plan_for_guest` 缓存已生成候选的评价值，维护非支配前沿，并从中确定最佳方案。将三个目标统一写成最大化方向，候选 $`a`$ 支配 $`b`$ 的条件为：
 
-<p align="center">
-<img src="docs/formulas/block-fc88618d360310a6.svg" alt="\begin{gathered}&#10;\mathbf f_g(p)=\left(U(H_g^{\mathrm L}(p)),-C(p),R(p)\right),\\&#10;f_{g,j}(a)\ge f_{g,j}(b)\quad(j=1,2,3),\qquad&#10;\exists j:\ f_{g,j}(a)&gt;f_{g,j}(b).&#10;\end{gathered}" width="428.9967">
-</p>
+<div align="center">
 
-其中 <img src="docs/formulas/inline-c49ffcc77d0b1f91.svg" alt="f_{g,j}" width="22.1601" align="middle"> 为目标向量的第 <img src="docs/formulas/inline-50a8852bc2f69c06.svg" alt="j" width="8.4399" align="middle"> 个分量。被支配者的词典序目标必然较差，因而可在保留候选内删除。未封顶的 `singlePLAN` 用 <img src="docs/formulas/inline-683063808c74c381.svg" alt="H_g^{\mathrm L}(p)" width="41.5443" align="middle"> 替代 <img src="docs/formulas/inline-8d460ad04c6bb409.svg" alt="U(H_g^{\mathrm L}(p))" width="65.5985" align="middle">。记 <img src="docs/formulas/inline-b5ae851d0372a9a1.svg" alt="\mathrm{best}_g(\mathcal P)" width="59.2030" align="middle"> 为从非空候选集 <img src="docs/formulas/inline-72710a3bd2befae5.svg" alt="\mathcal P" width="13.3494" align="middle"> 中按 <img src="docs/formulas/inline-b6e85818fa3f4eba.svg" alt="\mathbf f_g" width="12.1712" align="middle"> 选取方案的函数；三项全同后，依次采用售价降序、料理名升序、加料字符串升序的平局规则。`nCookware` 的正常路径直接扫描每厨具候选并保留 best，不构建该 Pareto 前沿。
+$`\displaystyle \begin{gathered} \mathbf f_g(p)=\left(U(H_g^{\mathrm L}(p)),-C(p),R(p)\right),\\ f_{g,j}(a)\ge f_{g,j}(b)\quad(j=1,2,3),\qquad \exists j:\ f_{g,j}(a)>f_{g,j}(b). \end{gathered}`$
+
+</div>
+
+其中 $`f_{g,j}`$ 为目标向量的第 $`j`$ 个分量。被支配者的词典序目标必然较差，因而可在保留候选内删除。未封顶的 `singlePLAN` 用 $`H_g^{\mathrm L}(p)`$ 替代 $`U(H_g^{\mathrm L}(p))`$。记 $`\mathrm{best}_g(\mathcal P)`$ 为从非空候选集 $`\mathcal P`$ 中按 $`\mathbf f_g`$ 选取方案的函数；三项全同后，依次采用售价降序、料理名升序、加料字符串升序的平局规则。`nCookware` 的正常路径直接扫描每厨具候选并保留 best，不构建该 Pareto 前沿。
 
 </details>
 
 ### 3.4 历史多方案的阈值搜索与状态复用
 
-`detailedPLAN` 需要为每个目标标签选择方案。固定 <img src="docs/formulas/inline-588cfc7ed9b91489.svg" alt="J_g" width="14.6810" align="middle">、<img src="docs/formulas/inline-ad9f08c85487522a.svg" alt="m_g&gt;0" width="49.7769" align="middle"> 与 <img src="docs/formulas/inline-d82ee76e3b804be9.svg" alt="K&gt;0" width="43.8266" align="middle">，令每标签订单份额 <img src="docs/formulas/inline-c66fc6d6e450f3ea.svg" alt="\alpha=K/m_g" width="72.7127" align="middle">。每个标签从 <img src="docs/formulas/inline-812fd16cdc7dd06d.svg" alt="\mathcal C_{g,t}" width="22.8120" align="middle"> 中选择一个方案。由于第一目标按标签相加，可先保留各标签全部并列最少件数候选：
+`detailedPLAN` 需要为每个目标标签选择方案。固定 $`J_g`$、$`m_g>0`$ 与 $`K>0`$，令每标签订单份额 $`\alpha=K/m_g`$。每个标签从 $`\mathcal C_{g,t}`$ 中选择一个方案。由于第一目标按标签相加，可先保留各标签全部并列最少件数候选：
 
-<p align="center">
-<img src="docs/formulas/block-4a782325849e0241.svg" alt="\begin{gathered}&#10;\mathcal M_{g,t}=\left\{p\in\mathcal C_{g,t}:C(p)=\min_{p&#x27;\in\mathcal C_{g,t}}C(p&#x27;)\right\},\\&#10;\min E_{\mathrm{old}}=\alpha\sum_{t\in J_g}\min_{p\in\mathcal C_{g,t}}C(p).&#10;\end{gathered}" width="309.4519">
-</p>
+```math
+\begin{gathered}
+\mathcal M_{g,t}=\left\{p\in\mathcal C_{g,t}:C(p)=\min_{p'\in\mathcal C_{g,t}}C(p')\right\},\\
+\min E_{\mathrm{old}}=\alpha\sum_{t\in J_g}\min_{p\in\mathcal C_{g,t}}C(p).
+\end{gathered}
+```
 
-程序进一步合并总用量向量相同的候选。并列件数但用料不同的方案继续参与组合，因为它们对供给余量的影响不同。令 <img src="docs/formulas/inline-48c33c2cf59b4ee9.svg" alt="\lambda" width="9.6832" align="middle"> 为最低日供给余量阈值（件／日），<img src="docs/formulas/inline-bffa73b097c22352.svg" alt="F_g(\lambda)\in\{0,1\}" width="95.8924" align="middle"> 为可行指示量：从每个 <img src="docs/formulas/inline-68be475628a23cbc.svg" alt="\mathcal M_{g,t}" width="33.3225" align="middle"> 选取一个方案，若存在组合使最低余量达到阈值，则取 1，否则取 0。利用用量的整数性，有限阈值条件可转换为容量上界：
+程序进一步合并总用量向量相同的候选。并列件数但用料不同的方案继续参与组合，因为它们对供给余量的影响不同。令 $`\lambda`$ 为最低日供给余量阈值（件／日），$`F_g(\lambda)\in\{0,1\}`$ 为可行指示量：从每个 $`\mathcal M_{g,t}`$ 选取一个方案，若存在组合使最低余量达到阈值，则取 1，否则取 0。利用用量的整数性，有限阈值条件可转换为容量上界：
 
-<p align="center">
-<img src="docs/formulas/block-a49becf55457815c.svg" alt="\begin{gathered}&#10;u_i^{\max}(\lambda)=\left\lfloor\frac{q_i-\lambda}{\alpha}\right\rfloor,\\&#10;R_{\mathrm{old}}\ge\lambda\ \Longleftrightarrow&#10;\forall i,\ u_i=0\ \lor\ u_i\le u_i^{\max}(\lambda).&#10;\end{gathered}" width="324.8601">
-</p>
+```math
+\begin{gathered}
+u_i^{\max}(\lambda)=\left\lfloor\frac{q_i-\lambda}{\alpha}\right\rfloor,\\
+R_{\mathrm{old}}\ge\lambda\ \Longleftrightarrow
+\forall i,\ u_i=0\ \lor\ u_i\le u_i^{\max}(\lambda).
+\end{gathered}
+```
 
-容量仅约束实际使用的食材。降低 <img src="docs/formulas/inline-48c33c2cf59b4ee9.svg" alt="\lambda" width="9.6832" align="middle"> 会放宽所有容量，因此 <img src="docs/formulas/inline-ccadd96dea0ee8d4.svg" alt="\lambda_1\le\lambda_2" width="51.9968" align="middle"> 时有 <img src="docs/formulas/inline-1a6230116b31441d.svg" alt="F_g(\lambda_2)=1\Rightarrow F_g(\lambda_1)=1" width="170.5447" align="middle">。令 <img src="docs/formulas/inline-e51908ce7c3999df.svg" alt="\mathcal I_g" width="16.3757" align="middle"> 为保留候选可能使用的食材集合；每份至多五件使 <img src="docs/formulas/inline-dc6baff3101d7702.svg" alt="u_i\le5m_g" width="62.9845" align="middle">，故最低余量可在有限网格上搜索：
+容量仅约束实际使用的食材。降低 $`\lambda`$ 会放宽所有容量，因此 $`\lambda_1\le\lambda_2`$ 时有 $`F_g(\lambda_2)=1\Rightarrow F_g(\lambda_1)=1`$。令 $`\mathcal I_g`$ 为保留候选可能使用的食材集合；每份至多五件使 $`u_i\le5m_g`$，故最低余量可在有限网格上搜索：
 
-<p align="center">
-<img src="docs/formulas/block-ff3a249ec1aa0ba4.svg" alt="\begin{gathered}&#10;\Lambda_g=\{-\infty\}\cup\{q_i-\alpha u:i\in\mathcal I_g,\ u=0,\ldots,5m_g\},\\&#10;\lambda^\star=\max\{\lambda\in\Lambda_g:F_g(\lambda)=1\}.&#10;\end{gathered}" width="378.3718">
-</p>
+```math
+\begin{gathered}
+\Lambda_g=\{-\infty\}\cup\{q_i-\alpha u:i\in\mathcal I_g,\ u=0,\ldots,5m_g\},\\
+\lambda^\star=\max\{\lambda\in\Lambda_g:F_g(\lambda)=1\}.
+\end{gathered}
+```
 
-外层二分定位最高可行阈值。源码将网格值舍入到小数点后 10 位，并以 <img src="docs/formulas/inline-a5b5de063ba82109.svg" alt="\lfloor(q_i-\lambda)/\alpha+10^{-12}\rfloor" width="136.1564" align="middle"> 计算容量；<img src="docs/formulas/inline-cd0bfef9b6393790.svg" alt="-\infty" width="28.1225" align="middle"> 为无容量限制的哨兵。上述等价推导采用精确算术，原实现的边界判定还受这些浮点处理影响。
+外层二分定位最高可行阈值。源码将网格值舍入到小数点后 10 位，并以 $`\lfloor(q_i-\lambda)/\alpha+10^{-12}\rfloor`$ 计算容量；$`-\infty`$ 为无容量限制的哨兵。上述等价推导采用精确算术，原实现的边界判定还受这些浮点处理影响。
 
-每次阈值测试先删除单份即超容量的候选，再按候选数从少到多将 <img src="docs/formulas/inline-588cfc7ed9b91489.svg" alt="J_g" width="14.6810" align="middle"> 中的标签排序为 <img src="docs/formulas/inline-6c693300b1a7599e.svg" alt="t_1,\ldots,t_{m_g}" width="68.7309" align="middle">。DFS 状态 <img src="docs/formulas/inline-8739471be97f9f7f.svg" alt="(r,\mathbf u)" width="34.5578" align="middle"> 表示已处理前 <img src="docs/formulas/inline-a9c2e4547c717024.svg" alt="r" width="8.3601" align="middle"> 个标签及其累计用量；记 <img src="docs/formulas/inline-4efe046f5d4d8732.svg" alt="\mathbf c(p)=(c_i(p))_i" width="97.0395" align="middle">，选择下一标签方案后的转移为：
+每次阈值测试先删除单份即超容量的候选，再按候选数从少到多将 $`J_g`$ 中的标签排序为 $`t_1,\ldots,t_{m_g}`$。DFS 状态 $`(r,\mathbf u)`$ 表示已处理前 $`r`$ 个标签及其累计用量；记 $`\mathbf c(p)=(c_i(p))_i`$，选择下一标签方案后的转移为：
 
-<p align="center">
-<img src="docs/formulas/block-0c5d2bf7aadb6aae.svg" alt="(r,\mathbf u)\longrightarrow(r+1,\mathbf u+\mathbf c(p))." width="207.1547">
-</p>
+```math
+(r,\mathbf u)\longrightarrow(r+1,\mathbf u+\mathbf c(p)).
+```
 
 任一已用食材超容量即剪枝；非负用量保证后续选择无法消除超额。相同状态具有相同的剩余问题，程序缓存其可行性；不同阈值分别建立缓存。二分减少阈值测试次数，单次判定仍包含组合搜索。
 
-找到 <img src="docs/formulas/inline-356bbf2806c1845f.svg" alt="\lambda^\star" width="15.7220" align="middle"> 后，程序在其容量下进一步最大化实际使用食材的完整升序余量向量。令 <img src="docs/formulas/inline-53c123900675a47f.svg" alt="\boldsymbol\Phi(r,\mathbf u)" width="48.0831" align="middle"> 为该状态可达到的最佳终态向量；无可行后继时标记无解。以下最大值仅遍历满足容量的转移：
+找到 $`\lambda^\star`$ 后，程序在其容量下进一步最大化实际使用食材的完整升序余量向量。令 $`\boldsymbol\Phi(r,\mathbf u)`$ 为该状态可达到的最佳终态向量；无可行后继时标记无解。以下最大值仅遍历满足容量的转移：
 
-<p align="center">
-<img src="docs/formulas/block-7aeed27fff61b76d.svg" alt="\begin{gathered}&#10;\boldsymbol\rho(\mathbf u)=\mathrm{sort}_{\uparrow}\big((q_i-\alpha u_i)_{i:u_i&gt;0}\big),\\&#10;\boldsymbol\Phi(m_g,\mathbf u)=\boldsymbol\rho(\mathbf u),\\&#10;\boldsymbol\Phi(r,\mathbf u)=\max_{p\in\mathcal M_{g,t_{r+1}}}^{\mathrm{lex}}&#10;\boldsymbol\Phi(r+1,\mathbf u+\mathbf c(p)).&#10;\end{gathered}" width="289.3349">
-</p>
+```math
+\begin{gathered}
+\boldsymbol\rho(\mathbf u)=\mathrm{sort}_{\uparrow}\big((q_i-\alpha u_i)_{i:u_i>0}\big),\\
+\boldsymbol\Phi(m_g,\mathbf u)=\boldsymbol\rho(\mathbf u),\\
+\boldsymbol\Phi(r,\mathbf u)=\max_{p\in\mathcal M_{g,t_{r+1}}}^{\mathrm{lex}}
+\boldsymbol\Phi(r+1,\mathbf u+\mathbf c(p)).
+\end{gathered}
+```
 
 每种实际使用的食材贡献一个分量。程序缓存最佳向量，再按固定候选顺序重建首个达到该向量的组合。变长向量按 Python 元组规则比较：首个不同分量较大者优先，完整前缀相同时较长者优先。缓存状态仍可能大量增长；该历史路线的阈值搜索未被 `nCookware` 正常主流程调用。
 
 <details>
-<summary><strong>v1.0.0 · Initial Release — 3.4 完整原文</strong></summary>
-
-原文出处：[v1.0.0](https://github.com/Mingcode123/Mystia-Menu-Optimizer/blob/v1.0.0/README.md)
+<summary><strong>点击展开旧版全文 — v1.0.0 · Initial Release，第 3.4 节</strong></summary>
 
 ### 3.4 历史多方案的阈值搜索与状态复用
 
-`detailedPLAN` 需要为每个目标标签选择方案。固定 <img src="docs/formulas/inline-588cfc7ed9b91489.svg" alt="J_g" width="14.6810" align="middle">、<img src="docs/formulas/inline-ad9f08c85487522a.svg" alt="m_g&gt;0" width="49.7769" align="middle"> 与 <img src="docs/formulas/inline-d82ee76e3b804be9.svg" alt="K&gt;0" width="43.8266" align="middle">，令每标签订单份额 <img src="docs/formulas/inline-c66fc6d6e450f3ea.svg" alt="\alpha=K/m_g" width="72.7127" align="middle">。每个标签从 <img src="docs/formulas/inline-812fd16cdc7dd06d.svg" alt="\mathcal C_{g,t}" width="22.8120" align="middle"> 中选择一个方案。由于第一目标按标签相加，可先保留各标签全部并列最少件数候选：
+`detailedPLAN` 需要为每个目标标签选择方案。固定 $`J_g`$、$`m_g>0`$ 与 $`K>0`$，令每标签订单份额 $`\alpha=K/m_g`$。每个标签从 $`\mathcal C_{g,t}`$ 中选择一个方案。由于第一目标按标签相加，可先保留各标签全部并列最少件数候选：
 
-<p align="center">
-<img src="docs/formulas/block-4a782325849e0241.svg" alt="\begin{gathered}&#10;\mathcal M_{g,t}=\left\{p\in\mathcal C_{g,t}:C(p)=\min_{p&#x27;\in\mathcal C_{g,t}}C(p&#x27;)\right\},\\&#10;\min E_{\mathrm{old}}=\alpha\sum_{t\in J_g}\min_{p\in\mathcal C_{g,t}}C(p).&#10;\end{gathered}" width="309.4519">
-</p>
+<div align="center">
 
-程序进一步合并总用量向量相同的候选。并列件数但用料不同的方案继续参与组合，因为它们对供给余量的影响不同。令 <img src="docs/formulas/inline-48c33c2cf59b4ee9.svg" alt="\lambda" width="9.6832" align="middle"> 为最低日供给余量阈值（件／日），<img src="docs/formulas/inline-bffa73b097c22352.svg" alt="F_g(\lambda)\in\{0,1\}" width="95.8924" align="middle"> 为可行指示量：从每个 <img src="docs/formulas/inline-68be475628a23cbc.svg" alt="\mathcal M_{g,t}" width="33.3225" align="middle"> 选取一个方案，若存在组合使最低余量达到阈值，则取 1，否则取 0。利用用量的整数性，有限阈值条件可转换为容量上界：
+$`\displaystyle \begin{gathered} \mathcal M_{g,t}=\left\{p\in\mathcal C_{g,t}:C(p)=\min_{p'\in\mathcal C_{g,t}}C(p')\right\},\\ \min E_{\mathrm{old}}=\alpha\sum_{t\in J_g}\min_{p\in\mathcal C_{g,t}}C(p). \end{gathered}`$
 
-<p align="center">
-<img src="docs/formulas/block-a49becf55457815c.svg" alt="\begin{gathered}&#10;u_i^{\max}(\lambda)=\left\lfloor\frac{q_i-\lambda}{\alpha}\right\rfloor,\\&#10;R_{\mathrm{old}}\ge\lambda\ \Longleftrightarrow&#10;\forall i,\ u_i=0\ \lor\ u_i\le u_i^{\max}(\lambda).&#10;\end{gathered}" width="324.8601">
-</p>
+</div>
 
-容量仅约束实际使用的食材。降低 <img src="docs/formulas/inline-48c33c2cf59b4ee9.svg" alt="\lambda" width="9.6832" align="middle"> 会放宽所有容量，因此 <img src="docs/formulas/inline-ccadd96dea0ee8d4.svg" alt="\lambda_1\le\lambda_2" width="51.9968" align="middle"> 时有 <img src="docs/formulas/inline-1a6230116b31441d.svg" alt="F_g(\lambda_2)=1\Rightarrow F_g(\lambda_1)=1" width="170.5447" align="middle">。令 <img src="docs/formulas/inline-e51908ce7c3999df.svg" alt="\mathcal I_g" width="16.3757" align="middle"> 为保留候选可能使用的食材集合；每份至多五件使 <img src="docs/formulas/inline-dc6baff3101d7702.svg" alt="u_i\le5m_g" width="62.9845" align="middle">，故最低余量可在有限网格上搜索：
+程序进一步合并总用量向量相同的候选。并列件数但用料不同的方案继续参与组合，因为它们对供给余量的影响不同。令 $`\lambda`$ 为最低日供给余量阈值（件／日），$`F_g(\lambda)\in\{0,1\}`$ 为可行指示量：从每个 $`\mathcal M_{g,t}`$ 选取一个方案，若存在组合使最低余量达到阈值，则取 1，否则取 0。利用用量的整数性，有限阈值条件可转换为容量上界：
 
-<p align="center">
-<img src="docs/formulas/block-ff3a249ec1aa0ba4.svg" alt="\begin{gathered}&#10;\Lambda_g=\{-\infty\}\cup\{q_i-\alpha u:i\in\mathcal I_g,\ u=0,\ldots,5m_g\},\\&#10;\lambda^\star=\max\{\lambda\in\Lambda_g:F_g(\lambda)=1\}.&#10;\end{gathered}" width="378.3718">
-</p>
+<div align="center">
 
-外层二分定位最高可行阈值。源码将网格值舍入到小数点后 10 位，并以 <img src="docs/formulas/inline-a5b5de063ba82109.svg" alt="\lfloor(q_i-\lambda)/\alpha+10^{-12}\rfloor" width="136.1564" align="middle"> 计算容量；<img src="docs/formulas/inline-cd0bfef9b6393790.svg" alt="-\infty" width="28.1225" align="middle"> 为无容量限制的哨兵。上述等价推导采用精确算术，原实现的边界判定还受这些浮点处理影响。
+$`\displaystyle \begin{gathered} u_i^{\max}(\lambda)=\left\lfloor\frac{q_i-\lambda}{\alpha}\right\rfloor,\\ R_{\mathrm{old}}\ge\lambda\ \Longleftrightarrow \forall i,\ u_i=0\ \lor\ u_i\le u_i^{\max}(\lambda). \end{gathered}`$
 
-每次阈值测试先删除单份即超容量的候选，再按候选数从少到多将 <img src="docs/formulas/inline-588cfc7ed9b91489.svg" alt="J_g" width="14.6810" align="middle"> 中的标签排序为 <img src="docs/formulas/inline-6c693300b1a7599e.svg" alt="t_1,\ldots,t_{m_g}" width="68.7309" align="middle">。DFS 状态 <img src="docs/formulas/inline-8739471be97f9f7f.svg" alt="(r,\mathbf u)" width="34.5578" align="middle"> 表示已处理前 <img src="docs/formulas/inline-a9c2e4547c717024.svg" alt="r" width="8.3601" align="middle"> 个标签及其累计用量；记 <img src="docs/formulas/inline-4efe046f5d4d8732.svg" alt="\mathbf c(p)=(c_i(p))_i" width="97.0395" align="middle">，选择下一标签方案后的转移为：
+</div>
 
-<p align="center">
-<img src="docs/formulas/block-0c5d2bf7aadb6aae.svg" alt="(r,\mathbf u)\longrightarrow(r+1,\mathbf u+\mathbf c(p))." width="207.1547">
-</p>
+容量仅约束实际使用的食材。降低 $`\lambda`$ 会放宽所有容量，因此 $`\lambda_1\le\lambda_2`$ 时有 $`F_g(\lambda_2)=1\Rightarrow F_g(\lambda_1)=1`$。令 $`\mathcal I_g`$ 为保留候选可能使用的食材集合；每份至多五件使 $`u_i\le5m_g`$，故最低余量可在有限网格上搜索：
+
+<div align="center">
+
+$`\displaystyle \begin{gathered} \Lambda_g=\{-\infty\}\cup\{q_i-\alpha u:i\in\mathcal I_g,\ u=0,\ldots,5m_g\},\\ \lambda^\star=\max\{\lambda\in\Lambda_g:F_g(\lambda)=1\}. \end{gathered}`$
+
+</div>
+
+外层二分定位最高可行阈值。源码将网格值舍入到小数点后 10 位，并以 $`\lfloor(q_i-\lambda)/\alpha+10^{-12}\rfloor`$ 计算容量；$`-\infty`$ 为无容量限制的哨兵。上述等价推导采用精确算术，原实现的边界判定还受这些浮点处理影响。
+
+每次阈值测试先删除单份即超容量的候选，再按候选数从少到多将 $`J_g`$ 中的标签排序为 $`t_1,\ldots,t_{m_g}`$。DFS 状态 $`(r,\mathbf u)`$ 表示已处理前 $`r`$ 个标签及其累计用量；记 $`\mathbf c(p)=(c_i(p))_i`$，选择下一标签方案后的转移为：
+
+<div align="center">
+
+$`\displaystyle (r,\mathbf u)\longrightarrow(r+1,\mathbf u+\mathbf c(p)).`$
+
+</div>
 
 任一已用食材超容量即剪枝；非负用量保证后续选择无法消除超额。相同状态具有相同的剩余问题，程序缓存其可行性；不同阈值分别建立缓存。二分减少阈值测试次数，单次判定仍包含组合搜索。
 
-找到 <img src="docs/formulas/inline-356bbf2806c1845f.svg" alt="\lambda^\star" width="15.7220" align="middle"> 后，程序在其容量下进一步最大化实际使用食材的完整升序余量向量。令 <img src="docs/formulas/inline-53c123900675a47f.svg" alt="\boldsymbol\Phi(r,\mathbf u)" width="48.0831" align="middle"> 为该状态可达到的最佳终态向量；无可行后继时标记无解。以下最大值仅遍历满足容量的转移：
+找到 $`\lambda^\star`$ 后，程序在其容量下进一步最大化实际使用食材的完整升序余量向量。令 $`\boldsymbol\Phi(r,\mathbf u)`$ 为该状态可达到的最佳终态向量；无可行后继时标记无解。以下最大值仅遍历满足容量的转移：
 
-<p align="center">
-<img src="docs/formulas/block-7aeed27fff61b76d.svg" alt="\begin{gathered}&#10;\boldsymbol\rho(\mathbf u)=\mathrm{sort}_{\uparrow}\big((q_i-\alpha u_i)_{i:u_i&gt;0}\big),\\&#10;\boldsymbol\Phi(m_g,\mathbf u)=\boldsymbol\rho(\mathbf u),\\&#10;\boldsymbol\Phi(r,\mathbf u)=\max_{p\in\mathcal M_{g,t_{r+1}}}^{\mathrm{lex}}&#10;\boldsymbol\Phi(r+1,\mathbf u+\mathbf c(p)).&#10;\end{gathered}" width="289.3349">
-</p>
+<div align="center">
+
+$`\displaystyle \begin{gathered} \boldsymbol\rho(\mathbf u)=\mathrm{sort}_{\uparrow}\big((q_i-\alpha u_i)_{i:u_i>0}\big),\\ \boldsymbol\Phi(m_g,\mathbf u)=\boldsymbol\rho(\mathbf u),\\ \boldsymbol\Phi(r,\mathbf u)=\max_{p\in\mathcal M_{g,t_{r+1}}}^{\mathrm{lex}} \boldsymbol\Phi(r+1,\mathbf u+\mathbf c(p)). \end{gathered}`$
+
+</div>
 
 每种实际使用的食材贡献一个分量。程序缓存最佳向量，再按固定候选顺序重建首个达到该向量的组合。变长向量按 Python 元组规则比较：首个不同分量较大者优先，完整前缀相同时较长者优先。缓存状态仍可能大量增长；该历史路线的阈值搜索未被 `nCookware` 正常主流程调用。
 
@@ -624,54 +739,63 @@ PLAN 主线聚焦料理与加料，酒水、完整满意度和现金利润尚未
 
 ### 3.5 共同厨具的预计算与集合枚举
 
-共同厨具求解先复用每客每厨具的最佳候选。取 <img src="docs/formulas/inline-baabfefa98097bd4.svg" alt="v=\mathrm{nCookware}" width="106.1052" align="middle">。对顾客 <img src="docs/formulas/inline-51728216ba238792.svg" alt="g" width="9.1572" align="middle">、厨具 <img src="docs/formulas/inline-797ef090e61e6c4c.svg" alt="h" width="9.6513" align="middle"> 和设备集合 <img src="docs/formulas/inline-fb772c3cf3597178.svg" alt="S" width="11.3091" align="middle">，沿用第一章的设备限制候选集与本章 best 函数；best 仅对非空集定义，下式只纳入存在候选的单厨具结果，第二式用于有解顾客：
+共同厨具求解先复用每客每厨具的最佳候选。取 $`v=\mathrm{nCookware}`$。对顾客 $`g`$、厨具 $`h`$ 和设备集合 $`S`$，沿用第一章的设备限制候选集与本章 best 函数；best 仅对非空集定义，下式只纳入存在候选的单厨具结果，第二式用于有解顾客：
 
-<p align="center">
-<img src="docs/formulas/block-5e500207d1db451d.svg" alt="\begin{gathered}&#10;p_{g,h}^{\star}=\mathrm{best}_g\left(\mathcal C_g^v(\{h\})\right),\\&#10;p_g^{\star}(S)=\mathrm{best}_g\left(\{p_{g,h}^{\star}:h\in S\}\right).&#10;\end{gathered}" width="236.2763">
-</p>
+```math
+\begin{gathered}
+p_{g,h}^{\star}=\mathrm{best}_g\left(\mathcal C_g^v(\{h\})\right),\\
+p_g^{\star}(S)=\mathrm{best}_g\left(\{p_{g,h}^{\star}:h\in S\}\right).
+\end{gathered}
+```
 
-固定 <img src="docs/formulas/inline-fb772c3cf3597178.svg" alt="S" width="11.3091" align="middle"> 后，各客方案与逐客供给独立，该集合内的无解惩罚为常量，有解顾客的候选集为各单厨具集合的并集。因此，先取每厨具 best 再比较具有相同最优目标；各客独立最优也给出汇总目标的最优值：
+固定 $`S`$ 后，各客方案与逐客供给独立，该集合内的无解惩罚为常量，有解顾客的候选集为各单厨具集合的并集。因此，先取每厨具 best 再比较具有相同最优目标；各客独立最优也给出汇总目标的最优值：
 
-<p align="center">
-<img src="docs/formulas/block-d0ab0774fabf7e20.svg" alt="\max_{(p_g)\in\prod_{g\in G_S}\mathcal C_g^v(S)}^{\mathrm{lex}}&#10;\sum_{g\in G_S}\mathbf f_g(p_g)&#10;=\sum_{g\in G_S}\mathbf f_g(p_g^{\star}(S))." width="323.9039">
-</p>
+```math
+\max_{(p_g)\in\prod_{g\in G_S}\mathcal C_g^v(S)}^{\mathrm{lex}}
+\sum_{g\in G_S}\mathbf f_g(p_g)
+=\sum_{g\in G_S}\mathbf f_g(p_g^{\star}(S)).
+```
 
-这一分解依赖固定设备集合、实际保留候选及无共享库存等跨客耦合约束。对 <img src="docs/formulas/inline-d9eaf2bad7755a03.svg" alt="1\le n\le&#124;H&#124;" width="81.3031" align="middle">，外层枚举全部 <img src="docs/formulas/inline-9d134b3a5aba2f08.svg" alt="\binom{&#124;H&#124;}{n}" width="28.1114" align="middle"> 个恰好含 <img src="docs/formulas/inline-5864f80948e3fda9.svg" alt="n" width="10.4164" align="middle"> 种厨具的集合，按第一章的汇总目标与无解惩罚比较；全部厨具可用且选满时只有一个集合。
+这一分解依赖固定设备集合、实际保留候选及无共享库存等跨客耦合约束。对 $`1\le n\le|H|`$，外层枚举全部 $`\binom{|H|}{n}`$ 个恰好含 $`n`$ 种厨具的集合，按第一章的汇总目标与无解惩罚比较；全部厨具可用且选满时只有一个集合。
 
-令 <img src="docs/formulas/inline-7c03f6224074fbdb.svg" alt="N_{\mathrm{cand}}" width="36.5892" align="middle"> 为所有顾客实际返回的候选总数。在单次指标求值成本固定的计量下，候选生成后的比较成本及 best 表容量分别为：
+令 $`N_{\mathrm{cand}}`$ 为所有顾客实际返回的候选总数。在单次指标求值成本固定的计量下，候选生成后的比较成本及 best 表容量分别为：
 
-<p align="center">
-<img src="docs/formulas/block-a5b07b9a1c99c359.svg" alt="O\left(N_{\mathrm{cand}}+\binom{&#124;H&#124;}{n}&#124;G&#124;n\right),\qquad O(&#124;G&#124;&#124;H&#124;)." width="320.4460">
-</p>
+```math
+O\left(N_{\mathrm{cand}}+\binom{|H|}{n}|G|n\right),\qquad O(|G||H|).
+```
 
 前者不含候选 DFS 的生成成本，后者仅计每客每厨具 best 表。相关筛选、等价代表与补位截断决定实际候选范围。单机对照见 3.6 节，跨设备性能尚未系统测量。具体调用关系见[系统架构](docs/architecture.md)，完整最优性边界见[优化模型与算法边界](docs/design.md)。
 
 <details>
-<summary><strong>v1.0.0 · Initial Release — 3.5 完整原文</strong></summary>
-
-原文出处：[v1.0.0](https://github.com/Mingcode123/Mystia-Menu-Optimizer/blob/v1.0.0/README.md)
+<summary><strong>点击展开旧版全文 — v1.0.0 · Initial Release，第 3.5 节</strong></summary>
 
 ### 3.5 共同厨具的预计算与集合枚举
 
-共同厨具求解先复用每客每厨具的最佳候选。取 <img src="docs/formulas/inline-baabfefa98097bd4.svg" alt="v=\mathrm{nCookware}" width="106.1052" align="middle">。对顾客 <img src="docs/formulas/inline-51728216ba238792.svg" alt="g" width="9.1572" align="middle">、厨具 <img src="docs/formulas/inline-797ef090e61e6c4c.svg" alt="h" width="9.6513" align="middle"> 和设备集合 <img src="docs/formulas/inline-fb772c3cf3597178.svg" alt="S" width="11.3091" align="middle">，沿用第一章的设备限制候选集与本章 best 函数；best 仅对非空集定义，下式只纳入存在候选的单厨具结果，第二式用于有解顾客：
+共同厨具求解先复用每客每厨具的最佳候选。取 $`v=\mathrm{nCookware}`$。对顾客 $`g`$、厨具 $`h`$ 和设备集合 $`S`$，沿用第一章的设备限制候选集与本章 best 函数；best 仅对非空集定义，下式只纳入存在候选的单厨具结果，第二式用于有解顾客：
 
-<p align="center">
-<img src="docs/formulas/block-5e500207d1db451d.svg" alt="\begin{gathered}&#10;p_{g,h}^{\star}=\mathrm{best}_g\left(\mathcal C_g^v(\{h\})\right),\\&#10;p_g^{\star}(S)=\mathrm{best}_g\left(\{p_{g,h}^{\star}:h\in S\}\right).&#10;\end{gathered}" width="236.2763">
-</p>
+<div align="center">
 
-固定 <img src="docs/formulas/inline-fb772c3cf3597178.svg" alt="S" width="11.3091" align="middle"> 后，各客方案与逐客供给独立，该集合内的无解惩罚为常量，有解顾客的候选集为各单厨具集合的并集。因此，先取每厨具 best 再比较具有相同最优目标；各客独立最优也给出汇总目标的最优值：
+$`\displaystyle \begin{gathered} p_{g,h}^{\star}=\mathrm{best}_g\left(\mathcal C_g^v(\{h\})\right),\\ p_g^{\star}(S)=\mathrm{best}_g\left(\{p_{g,h}^{\star}:h\in S\}\right). \end{gathered}`$
 
-<p align="center">
-<img src="docs/formulas/block-d0ab0774fabf7e20.svg" alt="\max_{(p_g)\in\prod_{g\in G_S}\mathcal C_g^v(S)}^{\mathrm{lex}}&#10;\sum_{g\in G_S}\mathbf f_g(p_g)&#10;=\sum_{g\in G_S}\mathbf f_g(p_g^{\star}(S))." width="323.9039">
-</p>
+</div>
 
-这一分解依赖固定设备集合、实际保留候选及无共享库存等跨客耦合约束。对 <img src="docs/formulas/inline-d9eaf2bad7755a03.svg" alt="1\le n\le&#124;H&#124;" width="81.3031" align="middle">，外层枚举全部 <img src="docs/formulas/inline-9d134b3a5aba2f08.svg" alt="\binom{&#124;H&#124;}{n}" width="28.1114" align="middle"> 个恰好含 <img src="docs/formulas/inline-5864f80948e3fda9.svg" alt="n" width="10.4164" align="middle"> 种厨具的集合，按第一章的汇总目标与无解惩罚比较；全部厨具可用且选满时只有一个集合。
+固定 $`S`$ 后，各客方案与逐客供给独立，该集合内的无解惩罚为常量，有解顾客的候选集为各单厨具集合的并集。因此，先取每厨具 best 再比较具有相同最优目标；各客独立最优也给出汇总目标的最优值：
 
-令 <img src="docs/formulas/inline-7c03f6224074fbdb.svg" alt="N_{\mathrm{cand}}" width="36.5892" align="middle"> 为所有顾客实际返回的候选总数。在单次指标求值成本固定的计量下，候选生成后的比较成本及 best 表容量分别为：
+<div align="center">
 
-<p align="center">
-<img src="docs/formulas/block-a5b07b9a1c99c359.svg" alt="O\left(N_{\mathrm{cand}}+\binom{&#124;H&#124;}{n}&#124;G&#124;n\right),\qquad O(&#124;G&#124;&#124;H&#124;)." width="320.4460">
-</p>
+$`\displaystyle \max_{(p_g)\in\prod_{g\in G_S}\mathcal C_g^v(S)}^{\mathrm{lex}} \sum_{g\in G_S}\mathbf f_g(p_g) =\sum_{g\in G_S}\mathbf f_g(p_g^{\star}(S)).`$
+
+</div>
+
+这一分解依赖固定设备集合、实际保留候选及无共享库存等跨客耦合约束。对 $`1\le n\le|H|`$，外层枚举全部 $`\binom{|H|}{n}`$ 个恰好含 $`n`$ 种厨具的集合，按第一章的汇总目标与无解惩罚比较；全部厨具可用且选满时只有一个集合。
+
+令 $`N_{\mathrm{cand}}`$ 为所有顾客实际返回的候选总数。在单次指标求值成本固定的计量下，候选生成后的比较成本及 best 表容量分别为：
+
+<div align="center">
+
+$`\displaystyle O\left(N_{\mathrm{cand}}+\binom{|H|}{n}|G|n\right),\qquad O(|G||H|).`$
+
+</div>
 
 前者不含候选 DFS 的生成成本，后者仅计每客每厨具 best 表。相关筛选、等价代表与补位截断决定实际候选范围；现有记录尚无统一性能基准或跨设备对照。具体调用关系见[系统架构](docs/architecture.md)，完整最优性边界见[优化模型与算法边界](docs/design.md)。
 
@@ -700,7 +824,7 @@ PLAN 主线聚焦料理与加料，酒水、完整满意度和现金利润尚未
 
 案例取自作者保存的[历史菜单存档](docs/case-study.md)，包含 58 条角色记录。文件名标注「流行·厌恶：水产」与五种厨具，其中的 `5` 表示厨具数量。
 
-历史复现采用 v1.0.0 的程序及根目录 [东方夜雀食堂.xlsx](东方夜雀食堂.xlsx)，每日订单 <img src="docs/formulas/inline-bd3e68b20f4e366f.svg" alt="K=5" width="43.6991" align="middle">、最低分 <img src="docs/formulas/inline-90c739fab2cb64f1.svg" alt="S_{\min}=3" width="58.4052" align="middle"> 使用该版本默认值。展示中的料理、厨具和食材来自历史存档；评分与余量为这些明确条件下的补充核算。
+历史复现采用 v1.0.0 的程序及根目录 [东方夜雀食堂.xlsx](东方夜雀食堂.xlsx)，每日订单 $`K=5`$、最低分 $`S_{\min}=3`$ 使用该版本默认值。展示中的料理、厨具和食材来自历史存档；评分与余量为这些明确条件下的补充核算。
 
 <a id="zh-methods"></a>
 <a id="zh-problem"></a>
@@ -783,23 +907,26 @@ python Python/singlePLAN_cover3_mixIng_nCookware.py
 | 加入蜂蜜 | `食材!B39:G39` 中蜂蜜提供「甜」；料理台作为厨具标签参与最终标签形成 | 新增喜爱命中「甜」，总喜爱命中 3，厌恶 0 |
 | 应用流行条件 | 最终标签不含「水产」，且未设置流行喜爱锚点 | 本方案不获得「流行·厌恶」或「流行·喜爱」 |
 
-最终标签为「素」「家常」「饱腹」「和风」「实惠」「料理台」「甜」。令 <img src="docs/formulas/inline-51728216ba238792.svg" alt="g" width="9.1572" align="middle"> 为博丽灵梦、<img src="docs/formulas/inline-74ab86906e20d3e1.svg" alt="p" width="10.1136" align="middle"> 为饭团加蜂蜜，则：
+最终标签为「素」「家常」「饱腹」「和风」「实惠」「料理台」「甜」。令 $`g`$ 为博丽灵梦、$`p`$ 为饭团加蜂蜜，则：
 
-<p align="center">
-<img src="docs/formulas/block-043973bc26c11ce7.svg" alt="\begin{gathered}&#10;H_g^{\mathrm L}(p)=3,\qquad H_g^{\mathrm D}(p)=0,\qquad S_g(p)=3-0=3,\\&#10;C(p)=1+1=2,\qquad U(H_g^{\mathrm L}(p))=\min(3,3)=3.&#10;\end{gathered}" width="387.5217">
-</p>
+```math
+\begin{gathered}
+H_g^{\mathrm L}(p)=3,\qquad H_g^{\mathrm D}(p)=0,\qquad S_g(p)=3-0=3,\\
+C(p)=1+1=2,\qquad U(H_g^{\mathrm L}(p))=\min(3,3)=3.
+\end{gathered}
+```
 
 原工作簿 `食材merchant_data` 的 `D6`、`D2` 分别保存海苔和蜂蜜的日供给 47、68 件。按每客每日 5 份、每份各用一件计算：
 
-<p align="center">
-<img src="docs/formulas/block-34b67246fe8b2287.svg" alt="R(p)=\min(47-5\times1,\ 68-5\times1)=42." width="319.7859">
-</p>
+```math
+R(p)=\min(47-5\times1,\ 68-5\times1)=42.
+```
 
 因此，该历史方案在本节条件下达到 3 分门槛，使用 2 件食材，最低日供给余量为 42 件。这里的余量按该顾客独立核算，未扣除其他顾客的用量；它是经验供给下的模型指标。
 
 同一料理的两个达标候选可说明目标取舍。下表由原候选函数在本节条件下重新计算，两者均无厌恶命中：
 
-| 方案 | 净分 <img src="docs/formulas/inline-89e72371142cc976.svg" alt="S_g(p)" width="35.6032" align="middle"> | 封顶收益 <img src="docs/formulas/inline-8d460ad04c6bb409.svg" alt="U(H_g^{\mathrm L}(p))" width="65.5985" align="middle"> | 件数 <img src="docs/formulas/inline-1c253c2658ea915c.svg" alt="C(p)" width="31.9129" align="middle"> | 最低余量 <img src="docs/formulas/inline-f7128c7ebd80e206.svg" alt="R(p)" width="31.6606" align="middle">（件／日） |
+| 方案 | 净分 $`S_g(p)`$ | 封顶收益 $`U(H_g^{\mathrm L}(p))`$ | 件数 $`C(p)`$ | 最低余量 $`R(p)`$（件／日） |
 | :---: | :---: | :---: | :---: | :---: |
 | 饭团＋蜂蜜 | 3 | 3 | 2 | 42 |
 | 饭团＋可可豆 | 4 | 3 | 2 | 10 |
@@ -894,47 +1021,54 @@ Preparation models build on plans, ingredient quantities, and tag matching, dist
 
 Preparation decisions have two levels: specifying how to prepare one dish and choosing among plans that satisfy the requirements. The versions share basic definitions of ingredient use and tag matching; each model specifies its own candidate-generation rules, order assumptions, and optimization objectives.
 
-**Objects and notation:** Let <img src="docs/formulas/inline-51728216ba238792.svg" alt="g" width="9.1572" align="middle"> denote a guest, <img src="docs/formulas/inline-a30a8e3869f444ee.svg" alt="d" width="9.4281" align="middle"> a dish, <img src="docs/formulas/inline-be098300053e6dfb.svg" alt="i" width="6.0807" align="middle"> an ingredient, <img src="docs/formulas/inline-ad66c02da2f44768.svg" alt="t" width="6.7821" align="middle"> a tag, and <img src="docs/formulas/inline-74ab86906e20d3e1.svg" alt="p" width="10.1136" align="middle"> a preparation plan. Candidate and preference sets use calligraphic letters, and vectors use boldface. Subscripts identify objects, parenthesized superscripts <img src="docs/formulas/inline-2a49d63a8daa6592.svg" alt="(r)" width="18.4701" align="middle"> identify filtering stages, and upright subscripts or superscripts identify fixed categories. <img src="docs/formulas/inline-51b50d180c75c937.svg" alt="v" width="8.8543" align="middle"> indexes model versions, and <img src="docs/formulas/inline-d08c9c8f923c371a.svg" alt="\star" width="9.7948" align="middle"> marks the best retained plan under the corresponding objective.
+**Objects and notation:** Let $`g`$ denote a guest, $`d`$ a dish, $`i`$ an ingredient, $`t`$ a tag, and $`p`$ a preparation plan. Candidate and preference sets use calligraphic letters, and vectors use boldface. Subscripts identify objects, parenthesized superscripts $`(r)`$ identify filtering stages, and upright subscripts or superscripts identify fixed categories. $`v`$ indexes model versions, and $`\star`$ marks the best retained plan under the corresponding objective.
 
 | Symbol | Definition | Unit or type |
 | :---: | :---: | :---: |
-| <img src="docs/formulas/inline-12bc1fd9d44164ed.svg" alt="b_i(d)" width="31.1024" align="middle"> | Base: ingredient quantity required by the dish's recipe; a given parameter | Units per serving |
-| <img src="docs/formulas/inline-94c139ea95400034.svg" alt="a_i(p)" width="32.4624" align="middle">, <img src="docs/formulas/inline-76b78fcdd5bd7df0.svg" alt="\mathbf A(p)" width="33.3186" align="middle"> | Addition: quantity of an added ingredient and the complete addition vector; decision variables | Units per serving; vector |
-| <img src="docs/formulas/inline-12b55a3dbf3f4a37.svg" alt="c_i(p)" width="30.9865" align="middle">, <img src="docs/formulas/inline-1c253c2658ea915c.svg" alt="C(p)" width="31.9129" align="middle"> | Count: total quantity of an ingredient and total ingredient count of the plan | Units per serving |
-| <img src="docs/formulas/inline-340454bc7c8bfdfd.svg" alt="T(i)" width="28.8227" align="middle">, <img src="docs/formulas/inline-68e33f0c1b8342af.svg" alt="T(p)" width="31.3317" align="middle"> | The ingredient's own tag set and the plan's final tag set | Sets |
-| <img src="docs/formulas/inline-dff365bedb03a76a.svg" alt="\mathcal L_g,\mathcal D_g" width="43.5206" align="middle"> | The guest's liked and disliked tag sets | Sets |
-| <img src="docs/formulas/inline-97d8dc015b918abb.svg" alt="H_g^{\mathrm L}(p),H_g^{\mathrm D}(p)" width="91.9569" align="middle"> | Counts of liked and disliked tags matched by the final tags | Matches |
-| <img src="docs/formulas/inline-3f45127840f6fcf1.svg" alt="S_g(p),S_{\min}" width="72.2872" align="middle"> | The plan's net score and the specified minimum net score | Points |
-| <img src="docs/formulas/inline-d664789216f3edcd.svg" alt="R_{\mathrm T},E_{\mathrm T}" width="48.2322" align="middle"> | Tags the user requires or excludes | Sets |
-| <img src="docs/formulas/inline-03b462f46967b9dd.svg" alt="q_i" width="11.6673" align="middle"> | Empirical daily ingredient supply, from the workbook's TDQ field | Units per day |
-| <img src="docs/formulas/inline-2066578204af0ef9.svg" alt="K" width="15.1985" align="middle"> | Assumed daily order count per guest; the Python planners use 5 by default | Orders per day |
+| $`b_i(d)`$ | Base: ingredient quantity required by the dish's recipe; a given parameter | Units per serving |
+| $`a_i(p)`$, $`\mathbf A(p)`$ | Addition: quantity of an added ingredient and the complete addition vector; decision variables | Units per serving; vector |
+| $`c_i(p)`$, $`C(p)`$ | Count: total quantity of an ingredient and total ingredient count of the plan | Units per serving |
+| $`T(i)`$, $`T(p)`$ | The ingredient's own tag set and the plan's final tag set | Sets |
+| $`\mathcal L_g,\mathcal D_g`$ | The guest's liked and disliked tag sets | Sets |
+| $`H_g^{\mathrm L}(p),H_g^{\mathrm D}(p)`$ | Counts of liked and disliked tags matched by the final tags | Matches |
+| $`S_g(p),S_{\min}`$ | The plan's net score and the specified minimum net score | Points |
+| $`R_{\mathrm T},E_{\mathrm T}`$ | Tags the user requires or excludes | Sets |
+| $`q_i`$ | Empirical daily ingredient supply, from the workbook's TDQ field | Units per day |
+| $`K`$ | Assumed daily order count per guest; the Python planners use 5 by default | Orders per day |
 
 **Plans and preparation constraints:** A plan consists of a selected dish and its addition quantities. Base ingredients and additions together occupy at most five slots; repeated use of the same ingredient is counted unit by unit:
 
-<p align="center">
-<img src="docs/formulas/block-a6e79c570f8fd13d.svg" alt="\begin{gathered}&#10;p=(d,\mathbf A),\quad \mathbf A=(a_i)_i,\quad a_i\in\mathbb Z_{\ge0},\\&#10;c_i(p)=b_i(d)+a_i(p),\quad C(p)=\sum_i c_i(p)\le5.&#10;\end{gathered}" width="339.0781">
-</p>
+```math
+\begin{gathered}
+p=(d,\mathbf A),\quad \mathbf A=(a_i)_i,\quad a_i\in\mathbb Z_{\ge0},\\
+c_i(p)=b_i(d)+a_i(p),\quad C(p)=\sum_i c_i(p)\le5.
+\end{gathered}
+```
 
-Base ingredients satisfy the recipe and occupy slots, but their tags do not automatically transfer to the dish; additions introduce ingredient tags. <img src="docs/formulas/inline-68e33f0c1b8342af.svg" alt="T(p)" width="31.3317" align="middle"> denotes the final tag set produced by the current version's rules for dishes, cookware, selling price, additions, overrides, and trends. Each distinct tag appears only once. A guest's trend preferences are fixed, while current trigger conditions determine whether a plan receives the corresponding tags. Recipe prohibitions and candidate-processing scope must be interpreted for the chosen entry point; HTML and Python behavior is detailed in the [web guide](docs/web-guide.md) and [optimization model and algorithm boundaries](docs/design.md).
+Base ingredients satisfy the recipe and occupy slots, but their tags do not automatically transfer to the dish; additions introduce ingredient tags. $`T(p)`$ denotes the final tag set produced by the current version's rules for dishes, cookware, selling price, additions, overrides, and trends. Each distinct tag appears only once. A guest's trend preferences are fixed, while current trigger conditions determine whether a plan receives the corresponding tags. Recipe prohibitions and candidate-processing scope must be interpreted for the chosen entry point; HTML and Python behavior is detailed in the [web guide](docs/web-guide.md) and [optimization model and algorithm boundaries](docs/design.md).
 
 **Matching and scoring:** Liked matches, disliked matches, and the net score are defined as:
 
-<p align="center">
-<img src="docs/formulas/block-0dc4f133cef0dc60.svg" alt="\begin{gathered}&#10;H_g^{\mathrm L}(p)=\left&#124;T(p)\cap\mathcal L_g\right&#124;,\\&#10;H_g^{\mathrm D}(p)=\left&#124;T(p)\cap\mathcal D_g\right&#124;,\\&#10;S_g(p)=H_g^{\mathrm L}(p)-H_g^{\mathrm D}(p)&#10;\end{gathered}" width="181.4389">
-</p>
+```math
+\begin{gathered}
+H_g^{\mathrm L}(p)=\left|T(p)\cap\mathcal L_g\right|,\\
+H_g^{\mathrm D}(p)=\left|T(p)\cap\mathcal D_g\right|,\\
+S_g(p)=H_g^{\mathrm L}(p)-H_g^{\mathrm D}(p)
+\end{gathered}
+```
 
-The net score describes how a plan matches a guest's preferences. Eligibility and comparison after qualification are determined by each version's admission and evaluation policies. <img src="docs/formulas/inline-932be834af2d956b.svg" alt="\mathrm{lex}" width="20.8122" align="middle"> denotes lexicographic order: compare the first objective-vector component, and consider the next only when the preceding components tie.
+The net score describes how a plan matches a guest's preferences. Eligibility and comparison after qualification are determined by each version's admission and evaluation policies. $`\mathrm{lex}`$ denotes lexicographic order: compare the first objective-vector component, and consider the next only when the preceding components tie.
 
 <details>
 <summary>Notation correspondence with the mechanics figure and supplementary documents</summary>
 
 | This chapter | Notation in the mechanics figure and supplementary documents | Meaning |
 | :---: | :---: | :---: |
-| <img src="docs/formulas/inline-94c139ea95400034.svg" alt="a_i(p)" width="32.4624" align="middle"> | <img src="docs/formulas/inline-53ec52a799055bb1.svg" alt="x_i" width="13.7918" align="middle"> | Addition count |
-| <img src="docs/formulas/inline-1c253c2658ea915c.svg" alt="C(p)" width="31.9129" align="middle"> | <img src="docs/formulas/inline-a7d1f3e8a07b31bc.svg" alt="L(p)" width="30.2845" align="middle"> | Total ingredient count |
-| <img src="docs/formulas/inline-dff365bedb03a76a.svg" alt="\mathcal L_g,\mathcal D_g" width="43.5206" align="middle"> | <img src="docs/formulas/inline-5f5ab2ae53d464a4.svg" alt="P_g,N_g" width="42.5338" align="middle"> | Liked and disliked tag sets |
-| <img src="docs/formulas/inline-97d8dc015b918abb.svg" alt="H_g^{\mathrm L}(p),H_g^{\mathrm D}(p)" width="91.9569" align="middle"> | <img src="docs/formulas/inline-c145e721bd9f5771.svg" alt="h_g(p),a_g(p)" width="76.5022" align="middle"> | Liked and disliked match counts |
-| <img src="docs/formulas/inline-3f45127840f6fcf1.svg" alt="S_g(p),S_{\min}" width="72.2872" align="middle"> | <img src="docs/formulas/inline-45e9bb78f0716c94.svg" alt="s_g(p),\tau" width="49.8771" align="middle"> | Net score and minimum net score |
+| $`a_i(p)`$ | $`x_i`$ | Addition count |
+| $`C(p)`$ | $`L(p)`$ | Total ingredient count |
+| $`\mathcal L_g,\mathcal D_g`$ | $`P_g,N_g`$ | Liked and disliked tag sets |
+| $`H_g^{\mathrm L}(p),H_g^{\mathrm D}(p)`$ | $`h_g(p),a_g(p)`$ | Liked and disliked match counts |
+| $`S_g(p),S_{\min}`$ | $`s_g(p),\tau`$ | Net score and minimum net score |
 
 </details>
 
@@ -965,11 +1099,14 @@ The execution order is **exclude ingredient names forbidden by the dish → opti
 
 **Constraints and admission:** Base ingredients and additions together use at most five units. The user may also specify required tags, excluded tags, and a minimum net score. When the base recipe uses fewer than five units and additions bring the total to five, the webpage adds 「Large portion」; a dish’s existing 「Large portion」 tag is retained.
 
-Let <img src="docs/formulas/inline-c91502f93de426a7.svg" alt="\mathcal B_d^{\mathrm{web}}" width="31.2229" align="middle"> be the plan pool actually enumerated by the webpage for dish <img src="docs/formulas/inline-a30a8e3869f444ee.svg" alt="d" width="9.4281" align="middle">; it depends on the original recipe handling and the equivalence-deduplication option. Unspecified tag requirements use empty sets. Qualified candidates entering the subsequent filters are:
+Let $`\mathcal B_d^{\mathrm{web}}`$ be the plan pool actually enumerated by the webpage for dish $`d`$; it depends on the original recipe handling and the equivalence-deduplication option. Unspecified tag requirements use empty sets. Qualified candidates entering the subsequent filters are:
 
-<p align="center">
-<img src="docs/formulas/block-04d39852148d33d1.svg" alt="\mathcal C_{g,d}^{(0)}=&#10;\left\{p\in\mathcal B_d^{\mathrm{web}}:&#10;S_g(p)\ge S_{\min},\quad R_{\mathrm T}\subseteq T(p),\quad E_{\mathrm T}\cap T(p)=\varnothing&#10;\right\}" width="498.7291">
-</p>
+```math
+\mathcal C_{g,d}^{(0)}=
+\left\{p\in\mathcal B_d^{\mathrm{web}}:
+S_g(p)\ge S_{\min},\quad R_{\mathrm T}\subseteq T(p),\quad E_{\mathrm T}\cap T(p)=\varnothing
+\right\}
+```
 
 This is a minimum net-score condition: a threshold of 3 also admits scores of 4 or 5, and liked matches can offset dislike penalties. The original webpage's recipe handling differs from the Python branches; see the [web guide](docs/web-guide.md). This is the stage-0 candidate set; subsequent filters compare only plans admitted at this step.
 
@@ -979,11 +1116,13 @@ This is a minimum net-score condition: a threshold of 3 also admits scores of 4 
 
 Define the equivalence relation and classes as:
 
-<p align="center">
-<img src="docs/formulas/block-ee4af984290f43a1.svg" alt="i\sim j\quad\Longleftrightarrow\quad&#10;i=j\ \lor\ \left(T(i)=T(j)\ne\varnothing\right),\qquad&#10;E(i)=\{j:j\sim i\}" width="510.2429">
-</p>
+```math
+i\sim j\quad\Longleftrightarrow\quad
+i=j\ \lor\ \left(T(i)=T(j)\ne\varnothing\right),\qquad
+E(i)=\{j:j\sim i\}
+```
 
-Ingredients without tags form separate singleton classes. Let <img src="docs/formulas/inline-bd116d50716e0d74.svg" alt="I_d" width="13.9901" align="middle"> be the addition pool after excluding ingredient names forbidden by the dish. Its available equivalence classes are <img src="docs/formulas/inline-67f4ee3616dc639f.svg" alt="E_d(i)=E(i)\cap I_d" width="118.0609" align="middle">. When deduplication is enabled, one representative from each nonempty class enters enumeration: the original program's preferred-name list takes priority, followed by Chinese name ordering. When disabled, the full <img src="docs/formulas/inline-bd116d50716e0d74.svg" alt="I_d" width="13.9901" align="middle"> is enumerated.
+Ingredients without tags form separate singleton classes. Let $`I_d`$ be the addition pool after excluding ingredient names forbidden by the dish. Its available equivalence classes are $`E_d(i)=E(i)\cap I_d`$. When deduplication is enabled, one representative from each nonempty class enters enumeration: the original program's preferred-name list takes priority, followed by Chinese name ordering. When disabled, the full $`I_d`$ is enumerated.
 
 Equivalence deduplication compresses the **addition-ingredient pool** before enumeration. The base recipe is preserved, and a representative may be added multiple times. Ingredients with identical tags belong to the same class even when their supply quantities differ; procurement recommendation handles these supply differences separately.
 
@@ -991,101 +1130,127 @@ Equivalence deduplication compresses the **addition-ingredient pool** before enu
 
 **Purpose:** Prefer plans using ingredients with fewer tags when those plans satisfy admission conditions. “Advanced” is a classification based on ingredient-tag inclusion, determined solely from tag sets.
 
-Within the ingredient pool actually used to enumerate the dish, consider ingredient <img src="docs/formulas/inline-be098300053e6dfb.svg" alt="i" width="6.0807" align="middle"> and seek a base alternative <img src="docs/formulas/inline-50a8852bc2f69c06.svg" alt="j" width="8.4399" align="middle"> satisfying:
+Within the ingredient pool actually used to enumerate the dish, consider ingredient $`i`$ and seek a base alternative $`j`$ satisfying:
 
-<p align="center">
-<img src="docs/formulas/block-32caf243e300e415.svg" alt="\varnothing\ne T(j)\subsetneq T(i)" width="127.7399">
-</p>
+```math
+\varnothing\ne T(j)\subsetneq T(i)
+```
 
-The original program selects the recognized alternative with the fewest tags, breaking ties by Chinese name order. Denote it by <img src="docs/formulas/inline-20f5c814eecea199.svg" alt="B_d(i)" width="35.4556" align="middle"> (Base representative); if no alternative exists, set <img src="docs/formulas/inline-1b0dd7c234d8e695.svg" alt="B_d(i)=i" width="62.5364" align="middle">. Map **all additions simultaneously** to these representatives to obtain the base addition vector:
+The original program selects the recognized alternative with the fewest tags, breaking ties by Chinese name order. Denote it by $`B_d(i)`$ (Base representative); if no alternative exists, set $`B_d(i)=i`$. Map **all additions simultaneously** to these representatives to obtain the base addition vector:
 
-<p align="center">
-<img src="docs/formulas/block-6c35401f6cb5339e.svg" alt="\begin{gathered}&#10;a_j^{\mathrm{base}}(p)=\sum_{i:B_d(i)=j}a_i(p),\\&#10;\mathbf A^{\mathrm{base}}(p)=(a_j^{\mathrm{base}}(p))_j,\\&#10;p^{\mathrm{base}}=(d,\mathbf A^{\mathrm{base}}(p)).&#10;\end{gathered}" width="179.6140">
-</p>
+```math
+\begin{gathered}
+a_j^{\mathrm{base}}(p)=\sum_{i:B_d(i)=j}a_i(p),\\
+\mathbf A^{\mathrm{base}}(p)=(a_j^{\mathrm{base}}(p))_j,\\
+p^{\mathrm{base}}=(d,\mathbf A^{\mathrm{base}}(p)).
+\end{gathered}
+```
 
-A plan is considered to contain advanced additions when <img src="docs/formulas/inline-937af39d8489ea40.svg" alt="\mathbf A^{\mathrm{base}}(p)\ne \mathbf A(p)" width="109.8832" align="middle">. With the upgrade filter enabled, it is removed when:
+A plan is considered to contain advanced additions when $`\mathbf A^{\mathrm{base}}(p)\ne \mathbf A(p)`$. With the upgrade filter enabled, it is removed when:
 
-<p align="center">
-<img src="docs/formulas/block-9e548de981b0e66b.svg" alt="\begin{gathered}&#10;\mathbf A^{\mathrm{base}}(p)\ne \mathbf A(p),\qquad p^{\mathrm{base}}\in\mathcal C_{g,d}^{(0)},\\&#10;\mathbf A^{\mathrm{base}}(p^{\mathrm{base}})=\mathbf A(p^{\mathrm{base}}),\qquad&#10;\left(F_{\mathrm U}=0\ \lor\ S_g(p^{\mathrm{base}})\ge S_g(p)\right).&#10;\end{gathered}" width="457.1962">
-</p>
+```math
+\begin{gathered}
+\mathbf A^{\mathrm{base}}(p)\ne \mathbf A(p),\qquad p^{\mathrm{base}}\in\mathcal C_{g,d}^{(0)},\\
+\mathbf A^{\mathrm{base}}(p^{\mathrm{base}})=\mathbf A(p^{\mathrm{base}}),\qquad
+\left(F_{\mathrm U}=0\ \lor\ S_g(p^{\mathrm{base}})\ge S_g(p)\right).
+\end{gathered}
+```
 
-<img src="docs/formulas/inline-e1c80b5b55944843.svg" alt="F_{\mathrm U}" width="19.3512" align="middle"> is this filter's “consider score” switch: 1 when enabled and 0 when disabled. When disabled, the existence of the corresponding qualified, nonadvanced base plan suffices to remove the advanced plan. When enabled, the base plan must also score at least as highly. The current plan remains if the base plan was not generated, failed the score threshold, or failed another admission condition.
+$`F_{\mathrm U}`$ is this filter's “consider score” switch: 1 when enabled and 0 when disabled. When disabled, the existence of the corresponding qualified, nonadvanced base plan suffices to remove the advanced plan. When enabled, the base plan must also score at least as highly. The current plan remains if the base plan was not generated, failed the score threshold, or failed another admission condition.
 
-For example, one ingredient may carry 「Sweet」, and another 「Sweet」「Premium」. The latter plan is evaluated for removal only if the former ingredient is its selected base representative and the complete replacement plan qualifies. The comparison is restricted to **the complete addition replacement produced by the designated base mapping**, with the base recipe preserved. Denote the retained set by <img src="docs/formulas/inline-f7ee1b77a1f6cedb.svg" alt="\mathcal C_{g,d}^{(1)}" width="24.8523" align="middle">; when the upgrade filter is disabled, it equals <img src="docs/formulas/inline-4d9d05e294ded4de.svg" alt="\mathcal C_{g,d}^{(0)}" width="24.8523" align="middle">.
+For example, one ingredient may carry 「Sweet」, and another 「Sweet」「Premium」. The latter plan is evaluated for removal only if the former ingredient is its selected base representative and the complete replacement plan qualifies. The comparison is restricted to **the complete addition replacement produced by the designated base mapping**, with the base recipe preserved. Denote the retained set by $`\mathcal C_{g,d}^{(1)}`$; when the upgrade filter is disabled, it equals $`\mathcal C_{g,d}^{(0)}`$.
 
 #### 1.2.5 Addition-subset filter: comparing smaller additions
 
 **Purpose:** If a retained plan qualifies using only some of the current plan's additions, omit the larger addition plan according to the selected policy. The comparison uses **ingredient-count vectors**, whose components record the quantity of each added ingredient:
 
-<p align="center">
-<img src="docs/formulas/block-59192e3896342d22.svg" alt="\mathbf A(p&#x27;)\preceq \mathbf A(p)\quad\Longleftrightarrow\quad&#10;\forall i,\ a_i(p&#x27;)\le a_i(p)" width="312.2607">
-</p>
+```math
+\mathbf A(p')\preceq \mathbf A(p)\quad\Longleftrightarrow\quad
+\forall i,\ a_i(p')\le a_i(p)
+```
 
-The input is the same-dish candidate set <img src="docs/formulas/inline-f7ee1b77a1f6cedb.svg" alt="\mathcal C_{g,d}^{(1)}" width="24.8523" align="middle"> remaining after the upgrade filter. They are sorted by ascending addition count, descending score, and addition-name key. During sequential processing, let <img src="docs/formulas/inline-c9119d0cc70f94a9.svg" alt="\mathcal K" width="13.2060" align="middle"> contain the previously retained plans. The current plan is removed when:
+The input is the same-dish candidate set $`\mathcal C_{g,d}^{(1)}`$ remaining after the upgrade filter. They are sorted by ascending addition count, descending score, and addition-name key. During sequential processing, let $`\mathcal K`$ contain the previously retained plans. The current plan is removed when:
 
-<p align="center">
-<img src="docs/formulas/block-86ac204100b12908.svg" alt="\exists p&#x27;\in\mathcal K:\quad&#10;\mathbf A(p&#x27;)\preceq \mathbf A(p)\quad\land\quad&#10;\left(F_{\mathrm S}=0\ \lor\ S_g(p&#x27;)\ge S_g(p)\right)" width="454.9973">
-</p>
+```math
+\exists p'\in\mathcal K:\quad
+\mathbf A(p')\preceq \mathbf A(p)\quad\land\quad
+\left(F_{\mathrm S}=0\ \lor\ S_g(p')\ge S_g(p)\right)
+```
 
-<img src="docs/formulas/inline-f05c56416827d4a7.svg" alt="F_{\mathrm S}" width="17.0027" align="middle"> is the subset filter's “consider score” switch. When disabled, any retained qualifying subset suffices; when enabled, the subset must also score at least as highly. A plan that survives is added to <img src="docs/formulas/inline-c9119d0cc70f94a9.svg" alt="\mathcal K" width="13.2060" align="middle"> for subsequent comparisons. A qualifying plan with no additions can also serve as a subset; the implemented relation includes equal vectors.
+$`F_{\mathrm S}`$ is the subset filter's “consider score” switch. When disabled, any retained qualifying subset suffices; when enabled, the subset must also score at least as highly. A plan that survives is added to $`\mathcal K`$ for subsequent comparisons. A qualifying plan with no additions can also serve as a subset; the implemented relation includes equal vectors.
 
-For example, “honey ×1” is an addition subset of “honey ×2”, but not conversely. If both qualify and the former has been retained, the latter can be removed when score consideration is disabled; when enabled, their net scores must also be compared. The upgrade filter compares ingredient substitutions at an unchanged count; the subset filter compares combinations using smaller quantities of existing additions. Both remove candidates according to these comparisons without rewriting retained plans. Denote the subset-filtered set by <img src="docs/formulas/inline-9c15b1bceca81cec.svg" alt="\mathcal C_{g,d}^{(2)}" width="24.8523" align="middle">; when this filter is disabled, it equals <img src="docs/formulas/inline-f7ee1b77a1f6cedb.svg" alt="\mathcal C_{g,d}^{(1)}" width="24.8523" align="middle">.
+For example, “honey ×1” is an addition subset of “honey ×2”, but not conversely. If both qualify and the former has been retained, the latter can be removed when score consideration is disabled; when enabled, their net scores must also be compared. The upgrade filter compares ingredient substitutions at an unchanged count; the subset filter compares combinations using smaller quantities of existing additions. Both remove candidates according to these comparisons without rewriting retained plans. Denote the subset-filtered set by $`\mathcal C_{g,d}^{(2)}`$; when this filter is disabled, it equals $`\mathcal C_{g,d}^{(1)}`$.
 
 #### 1.2.6 Procurement recommendation: setting a cutoff by supply vectors
 
-**Purpose:** Within <img src="docs/formulas/inline-9c15b1bceca81cec.svg" alt="\mathcal C_{g,d}^{(2)}" width="24.8523" align="middle">, favor ingredient combinations with better availability. At this stage, no daily order volume is assumed and consumption is not deducted from supply. Comparisons remain within each dish.
+**Purpose:** Within $`\mathcal C_{g,d}^{(2)}`$, favor ingredient combinations with better availability. At this stage, no daily order volume is assumed and consumption is not deducted from supply. Comparisons remain within each dish.
 
-**Effective supply:** Retaining empirical daily supply <img src="docs/formulas/inline-03b462f46967b9dd.svg" alt="q_i" width="11.6673" align="middle">, let <img src="docs/formulas/inline-c5ed1180c444ad01.svg" alt="M(i)\subseteq E(i)" width="85.0791" align="middle"> denote the members associated with that ingredient in the program's global group records that have known supply values. The webpage uses:
+**Effective supply:** Retaining empirical daily supply $`q_i`$, let $`M(i)\subseteq E(i)`$ denote the members associated with that ingredient in the program's global group records that have known supply values. The webpage uses:
 
-<p align="center">
-<img src="docs/formulas/block-06539d6cb09e1efe.svg" alt="\widetilde q_i=&#10;\begin{cases}&#10;\dfrac{1}{&#124;M(i)&#124;}\sum_{j\in M(i)}q_j,&amp; &#124;M(i)&#124;&gt;0,\\&#10;q_i,&amp; &#124;M(i)&#124;=0\text{ and }q_i\text{ is known},\\&#10;0,&amp;\text{otherwise}.&#10;\end{cases}" width="421.1851">
-</p>
+```math
+\widetilde q_i=
+\begin{cases}
+\dfrac{1}{|M(i)|}\sum_{j\in M(i)}q_j,& |M(i)|>0,\\
+q_i,& |M(i)|=0\text{ and }q_i\text{ is known},\\
+0,&\text{otherwise}.
+\end{cases}
+```
 
 For a singleton class with a known value, this equals the ingredient's own supply. With no group record, it first falls back to the ingredient's own supply record, then to 0 if that is also missing. The mean uses the global class, not only members allowed for the current dish. Procurement comparisons use this effective value even when equivalence deduplication is disabled.
 
-**Comparison vector:** Each unit of a base ingredient or addition contributes one effective supply value. Sorting these values in ascending order gives <img src="docs/formulas/inline-fe75e0097cd3f36a.svg" alt="\mathbf V(p)" width="33.8068" align="middle"> (Vector):
+**Comparison vector:** Each unit of a base ingredient or addition contributes one effective supply value. Sorting these values in ascending order gives $`\mathbf V(p)`$ (Vector):
 
-<p align="center">
-<img src="docs/formulas/block-a64ed4e77cbbce10.svg" alt="\mathbf V(p)=\mathrm{sort}_{\uparrow}&#10;\left(\biguplus_i\{\widetilde q_i\}^{c_i(p)}\right)" width="204.9316">
-</p>
+```math
+\mathbf V(p)=\mathrm{sort}_{\uparrow}
+\left(\biguplus_i\{\widetilde q_i\}^{c_i(p)}\right)
+```
 
-Here, <img src="docs/formulas/inline-e98973b4ca606038.svg" alt="\biguplus" width="13.4770" align="middle"> denotes concatenation preserving repeated elements, and <img src="docs/formulas/inline-1605f94b190a11cb.svg" alt="\{\widetilde q_i\}^{c_i(p)}" width="50.6857" align="middle"> repeats that value <img src="docs/formulas/inline-12b55a3dbf3f4a37.svg" alt="c_i(p)" width="30.9865" align="middle"> times. Ranking starts at the smallest component and favors the larger value at the first differing position. When prefixes match, missing components of the shorter vector are treated as <img src="docs/formulas/inline-5d38adbeeffb7080.svg" alt="+\infty" width="28.3263" align="middle">. Thus:
+Here, $`\biguplus`$ denotes concatenation preserving repeated elements, and $`\{\widetilde q_i\}^{c_i(p)}`$ repeats that value $`c_i(p)`$ times. Ranking starts at the smallest component and favors the larger value at the first differing position. When prefixes match, missing components of the shorter vector are treated as $`+\infty`$. Thus:
 
-<p align="center">
-<img src="docs/formulas/block-7e44b7bc4847dd08.svg" alt="(4,12)\succ(3,100),\qquad&#10;(4,12)\succ(4,10),\qquad&#10;(4)\succ(4,12)" width="426.6953">
-</p>
+```math
+(4,12)\succ(3,100),\qquad
+(4,12)\succ(4,10),\qquad
+(4)\succ(4,12)
+```
 
-This lexicographic rule compares supply values component by component, starting with the lowest. The original implementation uses a numerical comparison tolerance of <img src="docs/formulas/inline-83a2204fe13b539e.svg" alt="10^{-9}" width="30.1041" align="middle">; vector ties are ordered stably by addition count and addition-name key.
+This lexicographic rule compares supply values component by component, starting with the lowest. The original implementation uses a numerical comparison tolerance of $`10^{-9}`$; vector ties are ordered stably by addition count and addition-name key.
 
-**Top-N and ties:** Let <img src="docs/formulas/inline-b1bd71f878d995c6.svg" alt="m_{g,d}" width="29.8726" align="middle"> be the number of filtered candidates. Write them in ranking order as <img src="docs/formulas/inline-05f381c49d19a21c.svg" alt="p_1,\ldots,p_{m_{g,d}}" width="82.4605" align="middle">, with <img src="docs/formulas/inline-08ace3bf40646212.svg" alt="N\ge1" width="43.2193" align="middle"> the user-specified ranking threshold. To describe how deduplication affects the cutoff, define plan weight <img src="docs/formulas/inline-6e3703ce4bb5e958.svg" alt="W(p)" width="36.4567" align="middle"> (Weight):
+**Top-N and ties:** Let $`m_{g,d}`$ be the number of filtered candidates. Write them in ranking order as $`p_1,\ldots,p_{m_{g,d}}`$, with $`N\ge1`$ the user-specified ranking threshold. To describe how deduplication affects the cutoff, define plan weight $`W(p)`$ (Weight):
 
-<p align="center">
-<img src="docs/formulas/block-fa53f1681d29482c.svg" alt="W(p)=&#10;\begin{cases}&#10;1,&amp;\text{equivalence deduplication off},\\&#10;\prod_{i:a_i(p)&gt;0}&#124;E_d(i)&#124;^{a_i(p)},&amp;\text{equivalence deduplication on}.&#10;\end{cases}" width="479.1887">
-</p>
+```math
+W(p)=
+\begin{cases}
+1,&\text{equivalence deduplication off},\\
+\prod_{i:a_i(p)>0}|E_d(i)|^{a_i(p)},&\text{equivalence deduplication on}.
+\end{cases}
+```
 
-With no additions, the empty product is 1. Denote the cutoff position by <img src="docs/formulas/inline-a0d4c4438485bc0c.svg" alt="k_{\mathrm{cut}}" width="24.2833" align="middle">. The retained set is:
+With no additions, the empty product is 1. Denote the cutoff position by $`k_{\mathrm{cut}}`$. The retained set is:
 
-<p align="center">
-<img src="docs/formulas/block-66ad30f7e64de1d1.svg" alt="\begin{gathered}&#10;k_{\mathrm{cut}}=\min\left\{k:\sum_{j=1}^{k}W(p_j)\ge N\right\},\\&#10;\mathcal R_{g,d}=\{p_j:\mathbf V(p_j)\succeq \mathbf V(p_{k_{\mathrm{cut}}})\}&#10;\end{gathered}" width="261.4334">
-</p>
+```math
+\begin{gathered}
+k_{\mathrm{cut}}=\min\left\{k:\sum_{j=1}^{k}W(p_j)\ge N\right\},\\
+\mathcal R_{g,d}=\{p_j:\mathbf V(p_j)\succeq \mathbf V(p_{k_{\mathrm{cut}}})\}
+\end{gathered}
+```
 
-If cumulative weight is below <img src="docs/formulas/inline-91222128ebc40738.svg" alt="N" width="14.9435" align="middle">, use <img src="docs/formulas/inline-5d9c1a7df33320ea.svg" alt="k_{\mathrm{cut}}=m_{g,d}" width="74.8853" align="middle">; if there are no candidates, output is empty. Without deduplication, the cutoff is the <img src="docs/formulas/inline-dd6bfce9d4b063b2.svg" alt="\min(N,m_{g,d})" width="87.3738" align="middle">-th plan. With deduplication, weights accumulate according to the sizes of the dish's available equivalence classes. **Top-N locates the cutoff using cumulative plan weight, then retains every candidate whose supply vector meets or exceeds that cutoff, including all ties. The cutoff and ties together determine the final row count.**
+If cumulative weight is below $`N`$, use $`k_{\mathrm{cut}}=m_{g,d}`$; if there are no candidates, output is empty. Without deduplication, the cutoff is the $`\min(N,m_{g,d})`$-th plan. With deduplication, weights accumulate according to the sizes of the dish's available equivalence classes. **Top-N locates the cutoff using cumulative plan weight, then retains every candidate whose supply vector meets or exceeds that cutoff, including all ties. The cutoff and ties together determine the final row count.**
 
-The weight compensates for the effect of equivalence deduplication on the ranking cutoff. Its product calculation differs from counting unordered plans: adding two units from the same two-member class gives weight <img src="docs/formulas/inline-f063c29576c887ff.svg" alt="2^2=4" width="43.6921" align="middle">, whereas there are only three unordered combinations. The weight therefore does not exactly reconstruct the number of plans before deduplication, and strict equivalence of Top-N results with deduplication on and off has not been established.
+The weight compensates for the effect of equivalence deduplication on the ranking cutoff. Its product calculation differs from counting unordered plans: adding two units from the same two-member class gives weight $`2^2=4`$, whereas there are only three unordered combinations. The weight therefore does not exactly reconstruct the number of plans before deduplication, and strict equivalence of Top-N results with deduplication on and off has not been established.
 
 **Output names:** When both procurement recommendation and equivalence deduplication are enabled, displayed additions are also replaced by the global equivalent with the highest known raw supply:
 
-<p align="center">
-<img src="docs/formulas/block-919480bf90ba5b0e.svg" alt="i_{\mathrm{out}}\in\arg\max_{j\in M(i)}q_j" width="135.0522">
-</p>
+```math
+i_{\mathrm{out}}\in\arg\max_{j\in M(i)}q_j
+```
 
 If no supply value is known, the current representative remains. Ties follow representative priority and name order. **Ranking uses the class mean; output names use the class maximum.** Base ingredients are not replaced. This output step selects from the global class without checking the dish's forbidden-name list again; see the conditions in the [web guide](docs/web-guide.md).
 
-When procurement recommendation is disabled, retain all of <img src="docs/formulas/inline-9c15b1bceca81cec.svg" alt="\mathcal C_{g,d}^{(2)}" width="24.8523" align="middle">. Representing plans before the output-name replacement, the filtering stages satisfy:
+When procurement recommendation is disabled, retain all of $`\mathcal C_{g,d}^{(2)}`$. Representing plans before the output-name replacement, the filtering stages satisfy:
 
-<p align="center">
-<img src="docs/formulas/block-410c77c049855311.svg" alt="\mathcal C_{g,d}^{(0)}\supseteq\mathcal C_{g,d}^{(1)}\supseteq\mathcal C_{g,d}^{(2)}\supseteq\mathcal R_{g,d}" width="188.4408">
-</p>
+```math
+\mathcal C_{g,d}^{(0)}\supseteq\mathcal C_{g,d}^{(1)}\supseteq\mathcal C_{g,d}^{(2)}\supseteq\mathcal R_{g,d}
+```
 
 Equivalence deduplication first reduces the ingredient pool; the set relations above describe candidate removal after enumeration. The HTML model combines **admission conditions, two candidate-removal policies, an ingredient-equivalence approximation, and procurement ranking** to return alternatives that satisfy the user's conditions. Subsequent Python versions introduce optimization objectives for automatically selecting plans within their respective candidate sets.
 
@@ -1095,55 +1260,67 @@ Equivalence deduplication first reduces the ingredient pool; the set relations a
 
 **Constraints and assumptions:** Python PLAN adds a zero-disliked-match eligibility condition. Retaining the previous section's net-score threshold therefore gives:
 
-<p align="center">
-<img src="docs/formulas/block-22ccb73cd1932693.svg" alt="H_g^{\mathrm D}(p)=0,\qquad S_g(p)\ge S_{\min}&#10;\quad\Longrightarrow\quad H_g^{\mathrm L}(p)\ge S_{\min}" width="399.6142">
-</p>
+```math
+H_g^{\mathrm D}(p)=0,\qquad S_g(p)\ge S_{\min}
+\quad\Longrightarrow\quad H_g^{\mathrm L}(p)\ge S_{\min}
+```
 
 Recipe prohibitions, dish ownership, and candidate reduction follow the corresponding Python version. Each version defines its candidate set through its own processing rules; no inclusion relation is specified between HTML and Python candidates.
 
-**New decisions and order assumptions:** For a target tag <img src="docs/formulas/inline-e5a3e9f6e9394d95.svg" alt="t\in \mathcal L_g" width="43.0757" align="middle">, let <img src="docs/formulas/inline-812fd16cdc7dd06d.svg" alt="\mathcal C_{g,t}" width="22.8120" align="middle"> contain eligible candidates that include the tag, collected after the original upgrade/subset filters are applied separately for each dish and target tag. Define:
+**New decisions and order assumptions:** For a target tag $`t\in \mathcal L_g`$, let $`\mathcal C_{g,t}`$ contain eligible candidates that include the tag, collected after the original upgrade/subset filters are applied separately for each dish and target tag. Define:
 
-<p align="center">
-<img src="docs/formulas/block-102cf02fa9f7825e.svg" alt="J_g=\left\{t\in \mathcal L_g:\mathcal C_{g,t}\ne\varnothing\right\},\qquad&#10;m_g=&#124;J_g&#124;,\qquad p_t\in\mathcal C_{g,t}\quad(t\in J_g)" width="482.1758">
-</p>
+```math
+J_g=\left\{t\in \mathcal L_g:\mathcal C_{g,t}\ne\varnothing\right\},\qquad
+m_g=|J_g|,\qquad p_t\in\mathcal C_{g,t}\quad(t\in J_g)
+```
 
-The decision is a family of plans <img src="docs/formulas/inline-517ee1b17abb2bf5.svg" alt="(p_t)_{t\in J_g}" width="47.4759" align="middle">, with several tags allowed to select the same plan. <img src="docs/formulas/inline-e906c2dc912b6677.svg" alt="m_g" width="20.5354" align="middle"> counts target tags that have candidates. Retain the assumed daily order count <img src="docs/formulas/inline-2066578204af0ef9.svg" alt="K" width="15.1985" align="middle"> and distribute orders equally among these target tags, with <img src="docs/formulas/inline-ff8480d317651a48.svg" alt="K/m_g" width="41.5930" align="middle"> orders assigned to each. If <img src="docs/formulas/inline-dbca9d7ee48089cc.svg" alt="m_g=0" width="49.7769" align="middle">, no plan is produced.
+The decision is a family of plans $`(p_t)_{t\in J_g}`$, with several tags allowed to select the same plan. $`m_g`$ counts target tags that have candidates. Retain the assumed daily order count $`K`$ and distribute orders equally among these target tags, with $`K/m_g`$ orders assigned to each. If $`m_g=0`$, no plan is produced.
 
-Retaining <img src="docs/formulas/inline-12b55a3dbf3f4a37.svg" alt="c_i(p)" width="30.9865" align="middle"> and the original daily supply <img src="docs/formulas/inline-03b462f46967b9dd.svg" alt="q_i" width="11.6673" align="middle">, let <img src="docs/formulas/inline-90e6a8084bc3afcc.svg" alt="u_i" width="13.8216" align="middle"> be the cumulative use of an ingredient across the plans selected for the tags. Expected daily ingredient units <img src="docs/formulas/inline-757594083ee7f31b.svg" alt="E_{\mathrm{old}}" width="27.4898" align="middle"> and minimum supply slack <img src="docs/formulas/inline-12c50787a4e5d004.svg" alt="R_{\mathrm{old}}" width="27.8002" align="middle"> are:
+Retaining $`c_i(p)`$ and the original daily supply $`q_i`$, let $`u_i`$ be the cumulative use of an ingredient across the plans selected for the tags. Expected daily ingredient units $`E_{\mathrm{old}}`$ and minimum supply slack $`R_{\mathrm{old}}`$ are:
 
-<p align="center">
-<img src="docs/formulas/block-a61ecf65e98da2ef.svg" alt="\begin{gathered}&#10;u_i=\sum_{t\in J_g}c_i(p_t),\\&#10;E_{\mathrm{old}}=\frac{K}{m_g}\sum_i u_i,\\&#10;R_{\mathrm{old}}=\min_{i:u_i&gt;0}\left(q_i-\frac{K}{m_g}u_i\right)&#10;\end{gathered}" width="193.8832">
-</p>
+```math
+\begin{gathered}
+u_i=\sum_{t\in J_g}c_i(p_t),\\
+E_{\mathrm{old}}=\frac{K}{m_g}\sum_i u_i,\\
+R_{\mathrm{old}}=\min_{i:u_i>0}\left(q_i-\frac{K}{m_g}u_i\right)
+\end{gathered}
+```
 
 Both latter quantities are measured in units per day. The model calculates slack by subtracting ingredient consumption under the assumed orders from daily supply. Equal allocation is a modeling assumption without a corresponding empirical estimate of order probabilities.
 
 **Objective:**
 
-<p align="center">
-<img src="docs/formulas/block-ab2d7726bdf389c5.svg" alt="\min_{\substack{p_t\in\mathcal C_{g,t}\\t\in J_g}}^{\mathrm{lex}}&#10;\left(E_{\mathrm{old}},\;-R_{\mathrm{old}}\right)" width="147.0717">
-</p>
+```math
+\min_{\substack{p_t\in\mathcal C_{g,t}\\t\in J_g}}^{\mathrm{lex}}
+\left(E_{\mathrm{old}},\;-R_{\mathrm{old}}\right)
+```
 
-With <img src="docs/formulas/inline-e906c2dc912b6677.svg" alt="m_g" width="20.5354" align="middle"> fixed, minimizing expected units separates by tag. The program therefore retains every candidate tied for minimum units for each tag before comparing the supply pressure of their combinations. Ties in minimum slack are resolved by comparing the full ascending slack vector. Threshold binary search and DFS in this historical branch solve that combination problem; they are solution methods, while the objective remains the expression above.
+With $`m_g`$ fixed, minimizing expected units separates by tag. The program therefore retains every candidate tied for minimum units for each tag before comparing the supply pressure of their combinations. Ties in minimum slack are resolved by comparing the full ascending slack vector. Threshold binary search and DFS in this historical branch solve that combination problem; they are solution methods, while the objective remains the expression above.
 
 ### 1.4 singlePLAN: replace plans per tag with one plan per guest
 
-**Problem and change:** `singlePLAN.py` replaces the family <img src="docs/formulas/inline-517ee1b17abb2bf5.svg" alt="(p_t)_{t\in J_g}" width="47.4759" align="middle"> with a single <img src="docs/formulas/inline-74ab86906e20d3e1.svg" alt="p" width="10.1136" align="middle">: all assumed orders for the same guest use this one plan. The objective order also changes to **maximum liked matches, followed by minimum ingredient units, then maximum minimum supply slack**.
+**Problem and change:** `singlePLAN.py` replaces the family $`(p_t)_{t\in J_g}`$ with a single $`p`$: all assumed orders for the same guest use this one plan. The objective order also changes to **maximum liked matches, followed by minimum ingredient units, then maximum minimum supply slack**.
 
-**Constraints and assumptions:** Retain preparation conditions, the minimum net score, and zero-dislike eligibility. The decision becomes one plan <img src="docs/formulas/inline-74ab86906e20d3e1.svg" alt="p" width="10.1136" align="middle">, used for all <img src="docs/formulas/inline-2066578204af0ef9.svg" alt="K" width="15.1985" align="middle"> orders from the same guest.
+**Constraints and assumptions:** Retain preparation conditions, the minimum net score, and zero-dislike eligibility. The decision becomes one plan $`p`$, used for all $`K`$ orders from the same guest.
 
 **Consumption and slack:** One plan serves all of the guest's assumed daily orders, giving the following ingredient demand and slack:
 
-<p align="center">
-<img src="docs/formulas/block-ef1e5e2ca13002c6.svg" alt="\begin{gathered}&#10;\frac{K}{m_g}\sum_{t\in J_g}c_i(p_t)&#10;\quad\longrightarrow\quad Kc_i(p),\\&#10;R(p)=\min_{i:c_i(p)&gt;0}\left(q_i-Kc_i(p)\right)&#10;\end{gathered}" width="228.2302">
-</p>
+```math
+\begin{gathered}
+\frac{K}{m_g}\sum_{t\in J_g}c_i(p_t)
+\quad\longrightarrow\quad Kc_i(p),\\
+R(p)=\min_{i:c_i(p)>0}\left(q_i-Kc_i(p)\right)
+\end{gathered}
+```
 
-<img src="docs/formulas/inline-f7128c7ebd80e206.svg" alt="R(p)" width="31.6606" align="middle"> remains measured in units per day. For fixed <img src="docs/formulas/inline-2066578204af0ef9.svg" alt="K" width="15.1985" align="middle">, minimizing units per serving <img src="docs/formulas/inline-1c253c2658ea915c.svg" alt="C(p)" width="31.9129" align="middle"> is equivalent to minimizing this guest's daily units <img src="docs/formulas/inline-2475d248308f25a7.svg" alt="KC(p)" width="46.4002" align="middle">; the original implementation directly compares units per serving.
+$`R(p)`$ remains measured in units per day. For fixed $`K`$, minimizing units per serving $`C(p)`$ is equivalent to minimizing this guest's daily units $`KC(p)`$; the original implementation directly compares units per serving.
 
-**Objective:** Let <img src="docs/formulas/inline-8ba71ebc648e3643.svg" alt="\mathcal C_g^{\mathrm{single}}" width="38.4631" align="middle"> denote the eligible candidates generated and retained by this version:
+**Objective:** Let $`\mathcal C_g^{\mathrm{single}}`$ denote the eligible candidates generated and retained by this version:
 
-<p align="center">
-<img src="docs/formulas/block-06b9f48f85bc6dd9.svg" alt="\max_{p\in\mathcal C_g^{\mathrm{single}}}^{\mathrm{lex}}&#10;\left(H_g^{\mathrm L}(p),\;-C(p),\;R(p)\right)" width="228.4976">
-</p>
+```math
+\max_{p\in\mathcal C_g^{\mathrm{single}}}^{\mathrm{lex}}
+\left(H_g^{\mathrm L}(p),\;-C(p),\;R(p)\right)
+```
 
 This step changes both order allocation and the first priority. The earlier model first controls expected consumption across a collection of plans. This model first seeks more liked matches in one plan, then reduces ingredient units and supply pressure at equal coverage. When all three criteria tie, the original program uses selling price, dish name, and the additions string, in that order.
 
@@ -1153,59 +1330,73 @@ This step changes both order allocation and the first priority. The earlier mode
 
 **Constraints and assumptions:** Retain one plan per guest, zero-dislike eligibility, the minimum net score, and assumed order volume. Capped coverage benefit ranks eligible plans, while admission thresholds retain their existing settings.
 
-**New utility and objective:** Let <img src="docs/formulas/inline-e36a6767abc58511.svg" alt="U(h)" width="32.7311" align="middle"> denote the coverage utility used to compare plans with <img src="docs/formulas/inline-797ef090e61e6c4c.svg" alt="h" width="9.6513" align="middle"> liked matches, with the corresponding candidate set denoted by <img src="docs/formulas/inline-6da9d339b6d755ee.svg" alt="\mathcal C_g^{\mathrm{cover3}}" width="41.7105" align="middle">:
+**New utility and objective:** Let $`U(h)`$ denote the coverage utility used to compare plans with $`h`$ liked matches, with the corresponding candidate set denoted by $`\mathcal C_g^{\mathrm{cover3}}`$:
 
-<p align="center">
-<img src="docs/formulas/block-5e6e5b93b6ad8afb.svg" alt="\begin{gathered}&#10;U(h)=\min(h,3),\\&#10;\left(H_g^{\mathrm L}(p),-C(p),R(p)\right)&#10;\quad\longrightarrow\quad&#10;\left(U(H_g^{\mathrm L}(p)),-C(p),R(p)\right)&#10;\end{gathered}" width="429.0553">
-</p>
+```math
+\begin{gathered}
+U(h)=\min(h,3),\\
+\left(H_g^{\mathrm L}(p),-C(p),R(p)\right)
+\quad\longrightarrow\quad
+\left(U(H_g^{\mathrm L}(p)),-C(p),R(p)\right)
+\end{gathered}
+```
 
-<p align="center">
-<img src="docs/formulas/block-68219a58764ad072.svg" alt="\max_{p\in\mathcal C_g^{\mathrm{cover3}}}^{\mathrm{lex}}&#10;\left(U(H_g^{\mathrm L}(p)),\;-C(p),\;R(p)\right)" width="259.0913">
-</p>
+```math
+\max_{p\in\mathcal C_g^{\mathrm{cover3}}}^{\mathrm{lex}}
+\left(U(H_g^{\mathrm L}(p)),\;-C(p),\;R(p)\right)
+```
 
-The final tags <img src="docs/formulas/inline-68e33f0c1b8342af.svg" alt="T(p)" width="31.3317" align="middle">, match count <img src="docs/formulas/inline-683063808c74c381.svg" alt="H_g^{\mathrm L}(p)" width="41.5443" align="middle">, and raw net score <img src="docs/formulas/inline-89e72371142cc976.svg" alt="S_g(p)" width="35.6032" align="middle"> retain their previous definitions; the capped function computes the benefit used for ranking. In Figure 1, when 「Sweet」 is popular, the rice-ball-and-honey plan scores 4 for Reimu, while <img src="docs/formulas/inline-c1893638fdccd1d1.svg" alt="U(4)=3" width="61.2613" align="middle">.
+The final tags $`T(p)`$, match count $`H_g^{\mathrm L}(p)`$, and raw net score $`S_g(p)`$ retain their previous definitions; the capped function computes the benefit used for ranking. In Figure 1, when 「Sweet」 is popular, the rice-ball-and-honey plan scores 4 for Reimu, while $`U(4)=3`$.
 
-The threshold <img src="docs/formulas/inline-6de0be9d77809a12.svg" alt="S_{\min}" width="29.3042" align="middle"> controls eligibility, while the capped function <img src="docs/formulas/inline-c25d99961fd00ef1.svg" alt="U" width="12.6959" align="middle"> controls comparison after qualification. Under the default <img src="docs/formulas/inline-90c739fab2cb64f1.svg" alt="S_{\min}=3" width="58.4052" align="middle"> and zero-dislike conditions, every eligible candidate has <img src="docs/formulas/inline-db17e0cf22e06618.svg" alt="U=3" width="41.3178" align="middle">. The policy therefore becomes **qualify first, then minimize ingredient units, then consider supply slack**. The admission threshold and benefit cap are set independently, so lowering the threshold retains the existing cap.
+The threshold $`S_{\min}`$ controls eligibility, while the capped function $`U`$ controls comparison after qualification. Under the default $`S_{\min}=3`$ and zero-dislike conditions, every eligible candidate has $`U=3`$. The policy therefore becomes **qualify first, then minimize ingredient units, then consider supply slack**. The admission threshold and benefit cap are set independently, so lowering the threshold retains the existing cap.
 
 ### 1.6 Output-format branch: mixedingredients
 
 **Problem and change:** `singlePLAN_cover3_mixedingredients.py` changes how results are read and used. It combines base ingredients and additions into `Ingredient1` through `Ingredient5`, follows the original output ordering, and retains merged table cells.
 
-This branch retains the decision variables, objective, and tag-formation rules of Section 1.5, combining base and additional quantities only for display. The meanings and calculations of <img src="docs/formulas/inline-5dd9783eefc69414.svg" alt="p,c_i(p),C(p),T(p),H_g^{\mathrm L}(p),S_g(p),R(p),U(H_g^{\mathrm L}(p))" width="328.5551" align="middle"> remain unchanged: base ingredients satisfy the recipe, and additions introduce ingredient tags.
+This branch retains the decision variables, objective, and tag-formation rules of Section 1.5, combining base and additional quantities only for display. The meanings and calculations of $`p,c_i(p),C(p),T(p),H_g^{\mathrm L}(p),S_g(p),R(p),U(H_g^{\mathrm L}(p))`$ remain unchanged: base ingredients satisfy the recipe, and additions introduce ingredient tags.
 
 ### 1.7 Fixed-cookware branch: limitedCookware
 
 **Problem and change:** `singlePLAN_cover3_mixIng_limitedCookware.py` selects plans for guests under predetermined equipment conditions. The player specifies which cookware to exclude, while the objective remains that of cover3. The original file excludes the grill and steamer by default.
 
-**Constraints and decision:** Let <img src="docs/formulas/inline-e5f586d3e49d6f59.svg" alt="\kappa(d)" width="28.7832" align="middle"> denote the cookware required by a dish, and <img src="docs/formulas/inline-76d8e738fa414fbe.svg" alt="S_0" width="15.9827" align="middle"> the cookware set available after specified exclusions. Let <img src="docs/formulas/inline-51b50d180c75c937.svg" alt="v" width="8.8543" align="middle"> identify the current equipment-model version and <img src="docs/formulas/inline-f78becd5b7924ad5.svg" alt="\mathcal C_g^v" width="16.4131" align="middle"> denote its eligible candidates before restriction to an equipment set. Define the restriction operation:
+**Constraints and decision:** Let $`\kappa(d)`$ denote the cookware required by a dish, and $`S_0`$ the cookware set available after specified exclusions. Let $`v`$ identify the current equipment-model version and $`\mathcal C_g^v`$ denote its eligible candidates before restriction to an equipment set. Define the restriction operation:
 
-<p align="center">
-<img src="docs/formulas/block-30cea0d5e63bbea6.svg" alt="\mathcal C_g^v(S)=&#10;\left\{p=(d,\mathbf A)\in\mathcal C_g^v:\kappa(d)\in S\right\}" width="287.2365">
-</p>
+```math
+\mathcal C_g^v(S)=
+\left\{p=(d,\mathbf A)\in\mathcal C_g^v:\kappa(d)\in S\right\}
+```
 
-This section uses <img src="docs/formulas/inline-94ea785b6bb07974.svg" alt="v=\mathrm{limited}" width="77.9115" align="middle"> and <img src="docs/formulas/inline-ff73825d72e59965.svg" alt="S=S_0" width="47.5049" align="middle">, comparing candidates in that subset by the objective in Section 1.5. <img src="docs/formulas/inline-76d8e738fa414fbe.svg" alt="S_0" width="15.9827" align="middle"> is a fixed input restricting the candidate set, forming an equipment-constraint branch independent of the output-format adjustment.
+This section uses $`v=\mathrm{limited}`$ and $`S=S_0`$, comparing candidates in that subset by the objective in Section 1.5. $`S_0`$ is a fixed input restricting the candidate set, forming an equipment-constraint branch independent of the output-format adjustment.
 
 ### 1.8 Shared-cookware branch: nCookware
 
 **Problem and change:** `singlePLAN_cover3_mixIng_nCookware.py` makes the equipment set itself a decision. Given the number of cookware types to use, the program selects the specific equipment and assigns an available plan to each guest. This branch and `limitedCookware` each start from the input data, addressing joint equipment selection and fixed equipment exclusion, respectively.
 
-**Constraints and decision:** Let <img src="docs/formulas/inline-37ec03bd462d7e4d.svg" alt="G" width="13.0944" align="middle"> be the guests included in the current planning task, <img src="docs/formulas/inline-220478fb1e12f300.svg" alt="H" width="14.9435" align="middle"> the available cookware associated with owned dishes, and <img src="docs/formulas/inline-5864f80948e3fda9.svg" alt="n" width="10.4164" align="middle"> the number of cookware types used in this task. The fixed equipment set <img src="docs/formulas/inline-76d8e738fa414fbe.svg" alt="S_0" width="15.9827" align="middle"> becomes a set <img src="docs/formulas/inline-fb772c3cf3597178.svg" alt="S" width="11.3091" align="middle"> to be chosen:
+**Constraints and decision:** Let $`G`$ be the guests included in the current planning task, $`H`$ the available cookware associated with owned dishes, and $`n`$ the number of cookware types used in this task. The fixed equipment set $`S_0`$ becomes a set $`S`$ to be chosen:
 
-<p align="center">
-<img src="docs/formulas/block-1a8ff6fa145173da.svg" alt="S\subseteq H,\qquad &#124;S&#124;=n" width="150.1594">
-</p>
+```math
+S\subseteq H,\qquad |S|=n
+```
 
-Retain the restriction operation from Section 1.7, now with <img src="docs/formulas/inline-baabfefa98097bd4.svg" alt="v=\mathrm{nCookware}" width="106.1052" align="middle">. For a given <img src="docs/formulas/inline-fb772c3cf3597178.svg" alt="S" width="11.3091" align="middle">, let <img src="docs/formulas/inline-0c017602c84c19f9.svg" alt="p_g^\star(S)" width="37.8383" align="middle"> be the plan selected from <img src="docs/formulas/inline-ee81fc33a280e95d.svg" alt="\mathcal C_g^v(S)" width="38.7670" align="middle"> by the cover3 objective. Guests with a plan form <img src="docs/formulas/inline-23d693185a9f0dc1.svg" alt="G_S" width="20.6770" align="middle">, and the number without one is <img src="docs/formulas/inline-dadc553defbb9c7b.svg" alt="z_S=&#124;G\setminus G_S&#124;" width="92.4504" align="middle">.
+Retain the restriction operation from Section 1.7, now with $`v=\mathrm{nCookware}`$. For a given $`S`$, let $`p_g^\star(S)`$ be the plan selected from $`\mathcal C_g^v(S)`$ by the cover3 objective. Guests with a plan form $`G_S`$, and the number without one is $`z_S=|G\setminus G_S|`$.
 
 **Set-level objective:** The single-guest evaluation order is retained. A new outer comparison aggregates guest evaluations and includes the original program's penalties for missing plans:
 
-<p align="center">
-<img src="docs/formulas/block-5c8c470b0b1eb586.svg" alt="\max_{S\subseteq H,\ &#124;S&#124;=n}^{\mathrm{lex}}&#10;\left(&#10;\begin{gathered}&#10;\sum_{g\in G_S}U(H_g^{\mathrm L}(p_g^\star(S))),\\&#10;-\left[\sum_{g\in G_S}C(p_g^\star(S))+10^9z_S\right],\\&#10;\sum_{g\in G_S}R(p_g^\star(S))-10^{18}z_S&#10;\end{gathered}&#10;\right)" width="320.7783">
-</p>
+```math
+\max_{S\subseteq H,\ |S|=n}^{\mathrm{lex}}
+\left(
+\begin{gathered}
+\sum_{g\in G_S}U(H_g^{\mathrm L}(p_g^\star(S))),\\
+-\left[\sum_{g\in G_S}C(p_g^\star(S))+10^9z_S\right],\\
+\sum_{g\in G_S}R(p_g^\star(S))-10^{18}z_S
+\end{gathered}
+\right)
+```
 
 Under the default three-point eligibility condition, each guest with a plan contributes 3 units of capped benefit. The first criterion therefore prioritizes the number of guests receiving a qualifying plan, followed by total ingredient units and per-guest slack. The two penalty constants retain the original implementation's values and evaluate equipment configurations with missing guest plans; such configurations remain eligible for comparison.
 
-The cookware set is chosen jointly across guests, and <img src="docs/formulas/inline-f7128c7ebd80e206.svg" alt="R(p)" width="31.6606" align="middle"> is calculated independently from each guest's assumed orders. The model has no shared-inventory constraint aggregating consumption across all guests. The program reuses the best retained candidate for each guest and cookware type before enumerating equipment combinations. The historical multiple-plan branch instead distributes one guest's orders across tags and solves the resulting plan-combination problem.
+The cookware set is chosen jointly across guests, and $`R(p)`$ is calculated independently from each guest's assumed orders. The model has no shared-inventory constraint aggregating consumption across all guests. The program reuses the best retained candidate for each guest and cookware type before enumerating equipment combinations. The historical multiple-plan branch instead distributes one guest's orders across tags and solves the resulting plan-combination problem.
 
 ### 1.9 Version relationships and scope
 
@@ -1228,13 +1419,16 @@ The root workbook contains 13 sheets. As parsed by `nCookware`, it includes 62 i
 | Prices, daily supply, and commission records | Manually recorded by the author during gameplay and compiled into empirical expectations | Daily supply supports resource evaluation; prices support separate economic analysis |
 | Trends, owned dishes, and cookware conditions | Workbook records and runtime inputs | Define the scenario for the current query or planning task |
 
-`Total Daily Quantity` supplies the given parameter <img src="docs/formulas/inline-03b462f46967b9dd.svg" alt="q_i" width="11.6673" align="middle"> from Chapter 1. The separate price analysis uses quantity weighting. For ingredient <img src="docs/formulas/inline-be098300053e6dfb.svg" alt="i" width="6.0807" align="middle">, let <img src="docs/formulas/inline-8ee35a952c2e475d.svg" alt="\mathcal O_i" width="17.1503" align="middle"> be the included procurement-channel records, <img src="docs/formulas/inline-6fd67be04ffe6dbb.svg" alt="\pi_{i\ell}" width="18.6724" align="middle"> the unit purchase price in record <img src="docs/formulas/inline-22c961502fecff1e.svg" alt="\ell" width="8.0732" align="middle">, and <img src="docs/formulas/inline-dd256be7cb51541c.svg" alt="w_{i\ell}" width="20.9598" align="middle"> the corresponding quantity. Then:
+`Total Daily Quantity` supplies the given parameter $`q_i`$ from Chapter 1. The separate price analysis uses quantity weighting. For ingredient $`i`$, let $`\mathcal O_i`$ be the included procurement-channel records, $`\pi_{i\ell}`$ the unit purchase price in record $`\ell`$, and $`w_{i\ell}`$ the corresponding quantity. Then:
 
-<p align="center">
-<img src="docs/formulas/block-b953146c13dc9666.svg" alt="\bar\pi_i=&#10;\frac{\sum_{\ell\in\mathcal O_i}w_{i\ell}\pi_{i\ell}}&#10;{\sum_{\ell\in\mathcal O_i}w_{i\ell}},&#10;\qquad \sum_{\ell\in\mathcal O_i}w_{i\ell}&gt;0." width="271.5865">
-</p>
+```math
+\bar\pi_i=
+\frac{\sum_{\ell\in\mathcal O_i}w_{i\ell}\pi_{i\ell}}
+{\sum_{\ell\in\mathcal O_i}w_{i\ell}},
+\qquad \sum_{\ell\in\mathcal O_i}w_{i\ell}>0.
+```
 
-<img src="docs/formulas/inline-6fd67be04ffe6dbb.svg" alt="\pi_{i\ell}" width="18.6724" align="middle"> and <img src="docs/formulas/inline-af6f4b7200d18da6.svg" alt="\bar\pi_i" width="13.8080" align="middle"> are measured in in-game currency per ingredient unit, and <img src="docs/formulas/inline-dd256be7cb51541c.svg" alt="w_{i\ell}" width="20.9598" align="middle"> in ingredient units. Prices and quantities must cover the same source scope. Commission quantities included in the denominator without a corresponding cash-payment term are assigned zero cash purchase cost under this convention. Time and opportunity costs are excluded.
+$`\pi_{i\ell}`$ and $`\bar\pi_i`$ are measured in in-game currency per ingredient unit, and $`w_{i\ell}`$ in ingredient units. Prices and quantities must cover the same source scope. Commission quantities included in the denominator without a corresponding cash-payment term are assigned zero cash purchase cost under this convention. Time and opportunity costs are excluded.
 
 Complete sampling dates, sample counts, and source versions were not retained, and purchase-price formulas carry risks from row-based association errors and some cached formula errors. The available data describe historical empirical conditions and are insufficient to estimate reliable demand distributions, confidence intervals, or shortage probabilities. Fields and estimation conventions are detailed in the [data provenance notes (Chinese)](docs/data-provenance.md).
 
@@ -1258,70 +1452,89 @@ The programs enumerate, prune, and compare plans within the candidate scopes def
 
 ### 3.1 Enumerating combinations from a given ingredient pool
 
-For guest <img src="docs/formulas/inline-51728216ba238792.svg" alt="g" width="9.1572" align="middle"> and dish <img src="docs/formulas/inline-a30a8e3869f444ee.svg" alt="d" width="9.4281" align="middle">, let the actual enumeration pool be <img src="docs/formulas/inline-8ad64259219885b8.svg" alt="(i_1,\ldots,i_{n_{g,d}})" width="84.3780" align="middle">, with size <img src="docs/formulas/inline-76b85af9412e991b.svg" alt="n_{g,d}" width="25.5370" align="middle">. A base recipe uses 1–5 ingredient units and leaves <img src="docs/formulas/inline-88ef60727dab8586.svg" alt="s_d" width="14.2988" align="middle"> free slots. For <img src="docs/formulas/inline-6dd0afcac6d66595.svg" alt="k" width="9.1093" align="middle"> additions, DFS selects nondecreasing indices, permitting repeated ingredients while generating each multiset once. Before pruning, the number of combinations is:
+For guest $`g`$ and dish $`d`$, let the actual enumeration pool be $`(i_1,\ldots,i_{n_{g,d}})`$, with size $`n_{g,d}`$. A base recipe uses 1–5 ingredient units and leaves $`s_d`$ free slots. For $`k`$ additions, DFS selects nondecreasing indices, permitting repeated ingredients while generating each multiset once. Before pruning, the number of combinations is:
 
-<p align="center">
-<img src="docs/formulas/block-c61706a78ca6f2ef.svg" alt="\begin{gathered}&#10;s_d=5-\sum_i b_i(d),\qquad 0\le k\le s_d,\\&#10;1\le j_1\le\cdots\le j_k\le n_{g,d}\quad(k\ge1),\\&#10;N_{g,d}=\sum_{k=0}^{s_d}\binom{n_{g,d}+k-1}{k}&#10;=\binom{n_{g,d}+s_d}{s_d}\quad(n_{g,d}\ge1).&#10;\end{gathered}" width="412.2636">
-</p>
+```math
+\begin{gathered}
+s_d=5-\sum_i b_i(d),\qquad 0\le k\le s_d,\\
+1\le j_1\le\cdots\le j_k\le n_{g,d}\quad(k\ge1),\\
+N_{g,d}=\sum_{k=0}^{s_d}\binom{n_{g,d}+k-1}{k}
+=\binom{n_{g,d}+s_d}{s_d}\quad(n_{g,d}\ge1).
+\end{gathered}
+```
 
-An empty pool can generate only the zero-addition combination. When 「Large portion」 is required and is absent from the dish's original tags, the webpage restricts enumeration to <img src="docs/formulas/inline-734dbe47791dbc75.svg" alt="k=s_d" width="43.8828" align="middle">. It partitions dishes into static batches and uses at most 8 Web Workers in parallel; the Python entry points use CPUs. These counts apply to filtered, deduplicated pools, with admission conditions and subsequent filters further restricting output.
+An empty pool can generate only the zero-addition combination. When 「Large portion」 is required and is absent from the dish's original tags, the webpage restricts enumeration to $`k=s_d`$. It partitions dishes into static batches and uses at most 8 Web Workers in parallel; the Python entry points use CPUs. These counts apply to filtered, deduplicated pools, with admission conditions and subsequent filters further restricting output.
 
 
 #### Bitset evaluation of tag sets
 
-The browser worker retains its original enumeration order, while tag checks use precompiled bitsets. Let <img src="docs/formulas/inline-c76deb6bc966f6bd.svg" alt="\mathcal T" width="14.7522" align="middle"> contain every normalized tag involved in a run, with a unique position assigned to each tag. Any tag set <img src="docs/formulas/inline-ca7ea8e4550eb1c6.svg" alt="X\subseteq\mathcal T" width="50.3560" align="middle"> has the indicator vector:
+The browser worker retains its original enumeration order, while tag checks use precompiled bitsets. Let $`\mathcal T`$ contain every normalized tag involved in a run, with a unique position assigned to each tag. Any tag set $`X\subseteq\mathcal T`$ has the indicator vector:
 
-<p align="center">
-<img src="docs/formulas/block-9eb6eb6a5b990bb7.svg" alt="\begin{gathered}&#10;\mathbf z(X)=\left(\mathbf 1_{\{t_j\in X\}}\right)_{j=1}^{&#124;\mathcal T&#124;},\\&#10;\mathbf z(X\cup Y)=\mathbf z(X)\lor\mathbf z(Y),\qquad&#10;\mathbf z(X\cap Y)=\mathbf z(X)\land\mathbf z(Y),\\&#10;H_g^{\mathrm L}(p)=\sum_j z_j(T(p))z_j(\mathcal L_g),\qquad&#10;H_g^{\mathrm D}(p)=\sum_j z_j(T(p))z_j(\mathcal D_g).&#10;\end{gathered}" width="473.5543">
-</p>
+```math
+\begin{gathered}
+\mathbf z(X)=\left(\mathbf 1_{\{t_j\in X\}}\right)_{j=1}^{|\mathcal T|},\\
+\mathbf z(X\cup Y)=\mathbf z(X)\lor\mathbf z(Y),\qquad
+\mathbf z(X\cap Y)=\mathbf z(X)\land\mathbf z(Y),\\
+H_g^{\mathrm L}(p)=\sum_j z_j(T(p))z_j(\mathcal L_g),\qquad
+H_g^{\mathrm D}(p)=\sum_j z_j(T(p))z_j(\mathcal D_g).
+\end{gathered}
+```
 
-Here <img src="docs/formulas/inline-b9201d1f7ef9db02.svg" alt="\mathbf 1" width="8.3283" align="middle"> is an event indicator; <img src="docs/formulas/inline-732f688fd699d03b.svg" alt="\lor" width="10.8628" align="middle"> and <img src="docs/formulas/inline-cd6040bfe22d0824.svg" alt="\land" width="10.8628" align="middle"> denote componentwise OR and AND. Arrays of 32-bit words store these vectors and grow with the number of tags; population counts give intersection sizes. Fixed dish tags and ingredient bitsets are prepared in advance. Each combination first applies union and adds 「Large portion」 when additions fill all five ingredient slots under the rule. It then applies the four overrides, liked-trend addition, disliked-trend addition, required/excluded checks, and net-score evaluation in that order.
+Here $`\mathbf 1`$ is an event indicator; $`\lor`$ and $`\land`$ denote componentwise OR and AND. Arrays of 32-bit words store these vectors and grow with the number of tags; population counts give intersection sizes. Fixed dish tags and ingredient bitsets are prepared in advance. Each combination first applies union and adds 「Large portion」 when additions fill all five ingredient slots under the rule. It then applies the four overrides, liked-trend addition, disliked-trend addition, required/excluded checks, and net-score evaluation in that order.
 
 Display tag sets and candidate objects are materialized only for qualifying combinations, preserving original tag insertion order and Chinese collation. Upgrade filtering, subset filtering, procurement vectors, and Top-N ties continue to receive candidates in the same order. The main thread also caches each row's search text to avoid repeated string construction.
 
 <details>
-<summary><strong>v1.0.0 · Initial Release — Section 3.1 in full</strong></summary>
-
-Original text: [v1.0.0](https://github.com/Mingcode123/Mystia-Menu-Optimizer/blob/v1.0.0/README.md)
+<summary><strong>Click to expand the full text — v1.0.0 · Initial Release, Section 3.1</strong></summary>
 
 ### 3.1 Enumerating combinations from a given ingredient pool
 
-For guest <img src="docs/formulas/inline-51728216ba238792.svg" alt="g" width="9.1572" align="middle"> and dish <img src="docs/formulas/inline-a30a8e3869f444ee.svg" alt="d" width="9.4281" align="middle">, let the actual enumeration pool be <img src="docs/formulas/inline-8ad64259219885b8.svg" alt="(i_1,\ldots,i_{n_{g,d}})" width="84.3780" align="middle">, with size <img src="docs/formulas/inline-76b85af9412e991b.svg" alt="n_{g,d}" width="25.5370" align="middle">. A base recipe uses 1–5 ingredient units and leaves <img src="docs/formulas/inline-88ef60727dab8586.svg" alt="s_d" width="14.2988" align="middle"> free slots. For <img src="docs/formulas/inline-6dd0afcac6d66595.svg" alt="k" width="9.1093" align="middle"> additions, DFS selects nondecreasing indices, permitting repeated ingredients while generating each multiset once. Before pruning, the number of combinations is:
+For guest $`g`$ and dish $`d`$, let the actual enumeration pool be $`(i_1,\ldots,i_{n_{g,d}})`$, with size $`n_{g,d}`$. A base recipe uses 1–5 ingredient units and leaves $`s_d`$ free slots. For $`k`$ additions, DFS selects nondecreasing indices, permitting repeated ingredients while generating each multiset once. Before pruning, the number of combinations is:
 
-<p align="center">
-<img src="docs/formulas/block-c61706a78ca6f2ef.svg" alt="\begin{gathered}&#10;s_d=5-\sum_i b_i(d),\qquad 0\le k\le s_d,\\&#10;1\le j_1\le\cdots\le j_k\le n_{g,d}\quad(k\ge1),\\&#10;N_{g,d}=\sum_{k=0}^{s_d}\binom{n_{g,d}+k-1}{k}&#10;=\binom{n_{g,d}+s_d}{s_d}\quad(n_{g,d}\ge1).&#10;\end{gathered}" width="412.2636">
-</p>
+<div align="center">
 
-An empty pool can generate only the zero-addition combination. When 「Large portion」 is required and is absent from the dish's original tags, the webpage restricts enumeration to <img src="docs/formulas/inline-734dbe47791dbc75.svg" alt="k=s_d" width="43.8828" align="middle">. It partitions dishes into static batches and uses at most 8 Web Workers in parallel; the Python entry points use CPUs. These counts apply to filtered, deduplicated pools, with admission conditions and subsequent filters further restricting output.
+$`\displaystyle \begin{gathered} s_d=5-\sum_i b_i(d),\qquad 0\le k\le s_d,\\ 1\le j_1\le\cdots\le j_k\le n_{g,d}\quad(k\ge1),\\ N_{g,d}=\sum_{k=0}^{s_d}\binom{n_{g,d}+k-1}{k} =\binom{n_{g,d}+s_d}{s_d}\quad(n_{g,d}\ge1). \end{gathered}`$
+
+</div>
+
+An empty pool can generate only the zero-addition combination. When 「Large portion」 is required and is absent from the dish's original tags, the webpage restricts enumeration to $`k=s_d`$. It partitions dishes into static batches and uses at most 8 Web Workers in parallel; the Python entry points use CPUs. These counts apply to filtered, deduplicated pools, with admission conditions and subsequent filters further restricting output.
 
 </details>
 
 ### 3.2 The liked-match estimate in Python DFS
 
-The original Python code estimates the liked matches that remaining slots can provide and terminates branches with insufficient estimates. Let <img src="docs/formulas/inline-bc1bf7e9df8b9082.svg" alt="T_0(d)" width="35.7504" align="middle"> contain the dish, cookware, and price tags before overrides and trends; <img src="docs/formulas/inline-2cab91b0f1920ffd.svg" alt="\delta_\ell" width="12.6641" align="middle"> is the direct liked-tag count of ingredient <img src="docs/formulas/inline-22c961502fecff1e.svg" alt="\ell" width="8.0732" align="middle">, and <img src="docs/formulas/inline-26762c18d22c59e5.svg" alt="\Delta_j" width="18.6623" align="middle"> is the largest increment available from index <img src="docs/formulas/inline-50a8852bc2f69c06.svg" alt="j" width="8.4399" align="middle"> onward:
+The original Python code estimates the liked matches that remaining slots can provide and terminates branches with insufficient estimates. Let $`T_0(d)`$ contain the dish, cookware, and price tags before overrides and trends; $`\delta_\ell`$ is the direct liked-tag count of ingredient $`\ell`$, and $`\Delta_j`$ is the largest increment available from index $`j`$ onward:
 
-<p align="center">
-<img src="docs/formulas/block-13ff7604ff0da4e5.svg" alt="\begin{gathered}&#10;\beta_{g,d}=&#124;T_0(d)\cap\mathcal L_g&#124;&#10;+\eta_{\mathrm{large}}+\eta_{\mathrm L}+\eta_{\mathrm D},\\&#10;\delta_\ell=&#124;T(i_\ell)\cap\mathcal L_g&#124;,\qquad&#10;\Delta_j=\max_{\ell\ge j}\delta_\ell.&#10;\end{gathered}" width="283.8410">
-</p>
+```math
+\begin{gathered}
+\beta_{g,d}=|T_0(d)\cap\mathcal L_g|
++\eta_{\mathrm{large}}+\eta_{\mathrm L}+\eta_{\mathrm D},\\
+\delta_\ell=|T(i_\ell)\cap\mathcal L_g|,\qquad
+\Delta_j=\max_{\ell\ge j}\delta_\ell.
+\end{gathered}
+```
 
-Set <img src="docs/formulas/inline-bb4cdc4386aafe88.svg" alt="\Delta_{n_{g,d}+1}=0" width="78.2926" align="middle"> for the empty suffix. Each of the three <img src="docs/formulas/inline-d34bfbda68261584.svg" alt="\eta" width="9.2687" align="middle"> terms equals 1 when its condition holds and 0 otherwise: the large-portion term requires the guest to like 「Large portion」 and free slots to remain; each trend term requires the guest to like that trend tag and a direct base or enumerated-ingredient tag to match its anchors. State <img src="docs/formulas/inline-d031e81a387373b4.svg" alt="(j,r,\gamma)" width="47.0372" align="middle"> records the next minimum index, the remaining unit count, and the accumulated estimate. Initially, <img src="docs/formulas/inline-bd3bcf23f4a3f40c.svg" alt="\gamma=\beta_{g,d}" width="55.1171" align="middle">; choosing <img src="docs/formulas/inline-4c8a07938ccb7d1a.svg" alt="\ell\ge j" width="35.8284" align="middle"> gives state <img src="docs/formulas/inline-aea9b582971104ff.svg" alt="(\ell,r-1,\gamma+\delta_\ell)" width="106.6668" align="middle">.
+Set $`\Delta_{n_{g,d}+1}=0`$ for the empty suffix. Each of the three $`\eta`$ terms equals 1 when its condition holds and 0 otherwise: the large-portion term requires the guest to like 「Large portion」 and free slots to remain; each trend term requires the guest to like that trend tag and a direct base or enumerated-ingredient tag to match its anchors. State $`(j,r,\gamma)`$ records the next minimum index, the remaining unit count, and the accumulated estimate. Initially, $`\gamma=\beta_{g,d}`$; choosing $`\ell\ge j`$ gives state $`(\ell,r-1,\gamma+\delta_\ell)`$.
 
-<p align="center">
-<img src="docs/formulas/block-a5218bd9a63d567d.svg" alt="B(j,r,\gamma)=\gamma+r\Delta_j,\qquad&#10;B(j,r,\gamma) &lt; S_{\min}\ \Longrightarrow\ \text{prune}." width="420.0765">
-</p>
+```math
+B(j,r,\gamma)=\gamma+r\Delta_j,\qquad
+B(j,r,\gamma) < S_{\min}\ \Longrightarrow\ \text{prune}.
+```
 
-The dish-level precheck uses <img src="docs/formulas/inline-b9874d8a56035ab3.svg" alt="\beta_{g,d}+s_d\Delta_1" width="76.5525" align="middle">. This estimate counts repeated liked tags and ignores dislike penalties. It is a safe upper bound when its initial terms and increments cover every possible newly acquired like. The original trend-reachability check uses only direct tags and can miss a trend triggered by 「Large portion」 generated when all five slots are filled. Relevant-ingredient filtering and the cutoff of at most three neutral fillers also limit the candidate scope. At each leaf, final tags are recalculated and checked for dislikes and the minimum score; details appear in the [optimization model and algorithm boundaries (Chinese)](docs/design.md).
+The dish-level precheck uses $`\beta_{g,d}+s_d\Delta_1`$. This estimate counts repeated liked tags and ignores dislike penalties. It is a safe upper bound when its initial terms and increments cover every possible newly acquired like. The original trend-reachability check uses only direct tags and can miss a trend triggered by 「Large portion」 generated when all five slots are filled. Relevant-ingredient filtering and the cutoff of at most three neutral fillers also limit the candidate scope. At each leaf, final tags are recalculated and checked for dislikes and the minimum score; details appear in the [optimization model and algorithm boundaries (Chinese)](docs/design.md).
 
 
 #### Ingredient-count bounds after reaching capped utility
 
-The first objective of `cover3` is at most 3. Let <img src="docs/formulas/inline-2990c04ca0168488.svg" alt="q" width="8.4080" align="middle"> be an admitted incumbent plan, using the maximization-oriented objective vector <img src="docs/formulas/inline-b6e85818fa3f4eba.svg" alt="\mathbf f_g" width="12.1712" align="middle"> defined in this chapter. Once its utility reaches the cap, any plan using more ingredients is worse in lexicographic order:
+The first objective of `cover3` is at most 3. Let $`q`$ be an admitted incumbent plan, using the maximization-oriented objective vector $`\mathbf f_g`$ defined in this chapter. Once its utility reaches the cap, any plan using more ingredients is worse in lexicographic order:
 
-<p align="center">
-<img src="docs/formulas/block-5758ec908006950e.svg" alt="U(H_g^{\mathrm L}(q))=3,\quad C(p)&gt;C(q)&#10;\quad\Longrightarrow\quad&#10;\mathbf f_g(q)&gt;_{\mathrm{lex}}\mathbf f_g(p)." width="417.4963">
-</p>
+```math
+U(H_g^{\mathrm L}(q))=3,\quad C(p)>C(q)
+\quad\Longrightarrow\quad
+\mathbf f_g(q)>_{\mathrm{lex}}\mathbf f_g(p).
+```
 
-Search therefore retains branches satisfying <img src="docs/formulas/inline-3acce82c75333223.svg" alt="C(p)\le C(q)" width="85.1097" align="middle">. Candidates with equal ingredient counts are still fully compared by minimum supply slack, selling price, dish name, and additions string, with the original floating-point comparisons. This bound reduces search visits; feasibility and objective definitions remain those of Chapter 1.
+Search therefore retains branches satisfying $`C(p)\le C(q)`$. Candidates with equal ingredient counts are still fully compared by minimum supply slack, selling price, dish name, and additions string, with the original floating-point comparisons. This bound reduces search visits; feasibility and objective definitions remain those of Chapter 1.
 
 The bound operates at two levels:
 
@@ -1331,133 +1544,162 @@ The bound operates at two levels:
 This optimization applies to the four `singlePLAN_cover3*` entries. The candidate-pool function still returns the full original pool by default; uncapped `singlePLAN` and historical `detailedPLAN` retain their search methods. Inputs with duplicate dish names or ingredient names containing multiset-key delimiters use enumeration without this bound, preserving existing cache behavior. Python remains sequential on the CPU; the bound requires neither a GPU nor multiprocessing.
 
 <details>
-<summary><strong>v1.0.0 · Initial Release — Section 3.2 in full</strong></summary>
-
-Original text: [v1.0.0](https://github.com/Mingcode123/Mystia-Menu-Optimizer/blob/v1.0.0/README.md)
+<summary><strong>Click to expand the full text — v1.0.0 · Initial Release, Section 3.2</strong></summary>
 
 ### 3.2 The liked-match estimate in Python DFS
 
-The original Python code estimates the liked matches that remaining slots can provide and terminates branches with insufficient estimates. Let <img src="docs/formulas/inline-bc1bf7e9df8b9082.svg" alt="T_0(d)" width="35.7504" align="middle"> contain the dish, cookware, and price tags before overrides and trends; <img src="docs/formulas/inline-2cab91b0f1920ffd.svg" alt="\delta_\ell" width="12.6641" align="middle"> is the direct liked-tag count of ingredient <img src="docs/formulas/inline-22c961502fecff1e.svg" alt="\ell" width="8.0732" align="middle">, and <img src="docs/formulas/inline-26762c18d22c59e5.svg" alt="\Delta_j" width="18.6623" align="middle"> is the largest increment available from index <img src="docs/formulas/inline-50a8852bc2f69c06.svg" alt="j" width="8.4399" align="middle"> onward:
+The original Python code estimates the liked matches that remaining slots can provide and terminates branches with insufficient estimates. Let $`T_0(d)`$ contain the dish, cookware, and price tags before overrides and trends; $`\delta_\ell`$ is the direct liked-tag count of ingredient $`\ell`$, and $`\Delta_j`$ is the largest increment available from index $`j`$ onward:
 
-<p align="center">
-<img src="docs/formulas/block-13ff7604ff0da4e5.svg" alt="\begin{gathered}&#10;\beta_{g,d}=&#124;T_0(d)\cap\mathcal L_g&#124;&#10;+\eta_{\mathrm{large}}+\eta_{\mathrm L}+\eta_{\mathrm D},\\&#10;\delta_\ell=&#124;T(i_\ell)\cap\mathcal L_g&#124;,\qquad&#10;\Delta_j=\max_{\ell\ge j}\delta_\ell.&#10;\end{gathered}" width="283.8410">
-</p>
+<div align="center">
 
-Set <img src="docs/formulas/inline-bb4cdc4386aafe88.svg" alt="\Delta_{n_{g,d}+1}=0" width="78.2926" align="middle"> for the empty suffix. Each of the three <img src="docs/formulas/inline-d34bfbda68261584.svg" alt="\eta" width="9.2687" align="middle"> terms equals 1 when its condition holds and 0 otherwise: the large-portion term requires the guest to like 「Large portion」 and free slots to remain; each trend term requires the guest to like that trend tag and a direct base or enumerated-ingredient tag to match its anchors. State <img src="docs/formulas/inline-d031e81a387373b4.svg" alt="(j,r,\gamma)" width="47.0372" align="middle"> records the next minimum index, the remaining unit count, and the accumulated estimate. Initially, <img src="docs/formulas/inline-bd3bcf23f4a3f40c.svg" alt="\gamma=\beta_{g,d}" width="55.1171" align="middle">; choosing <img src="docs/formulas/inline-4c8a07938ccb7d1a.svg" alt="\ell\ge j" width="35.8284" align="middle"> gives state <img src="docs/formulas/inline-aea9b582971104ff.svg" alt="(\ell,r-1,\gamma+\delta_\ell)" width="106.6668" align="middle">.
+$`\displaystyle \begin{gathered} \beta_{g,d}=|T_0(d)\cap\mathcal L_g| +\eta_{\mathrm{large}}+\eta_{\mathrm L}+\eta_{\mathrm D},\\ \delta_\ell=|T(i_\ell)\cap\mathcal L_g|,\qquad \Delta_j=\max_{\ell\ge j}\delta_\ell. \end{gathered}`$
 
-<p align="center">
-<img src="docs/formulas/block-a5218bd9a63d567d.svg" alt="B(j,r,\gamma)=\gamma+r\Delta_j,\qquad&#10;B(j,r,\gamma) &lt; S_{\min}\ \Longrightarrow\ \text{prune}." width="420.0765">
-</p>
+</div>
 
-The dish-level precheck uses <img src="docs/formulas/inline-b9874d8a56035ab3.svg" alt="\beta_{g,d}+s_d\Delta_1" width="76.5525" align="middle">. This estimate counts repeated liked tags and ignores dislike penalties. It is a safe upper bound when its initial terms and increments cover every possible newly acquired like. The original trend-reachability check uses only direct tags and can miss a trend triggered by 「Large portion」 generated when all five slots are filled. Relevant-ingredient filtering and the cutoff of at most three neutral fillers also limit the candidate scope. At each leaf, final tags are recalculated and checked for dislikes and the minimum score; details appear in the [optimization model and algorithm boundaries (Chinese)](docs/design.md).
+Set $`\Delta_{n_{g,d}+1}=0`$ for the empty suffix. Each of the three $`\eta`$ terms equals 1 when its condition holds and 0 otherwise: the large-portion term requires the guest to like 「Large portion」 and free slots to remain; each trend term requires the guest to like that trend tag and a direct base or enumerated-ingredient tag to match its anchors. State $`(j,r,\gamma)`$ records the next minimum index, the remaining unit count, and the accumulated estimate. Initially, $`\gamma=\beta_{g,d}`$; choosing $`\ell\ge j`$ gives state $`(\ell,r-1,\gamma+\delta_\ell)`$.
+
+<div align="center">
+
+$`\displaystyle B(j,r,\gamma)=\gamma+r\Delta_j,\qquad B(j,r,\gamma) < S_{\min}\ \Longrightarrow\ \text{prune}.`$
+
+</div>
+
+The dish-level precheck uses $`\beta_{g,d}+s_d\Delta_1`$. This estimate counts repeated liked tags and ignores dislike penalties. It is a safe upper bound when its initial terms and increments cover every possible newly acquired like. The original trend-reachability check uses only direct tags and can miss a trend triggered by 「Large portion」 generated when all five slots are filled. Relevant-ingredient filtering and the cutoff of at most three neutral fillers also limit the candidate scope. At each leaf, final tags are recalculated and checked for dislikes and the minimum score; details appear in the [optimization model and algorithm boundaries (Chinese)](docs/design.md).
 
 </details>
 
 ### 3.3 Dominance filtering and lexicographic selection for one guest
 
-The single-guest `plan_for_guest` function caches the criteria of generated candidates, maintains a nondominated frontier, and selects the best plan. Writing all three criteria in the maximization direction, candidate <img src="docs/formulas/inline-d5a226cb51f40ca0.svg" alt="a" width="9.0934" align="middle"> dominates <img src="docs/formulas/inline-7f39b76d05760509.svg" alt="b" width="7.7066" align="middle"> when:
+The single-guest `plan_for_guest` function caches the criteria of generated candidates, maintains a nondominated frontier, and selects the best plan. Writing all three criteria in the maximization direction, candidate $`a`$ dominates $`b`$ when:
 
-<p align="center">
-<img src="docs/formulas/block-fc88618d360310a6.svg" alt="\begin{gathered}&#10;\mathbf f_g(p)=\left(U(H_g^{\mathrm L}(p)),-C(p),R(p)\right),\\&#10;f_{g,j}(a)\ge f_{g,j}(b)\quad(j=1,2,3),\qquad&#10;\exists j:\ f_{g,j}(a)&gt;f_{g,j}(b).&#10;\end{gathered}" width="428.9967">
-</p>
+```math
+\begin{gathered}
+\mathbf f_g(p)=\left(U(H_g^{\mathrm L}(p)),-C(p),R(p)\right),\\
+f_{g,j}(a)\ge f_{g,j}(b)\quad(j=1,2,3),\qquad
+\exists j:\ f_{g,j}(a)>f_{g,j}(b).
+\end{gathered}
+```
 
-Here <img src="docs/formulas/inline-c49ffcc77d0b1f91.svg" alt="f_{g,j}" width="22.1601" align="middle"> is component <img src="docs/formulas/inline-50a8852bc2f69c06.svg" alt="j" width="8.4399" align="middle"> of the objective vector. A dominated candidate has a strictly worse lexicographic objective and can therefore be removed within the retained candidate set. Uncapped `singlePLAN` uses <img src="docs/formulas/inline-683063808c74c381.svg" alt="H_g^{\mathrm L}(p)" width="41.5443" align="middle"> in place of <img src="docs/formulas/inline-8d460ad04c6bb409.svg" alt="U(H_g^{\mathrm L}(p))" width="65.5985" align="middle">. Define <img src="docs/formulas/inline-b5ae851d0372a9a1.svg" alt="\mathrm{best}_g(\mathcal P)" width="59.2030" align="middle"> to select a plan from nonempty candidate set <img src="docs/formulas/inline-72710a3bd2befae5.svg" alt="\mathcal P" width="13.3494" align="middle"> by <img src="docs/formulas/inline-b6e85818fa3f4eba.svg" alt="\mathbf f_g" width="12.1712" align="middle">. If all three criteria tie, it compares selling price in descending order, then dish name and addition string in ascending order. The normal `nCookware` path scans candidates directly to retain the best per cookware type, without constructing this Pareto frontier.
+Here $`f_{g,j}`$ is component $`j`$ of the objective vector. A dominated candidate has a strictly worse lexicographic objective and can therefore be removed within the retained candidate set. Uncapped `singlePLAN` uses $`H_g^{\mathrm L}(p)`$ in place of $`U(H_g^{\mathrm L}(p))`$. Define $`\mathrm{best}_g(\mathcal P)`$ to select a plan from nonempty candidate set $`\mathcal P`$ by $`\mathbf f_g`$. If all three criteria tie, it compares selling price in descending order, then dish name and addition string in ascending order. The normal `nCookware` path scans candidates directly to retain the best per cookware type, without constructing this Pareto frontier.
 
 <details>
-<summary><strong>v1.0.0 · Initial Release — Section 3.3 in full</strong></summary>
-
-Original text: [v1.0.0](https://github.com/Mingcode123/Mystia-Menu-Optimizer/blob/v1.0.0/README.md)
+<summary><strong>Click to expand the full text — v1.0.0 · Initial Release, Section 3.3</strong></summary>
 
 ### 3.3 Dominance filtering and lexicographic selection for one guest
 
-The single-guest `plan_for_guest` function caches the criteria of generated candidates, maintains a nondominated frontier, and selects the best plan. Writing all three criteria in the maximization direction, candidate <img src="docs/formulas/inline-d5a226cb51f40ca0.svg" alt="a" width="9.0934" align="middle"> dominates <img src="docs/formulas/inline-7f39b76d05760509.svg" alt="b" width="7.7066" align="middle"> when:
+The single-guest `plan_for_guest` function caches the criteria of generated candidates, maintains a nondominated frontier, and selects the best plan. Writing all three criteria in the maximization direction, candidate $`a`$ dominates $`b`$ when:
 
-<p align="center">
-<img src="docs/formulas/block-fc88618d360310a6.svg" alt="\begin{gathered}&#10;\mathbf f_g(p)=\left(U(H_g^{\mathrm L}(p)),-C(p),R(p)\right),\\&#10;f_{g,j}(a)\ge f_{g,j}(b)\quad(j=1,2,3),\qquad&#10;\exists j:\ f_{g,j}(a)&gt;f_{g,j}(b).&#10;\end{gathered}" width="428.9967">
-</p>
+<div align="center">
 
-Here <img src="docs/formulas/inline-c49ffcc77d0b1f91.svg" alt="f_{g,j}" width="22.1601" align="middle"> is component <img src="docs/formulas/inline-50a8852bc2f69c06.svg" alt="j" width="8.4399" align="middle"> of the objective vector. A dominated candidate has a strictly worse lexicographic objective and can therefore be removed within the retained candidate set. Uncapped `singlePLAN` uses <img src="docs/formulas/inline-683063808c74c381.svg" alt="H_g^{\mathrm L}(p)" width="41.5443" align="middle"> in place of <img src="docs/formulas/inline-8d460ad04c6bb409.svg" alt="U(H_g^{\mathrm L}(p))" width="65.5985" align="middle">. Define <img src="docs/formulas/inline-b5ae851d0372a9a1.svg" alt="\mathrm{best}_g(\mathcal P)" width="59.2030" align="middle"> to select a plan from nonempty candidate set <img src="docs/formulas/inline-72710a3bd2befae5.svg" alt="\mathcal P" width="13.3494" align="middle"> by <img src="docs/formulas/inline-b6e85818fa3f4eba.svg" alt="\mathbf f_g" width="12.1712" align="middle">. If all three criteria tie, it compares selling price in descending order, then dish name and addition string in ascending order. The normal `nCookware` path scans candidates directly to retain the best per cookware type, without constructing this Pareto frontier.
+$`\displaystyle \begin{gathered} \mathbf f_g(p)=\left(U(H_g^{\mathrm L}(p)),-C(p),R(p)\right),\\ f_{g,j}(a)\ge f_{g,j}(b)\quad(j=1,2,3),\qquad \exists j:\ f_{g,j}(a)>f_{g,j}(b). \end{gathered}`$
+
+</div>
+
+Here $`f_{g,j}`$ is component $`j`$ of the objective vector. A dominated candidate has a strictly worse lexicographic objective and can therefore be removed within the retained candidate set. Uncapped `singlePLAN` uses $`H_g^{\mathrm L}(p)`$ in place of $`U(H_g^{\mathrm L}(p))`$. Define $`\mathrm{best}_g(\mathcal P)`$ to select a plan from nonempty candidate set $`\mathcal P`$ by $`\mathbf f_g`$. If all three criteria tie, it compares selling price in descending order, then dish name and addition string in ascending order. The normal `nCookware` path scans candidates directly to retain the best per cookware type, without constructing this Pareto frontier.
 
 </details>
 
 ### 3.4 Threshold search and state reuse for the historical multiple-plan model
 
-`detailedPLAN` selects a plan for each target tag. With <img src="docs/formulas/inline-588cfc7ed9b91489.svg" alt="J_g" width="14.6810" align="middle">, <img src="docs/formulas/inline-ad9f08c85487522a.svg" alt="m_g&gt;0" width="49.7769" align="middle">, and <img src="docs/formulas/inline-d82ee76e3b804be9.svg" alt="K&gt;0" width="43.8266" align="middle"> fixed, define the order share per tag as <img src="docs/formulas/inline-c66fc6d6e450f3ea.svg" alt="\alpha=K/m_g" width="72.7127" align="middle">. One plan is selected from <img src="docs/formulas/inline-812fd16cdc7dd06d.svg" alt="\mathcal C_{g,t}" width="22.8120" align="middle"> for each tag. The first objective adds across tags, so all tied minimum-unit candidates can be retained separately for each tag:
+`detailedPLAN` selects a plan for each target tag. With $`J_g`$, $`m_g>0`$, and $`K>0`$ fixed, define the order share per tag as $`\alpha=K/m_g`$. One plan is selected from $`\mathcal C_{g,t}`$ for each tag. The first objective adds across tags, so all tied minimum-unit candidates can be retained separately for each tag:
 
-<p align="center">
-<img src="docs/formulas/block-4a782325849e0241.svg" alt="\begin{gathered}&#10;\mathcal M_{g,t}=\left\{p\in\mathcal C_{g,t}:C(p)=\min_{p&#x27;\in\mathcal C_{g,t}}C(p&#x27;)\right\},\\&#10;\min E_{\mathrm{old}}=\alpha\sum_{t\in J_g}\min_{p\in\mathcal C_{g,t}}C(p).&#10;\end{gathered}" width="309.4519">
-</p>
+```math
+\begin{gathered}
+\mathcal M_{g,t}=\left\{p\in\mathcal C_{g,t}:C(p)=\min_{p'\in\mathcal C_{g,t}}C(p')\right\},\\
+\min E_{\mathrm{old}}=\alpha\sum_{t\in J_g}\min_{p\in\mathcal C_{g,t}}C(p).
+\end{gathered}
+```
 
-The program further merges candidates with identical total ingredient-count vectors. Plans with tied counts but different ingredients remain in the combination search because their supply effects differ. Let <img src="docs/formulas/inline-48c33c2cf59b4ee9.svg" alt="\lambda" width="9.6832" align="middle"> be the minimum daily supply-slack threshold in units/day, and define the feasibility indicator <img src="docs/formulas/inline-bffa73b097c22352.svg" alt="F_g(\lambda)\in\{0,1\}" width="95.8924" align="middle">. Select one plan from each <img src="docs/formulas/inline-68be475628a23cbc.svg" alt="\mathcal M_{g,t}" width="33.3225" align="middle">: the indicator is 1 if some combination reaches the minimum-slack threshold, and 0 otherwise. Integer ingredient counts convert a finite threshold condition into capacity bounds:
+The program further merges candidates with identical total ingredient-count vectors. Plans with tied counts but different ingredients remain in the combination search because their supply effects differ. Let $`\lambda`$ be the minimum daily supply-slack threshold in units/day, and define the feasibility indicator $`F_g(\lambda)\in\{0,1\}`$. Select one plan from each $`\mathcal M_{g,t}`$: the indicator is 1 if some combination reaches the minimum-slack threshold, and 0 otherwise. Integer ingredient counts convert a finite threshold condition into capacity bounds:
 
-<p align="center">
-<img src="docs/formulas/block-a49becf55457815c.svg" alt="\begin{gathered}&#10;u_i^{\max}(\lambda)=\left\lfloor\frac{q_i-\lambda}{\alpha}\right\rfloor,\\&#10;R_{\mathrm{old}}\ge\lambda\ \Longleftrightarrow&#10;\forall i,\ u_i=0\ \lor\ u_i\le u_i^{\max}(\lambda).&#10;\end{gathered}" width="324.8601">
-</p>
+```math
+\begin{gathered}
+u_i^{\max}(\lambda)=\left\lfloor\frac{q_i-\lambda}{\alpha}\right\rfloor,\\
+R_{\mathrm{old}}\ge\lambda\ \Longleftrightarrow
+\forall i,\ u_i=0\ \lor\ u_i\le u_i^{\max}(\lambda).
+\end{gathered}
+```
 
-Capacity bounds apply only to used ingredients. Lowering <img src="docs/formulas/inline-48c33c2cf59b4ee9.svg" alt="\lambda" width="9.6832" align="middle"> relaxes every capacity, so <img src="docs/formulas/inline-ccadd96dea0ee8d4.svg" alt="\lambda_1\le\lambda_2" width="51.9968" align="middle"> implies <img src="docs/formulas/inline-1a6230116b31441d.svg" alt="F_g(\lambda_2)=1\Rightarrow F_g(\lambda_1)=1" width="170.5447" align="middle">. Let <img src="docs/formulas/inline-e51908ce7c3999df.svg" alt="\mathcal I_g" width="16.3757" align="middle"> contain ingredients that can occur in retained candidates. The five-unit limit per plan gives <img src="docs/formulas/inline-dc6baff3101d7702.svg" alt="u_i\le5m_g" width="62.9845" align="middle">, allowing minimum slack to be searched on a finite grid:
+Capacity bounds apply only to used ingredients. Lowering $`\lambda`$ relaxes every capacity, so $`\lambda_1\le\lambda_2`$ implies $`F_g(\lambda_2)=1\Rightarrow F_g(\lambda_1)=1`$. Let $`\mathcal I_g`$ contain ingredients that can occur in retained candidates. The five-unit limit per plan gives $`u_i\le5m_g`$, allowing minimum slack to be searched on a finite grid:
 
-<p align="center">
-<img src="docs/formulas/block-ff3a249ec1aa0ba4.svg" alt="\begin{gathered}&#10;\Lambda_g=\{-\infty\}\cup\{q_i-\alpha u:i\in\mathcal I_g,\ u=0,\ldots,5m_g\},\\&#10;\lambda^\star=\max\{\lambda\in\Lambda_g:F_g(\lambda)=1\}.&#10;\end{gathered}" width="378.3718">
-</p>
+```math
+\begin{gathered}
+\Lambda_g=\{-\infty\}\cup\{q_i-\alpha u:i\in\mathcal I_g,\ u=0,\ldots,5m_g\},\\
+\lambda^\star=\max\{\lambda\in\Lambda_g:F_g(\lambda)=1\}.
+\end{gathered}
+```
 
-The outer binary search locates the highest feasible threshold. The code rounds grid values to 10 decimal places and computes capacities with <img src="docs/formulas/inline-a5b5de063ba82109.svg" alt="\lfloor(q_i-\lambda)/\alpha+10^{-12}\rfloor" width="136.1564" align="middle">; <img src="docs/formulas/inline-cd0bfef9b6393790.svg" alt="-\infty" width="28.1225" align="middle"> is the sentinel for unrestricted capacity. The equivalences above use exact arithmetic, while the original implementation's boundary decisions also reflect these floating-point operations.
+The outer binary search locates the highest feasible threshold. The code rounds grid values to 10 decimal places and computes capacities with $`\lfloor(q_i-\lambda)/\alpha+10^{-12}\rfloor`$; $`-\infty`$ is the sentinel for unrestricted capacity. The equivalences above use exact arithmetic, while the original implementation's boundary decisions also reflect these floating-point operations.
 
-Each threshold test first removes candidates that individually exceed capacity, then orders the tags in <img src="docs/formulas/inline-588cfc7ed9b91489.svg" alt="J_g" width="14.6810" align="middle"> as <img src="docs/formulas/inline-6c693300b1a7599e.svg" alt="t_1,\ldots,t_{m_g}" width="68.7309" align="middle"> by increasing candidate count. DFS state <img src="docs/formulas/inline-8739471be97f9f7f.svg" alt="(r,\mathbf u)" width="34.5578" align="middle"> records the first <img src="docs/formulas/inline-a9c2e4547c717024.svg" alt="r" width="8.3601" align="middle"> processed tags and their accumulated ingredient counts. Writing <img src="docs/formulas/inline-4efe046f5d4d8732.svg" alt="\mathbf c(p)=(c_i(p))_i" width="97.0395" align="middle">, choosing a plan for the next tag gives:
+Each threshold test first removes candidates that individually exceed capacity, then orders the tags in $`J_g`$ as $`t_1,\ldots,t_{m_g}`$ by increasing candidate count. DFS state $`(r,\mathbf u)`$ records the first $`r`$ processed tags and their accumulated ingredient counts. Writing $`\mathbf c(p)=(c_i(p))_i`$, choosing a plan for the next tag gives:
 
-<p align="center">
-<img src="docs/formulas/block-0c5d2bf7aadb6aae.svg" alt="(r,\mathbf u)\longrightarrow(r+1,\mathbf u+\mathbf c(p))." width="207.1547">
-</p>
+```math
+(r,\mathbf u)\longrightarrow(r+1,\mathbf u+\mathbf c(p)).
+```
 
 A branch is pruned as soon as any used ingredient exceeds capacity; nonnegative counts ensure later choices cannot remove the excess. Identical states have identical remaining problems, so the program caches feasibility, with a separate cache for each threshold. Binary search reduces the number of threshold tests; each test still contains a combinatorial search.
 
-After finding <img src="docs/formulas/inline-356bbf2806c1845f.svg" alt="\lambda^\star" width="15.7220" align="middle">, the program further maximizes the complete ascending slack vector of used ingredients under those capacities. Let <img src="docs/formulas/inline-53c123900675a47f.svg" alt="\boldsymbol\Phi(r,\mathbf u)" width="48.0831" align="middle"> be the best terminal vector reachable from the state; a state with no feasible successor is marked infeasible. The following maximum considers only capacity-compliant transitions:
+After finding $`\lambda^\star`$, the program further maximizes the complete ascending slack vector of used ingredients under those capacities. Let $`\boldsymbol\Phi(r,\mathbf u)`$ be the best terminal vector reachable from the state; a state with no feasible successor is marked infeasible. The following maximum considers only capacity-compliant transitions:
 
-<p align="center">
-<img src="docs/formulas/block-7aeed27fff61b76d.svg" alt="\begin{gathered}&#10;\boldsymbol\rho(\mathbf u)=\mathrm{sort}_{\uparrow}\big((q_i-\alpha u_i)_{i:u_i&gt;0}\big),\\&#10;\boldsymbol\Phi(m_g,\mathbf u)=\boldsymbol\rho(\mathbf u),\\&#10;\boldsymbol\Phi(r,\mathbf u)=\max_{p\in\mathcal M_{g,t_{r+1}}}^{\mathrm{lex}}&#10;\boldsymbol\Phi(r+1,\mathbf u+\mathbf c(p)).&#10;\end{gathered}" width="289.3349">
-</p>
+```math
+\begin{gathered}
+\boldsymbol\rho(\mathbf u)=\mathrm{sort}_{\uparrow}\big((q_i-\alpha u_i)_{i:u_i>0}\big),\\
+\boldsymbol\Phi(m_g,\mathbf u)=\boldsymbol\rho(\mathbf u),\\
+\boldsymbol\Phi(r,\mathbf u)=\max_{p\in\mathcal M_{g,t_{r+1}}}^{\mathrm{lex}}
+\boldsymbol\Phi(r+1,\mathbf u+\mathbf c(p)).
+\end{gathered}
+```
 
 Each used ingredient type contributes one component. The program caches the best vector, then reconstructs the first combination attaining it in a fixed candidate order. Variable-length vectors follow Python tuple comparison: the larger first differing component wins; when one is a complete prefix of the other, the longer vector wins. The cached state set can still grow substantially. This historical threshold-search route is not called by the normal `nCookware` workflow.
 
 <details>
-<summary><strong>v1.0.0 · Initial Release — Section 3.4 in full</strong></summary>
-
-Original text: [v1.0.0](https://github.com/Mingcode123/Mystia-Menu-Optimizer/blob/v1.0.0/README.md)
+<summary><strong>Click to expand the full text — v1.0.0 · Initial Release, Section 3.4</strong></summary>
 
 ### 3.4 Threshold search and state reuse for the historical multiple-plan model
 
-`detailedPLAN` selects a plan for each target tag. With <img src="docs/formulas/inline-588cfc7ed9b91489.svg" alt="J_g" width="14.6810" align="middle">, <img src="docs/formulas/inline-ad9f08c85487522a.svg" alt="m_g&gt;0" width="49.7769" align="middle">, and <img src="docs/formulas/inline-d82ee76e3b804be9.svg" alt="K&gt;0" width="43.8266" align="middle"> fixed, define the order share per tag as <img src="docs/formulas/inline-c66fc6d6e450f3ea.svg" alt="\alpha=K/m_g" width="72.7127" align="middle">. One plan is selected from <img src="docs/formulas/inline-812fd16cdc7dd06d.svg" alt="\mathcal C_{g,t}" width="22.8120" align="middle"> for each tag. The first objective adds across tags, so all tied minimum-unit candidates can be retained separately for each tag:
+`detailedPLAN` selects a plan for each target tag. With $`J_g`$, $`m_g>0`$, and $`K>0`$ fixed, define the order share per tag as $`\alpha=K/m_g`$. One plan is selected from $`\mathcal C_{g,t}`$ for each tag. The first objective adds across tags, so all tied minimum-unit candidates can be retained separately for each tag:
 
-<p align="center">
-<img src="docs/formulas/block-4a782325849e0241.svg" alt="\begin{gathered}&#10;\mathcal M_{g,t}=\left\{p\in\mathcal C_{g,t}:C(p)=\min_{p&#x27;\in\mathcal C_{g,t}}C(p&#x27;)\right\},\\&#10;\min E_{\mathrm{old}}=\alpha\sum_{t\in J_g}\min_{p\in\mathcal C_{g,t}}C(p).&#10;\end{gathered}" width="309.4519">
-</p>
+<div align="center">
 
-The program further merges candidates with identical total ingredient-count vectors. Plans with tied counts but different ingredients remain in the combination search because their supply effects differ. Let <img src="docs/formulas/inline-48c33c2cf59b4ee9.svg" alt="\lambda" width="9.6832" align="middle"> be the minimum daily supply-slack threshold in units/day, and define the feasibility indicator <img src="docs/formulas/inline-bffa73b097c22352.svg" alt="F_g(\lambda)\in\{0,1\}" width="95.8924" align="middle">. Select one plan from each <img src="docs/formulas/inline-68be475628a23cbc.svg" alt="\mathcal M_{g,t}" width="33.3225" align="middle">: the indicator is 1 if some combination reaches the minimum-slack threshold, and 0 otherwise. Integer ingredient counts convert a finite threshold condition into capacity bounds:
+$`\displaystyle \begin{gathered} \mathcal M_{g,t}=\left\{p\in\mathcal C_{g,t}:C(p)=\min_{p'\in\mathcal C_{g,t}}C(p')\right\},\\ \min E_{\mathrm{old}}=\alpha\sum_{t\in J_g}\min_{p\in\mathcal C_{g,t}}C(p). \end{gathered}`$
 
-<p align="center">
-<img src="docs/formulas/block-a49becf55457815c.svg" alt="\begin{gathered}&#10;u_i^{\max}(\lambda)=\left\lfloor\frac{q_i-\lambda}{\alpha}\right\rfloor,\\&#10;R_{\mathrm{old}}\ge\lambda\ \Longleftrightarrow&#10;\forall i,\ u_i=0\ \lor\ u_i\le u_i^{\max}(\lambda).&#10;\end{gathered}" width="324.8601">
-</p>
+</div>
 
-Capacity bounds apply only to used ingredients. Lowering <img src="docs/formulas/inline-48c33c2cf59b4ee9.svg" alt="\lambda" width="9.6832" align="middle"> relaxes every capacity, so <img src="docs/formulas/inline-ccadd96dea0ee8d4.svg" alt="\lambda_1\le\lambda_2" width="51.9968" align="middle"> implies <img src="docs/formulas/inline-1a6230116b31441d.svg" alt="F_g(\lambda_2)=1\Rightarrow F_g(\lambda_1)=1" width="170.5447" align="middle">. Let <img src="docs/formulas/inline-e51908ce7c3999df.svg" alt="\mathcal I_g" width="16.3757" align="middle"> contain ingredients that can occur in retained candidates. The five-unit limit per plan gives <img src="docs/formulas/inline-dc6baff3101d7702.svg" alt="u_i\le5m_g" width="62.9845" align="middle">, allowing minimum slack to be searched on a finite grid:
+The program further merges candidates with identical total ingredient-count vectors. Plans with tied counts but different ingredients remain in the combination search because their supply effects differ. Let $`\lambda`$ be the minimum daily supply-slack threshold in units/day, and define the feasibility indicator $`F_g(\lambda)\in\{0,1\}`$. Select one plan from each $`\mathcal M_{g,t}`$: the indicator is 1 if some combination reaches the minimum-slack threshold, and 0 otherwise. Integer ingredient counts convert a finite threshold condition into capacity bounds:
 
-<p align="center">
-<img src="docs/formulas/block-ff3a249ec1aa0ba4.svg" alt="\begin{gathered}&#10;\Lambda_g=\{-\infty\}\cup\{q_i-\alpha u:i\in\mathcal I_g,\ u=0,\ldots,5m_g\},\\&#10;\lambda^\star=\max\{\lambda\in\Lambda_g:F_g(\lambda)=1\}.&#10;\end{gathered}" width="378.3718">
-</p>
+<div align="center">
 
-The outer binary search locates the highest feasible threshold. The code rounds grid values to 10 decimal places and computes capacities with <img src="docs/formulas/inline-a5b5de063ba82109.svg" alt="\lfloor(q_i-\lambda)/\alpha+10^{-12}\rfloor" width="136.1564" align="middle">; <img src="docs/formulas/inline-cd0bfef9b6393790.svg" alt="-\infty" width="28.1225" align="middle"> is the sentinel for unrestricted capacity. The equivalences above use exact arithmetic, while the original implementation's boundary decisions also reflect these floating-point operations.
+$`\displaystyle \begin{gathered} u_i^{\max}(\lambda)=\left\lfloor\frac{q_i-\lambda}{\alpha}\right\rfloor,\\ R_{\mathrm{old}}\ge\lambda\ \Longleftrightarrow \forall i,\ u_i=0\ \lor\ u_i\le u_i^{\max}(\lambda). \end{gathered}`$
 
-Each threshold test first removes candidates that individually exceed capacity, then orders the tags in <img src="docs/formulas/inline-588cfc7ed9b91489.svg" alt="J_g" width="14.6810" align="middle"> as <img src="docs/formulas/inline-6c693300b1a7599e.svg" alt="t_1,\ldots,t_{m_g}" width="68.7309" align="middle"> by increasing candidate count. DFS state <img src="docs/formulas/inline-8739471be97f9f7f.svg" alt="(r,\mathbf u)" width="34.5578" align="middle"> records the first <img src="docs/formulas/inline-a9c2e4547c717024.svg" alt="r" width="8.3601" align="middle"> processed tags and their accumulated ingredient counts. Writing <img src="docs/formulas/inline-4efe046f5d4d8732.svg" alt="\mathbf c(p)=(c_i(p))_i" width="97.0395" align="middle">, choosing a plan for the next tag gives:
+</div>
 
-<p align="center">
-<img src="docs/formulas/block-0c5d2bf7aadb6aae.svg" alt="(r,\mathbf u)\longrightarrow(r+1,\mathbf u+\mathbf c(p))." width="207.1547">
-</p>
+Capacity bounds apply only to used ingredients. Lowering $`\lambda`$ relaxes every capacity, so $`\lambda_1\le\lambda_2`$ implies $`F_g(\lambda_2)=1\Rightarrow F_g(\lambda_1)=1`$. Let $`\mathcal I_g`$ contain ingredients that can occur in retained candidates. The five-unit limit per plan gives $`u_i\le5m_g`$, allowing minimum slack to be searched on a finite grid:
+
+<div align="center">
+
+$`\displaystyle \begin{gathered} \Lambda_g=\{-\infty\}\cup\{q_i-\alpha u:i\in\mathcal I_g,\ u=0,\ldots,5m_g\},\\ \lambda^\star=\max\{\lambda\in\Lambda_g:F_g(\lambda)=1\}. \end{gathered}`$
+
+</div>
+
+The outer binary search locates the highest feasible threshold. The code rounds grid values to 10 decimal places and computes capacities with $`\lfloor(q_i-\lambda)/\alpha+10^{-12}\rfloor`$; $`-\infty`$ is the sentinel for unrestricted capacity. The equivalences above use exact arithmetic, while the original implementation's boundary decisions also reflect these floating-point operations.
+
+Each threshold test first removes candidates that individually exceed capacity, then orders the tags in $`J_g`$ as $`t_1,\ldots,t_{m_g}`$ by increasing candidate count. DFS state $`(r,\mathbf u)`$ records the first $`r`$ processed tags and their accumulated ingredient counts. Writing $`\mathbf c(p)=(c_i(p))_i`$, choosing a plan for the next tag gives:
+
+<div align="center">
+
+$`\displaystyle (r,\mathbf u)\longrightarrow(r+1,\mathbf u+\mathbf c(p)).`$
+
+</div>
 
 A branch is pruned as soon as any used ingredient exceeds capacity; nonnegative counts ensure later choices cannot remove the excess. Identical states have identical remaining problems, so the program caches feasibility, with a separate cache for each threshold. Binary search reduces the number of threshold tests; each test still contains a combinatorial search.
 
-After finding <img src="docs/formulas/inline-356bbf2806c1845f.svg" alt="\lambda^\star" width="15.7220" align="middle">, the program further maximizes the complete ascending slack vector of used ingredients under those capacities. Let <img src="docs/formulas/inline-53c123900675a47f.svg" alt="\boldsymbol\Phi(r,\mathbf u)" width="48.0831" align="middle"> be the best terminal vector reachable from the state; a state with no feasible successor is marked infeasible. The following maximum considers only capacity-compliant transitions:
+After finding $`\lambda^\star`$, the program further maximizes the complete ascending slack vector of used ingredients under those capacities. Let $`\boldsymbol\Phi(r,\mathbf u)`$ be the best terminal vector reachable from the state; a state with no feasible successor is marked infeasible. The following maximum considers only capacity-compliant transitions:
 
-<p align="center">
-<img src="docs/formulas/block-7aeed27fff61b76d.svg" alt="\begin{gathered}&#10;\boldsymbol\rho(\mathbf u)=\mathrm{sort}_{\uparrow}\big((q_i-\alpha u_i)_{i:u_i&gt;0}\big),\\&#10;\boldsymbol\Phi(m_g,\mathbf u)=\boldsymbol\rho(\mathbf u),\\&#10;\boldsymbol\Phi(r,\mathbf u)=\max_{p\in\mathcal M_{g,t_{r+1}}}^{\mathrm{lex}}&#10;\boldsymbol\Phi(r+1,\mathbf u+\mathbf c(p)).&#10;\end{gathered}" width="289.3349">
-</p>
+<div align="center">
+
+$`\displaystyle \begin{gathered} \boldsymbol\rho(\mathbf u)=\mathrm{sort}_{\uparrow}\big((q_i-\alpha u_i)_{i:u_i>0}\big),\\ \boldsymbol\Phi(m_g,\mathbf u)=\boldsymbol\rho(\mathbf u),\\ \boldsymbol\Phi(r,\mathbf u)=\max_{p\in\mathcal M_{g,t_{r+1}}}^{\mathrm{lex}} \boldsymbol\Phi(r+1,\mathbf u+\mathbf c(p)). \end{gathered}`$
+
+</div>
 
 Each used ingredient type contributes one component. The program caches the best vector, then reconstructs the first combination attaining it in a fixed candidate order. Variable-length vectors follow Python tuple comparison: the larger first differing component wins; when one is a complete prefix of the other, the longer vector wins. The cached state set can still grow substantially. This historical threshold-search route is not called by the normal `nCookware` workflow.
 
@@ -1465,54 +1707,63 @@ Each used ingredient type contributes one component. The program caches the best
 
 ### 3.5 Precomputation and enumeration for shared cookware
 
-Shared cookware selection reuses the best candidate for each guest and cookware type. Set <img src="docs/formulas/inline-baabfefa98097bd4.svg" alt="v=\mathrm{nCookware}" width="106.1052" align="middle">. For guest <img src="docs/formulas/inline-51728216ba238792.svg" alt="g" width="9.1572" align="middle">, cookware <img src="docs/formulas/inline-797ef090e61e6c4c.svg" alt="h" width="9.6513" align="middle">, and equipment set <img src="docs/formulas/inline-fb772c3cf3597178.svg" alt="S" width="11.3091" align="middle">, use Chapter 1's equipment-restricted candidate sets and this chapter's best function. The best function is defined only for nonempty sets: only existing single-cookware results enter these expressions, and the second applies to guests with feasible plans:
+Shared cookware selection reuses the best candidate for each guest and cookware type. Set $`v=\mathrm{nCookware}`$. For guest $`g`$, cookware $`h`$, and equipment set $`S`$, use Chapter 1's equipment-restricted candidate sets and this chapter's best function. The best function is defined only for nonempty sets: only existing single-cookware results enter these expressions, and the second applies to guests with feasible plans:
 
-<p align="center">
-<img src="docs/formulas/block-5e500207d1db451d.svg" alt="\begin{gathered}&#10;p_{g,h}^{\star}=\mathrm{best}_g\left(\mathcal C_g^v(\{h\})\right),\\&#10;p_g^{\star}(S)=\mathrm{best}_g\left(\{p_{g,h}^{\star}:h\in S\}\right).&#10;\end{gathered}" width="236.2763">
-</p>
+```math
+\begin{gathered}
+p_{g,h}^{\star}=\mathrm{best}_g\left(\mathcal C_g^v(\{h\})\right),\\
+p_g^{\star}(S)=\mathrm{best}_g\left(\{p_{g,h}^{\star}:h\in S\}\right).
+\end{gathered}
+```
 
-For fixed <img src="docs/formulas/inline-fb772c3cf3597178.svg" alt="S" width="11.3091" align="middle">, plans and supply calculations are independent across guests, the missing-plan penalty for that set is constant, and each feasible guest's candidate set is the union of single-cookware sets. Selecting the best per cookware type before comparing them therefore preserves the optimal objective. Independent guest optima also attain the best aggregate objective:
+For fixed $`S`$, plans and supply calculations are independent across guests, the missing-plan penalty for that set is constant, and each feasible guest's candidate set is the union of single-cookware sets. Selecting the best per cookware type before comparing them therefore preserves the optimal objective. Independent guest optima also attain the best aggregate objective:
 
-<p align="center">
-<img src="docs/formulas/block-d0ab0774fabf7e20.svg" alt="\max_{(p_g)\in\prod_{g\in G_S}\mathcal C_g^v(S)}^{\mathrm{lex}}&#10;\sum_{g\in G_S}\mathbf f_g(p_g)&#10;=\sum_{g\in G_S}\mathbf f_g(p_g^{\star}(S))." width="323.9039">
-</p>
+```math
+\max_{(p_g)\in\prod_{g\in G_S}\mathcal C_g^v(S)}^{\mathrm{lex}}
+\sum_{g\in G_S}\mathbf f_g(p_g)
+=\sum_{g\in G_S}\mathbf f_g(p_g^{\star}(S)).
+```
 
-This decomposition requires a fixed equipment set, the retained candidate scopes, and no shared inventory or other coupling constraints across guests. For <img src="docs/formulas/inline-d9eaf2bad7755a03.svg" alt="1\le n\le&#124;H&#124;" width="81.3031" align="middle">, the outer search enumerates all <img src="docs/formulas/inline-9d134b3a5aba2f08.svg" alt="\binom{&#124;H&#124;}{n}" width="28.1114" align="middle"> sets containing exactly <img src="docs/formulas/inline-5864f80948e3fda9.svg" alt="n" width="10.4164" align="middle"> cookware types and compares them by Chapter 1's aggregate objective and missing-plan penalties. Selecting all available cookware yields one set.
+This decomposition requires a fixed equipment set, the retained candidate scopes, and no shared inventory or other coupling constraints across guests. For $`1\le n\le|H|`$, the outer search enumerates all $`\binom{|H|}{n}`$ sets containing exactly $`n`$ cookware types and compares them by Chapter 1's aggregate objective and missing-plan penalties. Selecting all available cookware yields one set.
 
-Let <img src="docs/formulas/inline-7c03f6224074fbdb.svg" alt="N_{\mathrm{cand}}" width="36.5892" align="middle"> be the total number of candidates actually returned across all guests. Treating each criterion evaluation as constant cost, comparison work after candidate generation and the size of the best table are, respectively:
+Let $`N_{\mathrm{cand}}`$ be the total number of candidates actually returned across all guests. Treating each criterion evaluation as constant cost, comparison work after candidate generation and the size of the best table are, respectively:
 
-<p align="center">
-<img src="docs/formulas/block-a5b07b9a1c99c359.svg" alt="O\left(N_{\mathrm{cand}}+\binom{&#124;H&#124;}{n}&#124;G&#124;n\right),\qquad O(&#124;G&#124;&#124;H&#124;)." width="320.4460">
-</p>
+```math
+O\left(N_{\mathrm{cand}}+\binom{|H|}{n}|G|n\right),\qquad O(|G||H|).
+```
 
 The first expression excludes candidate-generation DFS, and the second counts only the guest-by-cookware best table. Relevant-ingredient filtering, equivalence representatives, and filler cutoffs determine the actual candidate scope. Section 3.6 reports a single-machine comparison; cross-device performance has not been systematically measured. Call relationships appear in the [architecture guide (Chinese)](docs/architecture.md), with the full optimality boundaries in the [optimization model and algorithm boundaries (Chinese)](docs/design.md).
 
 <details>
-<summary><strong>v1.0.0 · Initial Release — Section 3.5 in full</strong></summary>
-
-Original text: [v1.0.0](https://github.com/Mingcode123/Mystia-Menu-Optimizer/blob/v1.0.0/README.md)
+<summary><strong>Click to expand the full text — v1.0.0 · Initial Release, Section 3.5</strong></summary>
 
 ### 3.5 Precomputation and enumeration for shared cookware
 
-Shared cookware selection reuses the best candidate for each guest and cookware type. Set <img src="docs/formulas/inline-baabfefa98097bd4.svg" alt="v=\mathrm{nCookware}" width="106.1052" align="middle">. For guest <img src="docs/formulas/inline-51728216ba238792.svg" alt="g" width="9.1572" align="middle">, cookware <img src="docs/formulas/inline-797ef090e61e6c4c.svg" alt="h" width="9.6513" align="middle">, and equipment set <img src="docs/formulas/inline-fb772c3cf3597178.svg" alt="S" width="11.3091" align="middle">, use Chapter 1's equipment-restricted candidate sets and this chapter's best function. The best function is defined only for nonempty sets: only existing single-cookware results enter these expressions, and the second applies to guests with feasible plans:
+Shared cookware selection reuses the best candidate for each guest and cookware type. Set $`v=\mathrm{nCookware}`$. For guest $`g`$, cookware $`h`$, and equipment set $`S`$, use Chapter 1's equipment-restricted candidate sets and this chapter's best function. The best function is defined only for nonempty sets: only existing single-cookware results enter these expressions, and the second applies to guests with feasible plans:
 
-<p align="center">
-<img src="docs/formulas/block-5e500207d1db451d.svg" alt="\begin{gathered}&#10;p_{g,h}^{\star}=\mathrm{best}_g\left(\mathcal C_g^v(\{h\})\right),\\&#10;p_g^{\star}(S)=\mathrm{best}_g\left(\{p_{g,h}^{\star}:h\in S\}\right).&#10;\end{gathered}" width="236.2763">
-</p>
+<div align="center">
 
-For fixed <img src="docs/formulas/inline-fb772c3cf3597178.svg" alt="S" width="11.3091" align="middle">, plans and supply calculations are independent across guests, the missing-plan penalty for that set is constant, and each feasible guest's candidate set is the union of single-cookware sets. Selecting the best per cookware type before comparing them therefore preserves the optimal objective. Independent guest optima also attain the best aggregate objective:
+$`\displaystyle \begin{gathered} p_{g,h}^{\star}=\mathrm{best}_g\left(\mathcal C_g^v(\{h\})\right),\\ p_g^{\star}(S)=\mathrm{best}_g\left(\{p_{g,h}^{\star}:h\in S\}\right). \end{gathered}`$
 
-<p align="center">
-<img src="docs/formulas/block-d0ab0774fabf7e20.svg" alt="\max_{(p_g)\in\prod_{g\in G_S}\mathcal C_g^v(S)}^{\mathrm{lex}}&#10;\sum_{g\in G_S}\mathbf f_g(p_g)&#10;=\sum_{g\in G_S}\mathbf f_g(p_g^{\star}(S))." width="323.9039">
-</p>
+</div>
 
-This decomposition requires a fixed equipment set, the retained candidate scopes, and no shared inventory or other coupling constraints across guests. For <img src="docs/formulas/inline-d9eaf2bad7755a03.svg" alt="1\le n\le&#124;H&#124;" width="81.3031" align="middle">, the outer search enumerates all <img src="docs/formulas/inline-9d134b3a5aba2f08.svg" alt="\binom{&#124;H&#124;}{n}" width="28.1114" align="middle"> sets containing exactly <img src="docs/formulas/inline-5864f80948e3fda9.svg" alt="n" width="10.4164" align="middle"> cookware types and compares them by Chapter 1's aggregate objective and missing-plan penalties. Selecting all available cookware yields one set.
+For fixed $`S`$, plans and supply calculations are independent across guests, the missing-plan penalty for that set is constant, and each feasible guest's candidate set is the union of single-cookware sets. Selecting the best per cookware type before comparing them therefore preserves the optimal objective. Independent guest optima also attain the best aggregate objective:
 
-Let <img src="docs/formulas/inline-7c03f6224074fbdb.svg" alt="N_{\mathrm{cand}}" width="36.5892" align="middle"> be the total number of candidates actually returned across all guests. Treating each criterion evaluation as constant cost, comparison work after candidate generation and the size of the best table are, respectively:
+<div align="center">
 
-<p align="center">
-<img src="docs/formulas/block-a5b07b9a1c99c359.svg" alt="O\left(N_{\mathrm{cand}}+\binom{&#124;H&#124;}{n}&#124;G&#124;n\right),\qquad O(&#124;G&#124;&#124;H&#124;)." width="320.4460">
-</p>
+$`\displaystyle \max_{(p_g)\in\prod_{g\in G_S}\mathcal C_g^v(S)}^{\mathrm{lex}} \sum_{g\in G_S}\mathbf f_g(p_g) =\sum_{g\in G_S}\mathbf f_g(p_g^{\star}(S)).`$
+
+</div>
+
+This decomposition requires a fixed equipment set, the retained candidate scopes, and no shared inventory or other coupling constraints across guests. For $`1\le n\le|H|`$, the outer search enumerates all $`\binom{|H|}{n}`$ sets containing exactly $`n`$ cookware types and compares them by Chapter 1's aggregate objective and missing-plan penalties. Selecting all available cookware yields one set.
+
+Let $`N_{\mathrm{cand}}`$ be the total number of candidates actually returned across all guests. Treating each criterion evaluation as constant cost, comparison work after candidate generation and the size of the best table are, respectively:
+
+<div align="center">
+
+$`\displaystyle O\left(N_{\mathrm{cand}}+\binom{|H|}{n}|G|n\right),\qquad O(|G||H|).`$
+
+</div>
 
 The first expression excludes candidate-generation DFS, and the second counts only the guest-by-cookware best table. Relevant-ingredient filtering, equivalence representatives, and filler cutoffs determine the actual candidate scope. Uniform performance benchmarks and cross-device comparisons remain unavailable. Call relationships appear in the [architecture guide (Chinese)](docs/architecture.md), with the full optimality boundaries in the [optimization model and algorithm boundaries (Chinese)](docs/design.md).
 
@@ -1541,7 +1792,7 @@ This case selects dishes and additions for rare guests when 「Aquatic」 trigge
 
 The case uses the author's [historical menu archive](docs/case-study.md), containing 58 guest records. Its filename identifies 「Disliked trend: Aquatic」 and five cookware types; the `5` denotes the cookware count.
 
-Historical reproduction uses the v1.0.0 program and the root [东方夜雀食堂.xlsx](东方夜雀食堂.xlsx), with that version's defaults of daily orders <img src="docs/formulas/inline-bd3e68b20f4e366f.svg" alt="K=5" width="43.6991" align="middle"> and minimum score <img src="docs/formulas/inline-90c739fab2cb64f1.svg" alt="S_{\min}=3" width="58.4052" align="middle">. Displayed dishes, cookware, and ingredients come from the historical archive; scores and slack are supplementary calculations under these explicit conditions.
+Historical reproduction uses the v1.0.0 program and the root [东方夜雀食堂.xlsx](东方夜雀食堂.xlsx), with that version's defaults of daily orders $`K=5`$ and minimum score $`S_{\min}=3`$. Displayed dishes, cookware, and ingredients come from the historical archive; scores and slack are supplementary calculations under these explicit conditions.
 
 <a id="en-methods"></a>
 <a id="en-problem"></a>
@@ -1624,23 +1875,26 @@ Historical row 8 selects a rice ball and the prep counter for Hakurei Reimu, usi
 | Add honey | Honey supplies 「Sweet」 in `食材!B39:G39`; the prep counter also contributes its cookware tag to the final tag set | 「Sweet」 adds one liked match, bringing the total to 3 likes and 0 dislikes |
 | Apply the trend condition | The final tags do not contain 「Aquatic」, and no liked-trend anchor is set | This plan gains neither 「Disliked trend」 nor 「Liked trend」 |
 
-The final tags are 「Vegetarian」「Home-style」「Filling」「Japanese-style」「Affordable」「Prep counter」「Sweet」. Let <img src="docs/formulas/inline-51728216ba238792.svg" alt="g" width="9.1572" align="middle"> denote Hakurei Reimu and <img src="docs/formulas/inline-74ab86906e20d3e1.svg" alt="p" width="10.1136" align="middle"> the rice ball with honey:
+The final tags are 「Vegetarian」「Home-style」「Filling」「Japanese-style」「Affordable」「Prep counter」「Sweet」. Let $`g`$ denote Hakurei Reimu and $`p`$ the rice ball with honey:
 
-<p align="center">
-<img src="docs/formulas/block-043973bc26c11ce7.svg" alt="\begin{gathered}&#10;H_g^{\mathrm L}(p)=3,\qquad H_g^{\mathrm D}(p)=0,\qquad S_g(p)=3-0=3,\\&#10;C(p)=1+1=2,\qquad U(H_g^{\mathrm L}(p))=\min(3,3)=3.&#10;\end{gathered}" width="387.5217">
-</p>
+```math
+\begin{gathered}
+H_g^{\mathrm L}(p)=3,\qquad H_g^{\mathrm D}(p)=0,\qquad S_g(p)=3-0=3,\\
+C(p)=1+1=2,\qquad U(H_g^{\mathrm L}(p))=\min(3,3)=3.
+\end{gathered}
+```
 
 Cells `D6` and `D2` of the original workbook's `食材merchant_data` sheet store daily supplies of 47 seaweed and 68 honey units. At five orders per guest per day, using one unit of each ingredient per order:
 
-<p align="center">
-<img src="docs/formulas/block-34b67246fe8b2287.svg" alt="R(p)=\min(47-5\times1,\ 68-5\times1)=42." width="319.7859">
-</p>
+```math
+R(p)=\min(47-5\times1,\ 68-5\times1)=42.
+```
 
 Under these conditions, the historical plan meets the 3-point threshold, uses 2 ingredient units, and has minimum daily supply slack of 42 units. Slack is calculated for this guest independently, without deducting other guests' use; it is a model metric based on empirical supply.
 
 Two eligible candidates for the same dish illustrate the objective tradeoff. The original candidate function recalculated the following plans under this case's conditions; neither has disliked matches:
 
-| Plan | Net score <img src="docs/formulas/inline-89e72371142cc976.svg" alt="S_g(p)" width="35.6032" align="middle"> | Capped benefit <img src="docs/formulas/inline-8d460ad04c6bb409.svg" alt="U(H_g^{\mathrm L}(p))" width="65.5985" align="middle"> | Units <img src="docs/formulas/inline-1c253c2658ea915c.svg" alt="C(p)" width="31.9129" align="middle"> | Minimum slack <img src="docs/formulas/inline-f7128c7ebd80e206.svg" alt="R(p)" width="31.6606" align="middle"> (units/day) |
+| Plan | Net score $`S_g(p)`$ | Capped benefit $`U(H_g^{\mathrm L}(p))`$ | Units $`C(p)`$ | Minimum slack $`R(p)`$ (units/day) |
 | :---: | :---: | :---: | :---: | :---: |
 | Rice ball + honey | 3 | 3 | 2 | 42 |
 | Rice ball + cocoa beans | 4 | 3 | 2 | 10 |
