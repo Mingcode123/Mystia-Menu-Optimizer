@@ -41,7 +41,11 @@ Python、openpyxl、pandas 通过运行环境或依赖安装提供，其许可�
 
 ## 作者与 AI 协作
 
-[README 图标流程图](docs/images/tag-example.png) 的版式与文字说明由 AI 辅助制作，以原工作簿和代码核对的饭团与臭豆腐案例为依据。全部游戏图标直接取自原素材：人物、料理及食材图标使用作者留存的原 PNG，网页所需原图另见[素材目录](HTML/izakaya_icons_pack/)；黑暗物质图标从同一上游 [AnYiEE/touhou-mystia-izakaya-assistant](https://github.com/AnYiEE/touhou-mystia-izakaya-assistant) 的 `public/assets/sprites/recipe.png` 图集中按原格位直接裁出。图标必要时使用最近邻缩放，未经 AI 重绘。整张上游图集未纳入分发，原网页资源未新增或修改。图中完整展示料理偏好、对象标签、方案分组及匹配关系，另说明基础配方原料、流行机制与禁忌后果；该图为规则示意，非游戏截图。图标涉及的游戏角色与美术归属沿用上述游戏素材声明，图示制作不改变原素材的权利归属。
+README 提供[中文机制图](docs/images/tag-example.png)与[英文机制图](docs/images/tag-example-en.png)，并附[中文 SVG](docs/images/tag-example.svg)与[英文 SVG](docs/images/tag-example-en.svg)。图示文字、版式及绘图代码由 AI 辅助制作，案例以原工作簿和原程序核对。文字使用真实字体直接高分辨率渲染；SVG 保留可编辑文字与矢量线条。大并集符号由 LaTeX `\displaystyle\bigcup` 排版，使用 Computer Modern 大运算符字形并转为 SVG 轮廓，PNG 使用同源字形。
+
+全部游戏图标直接取自原素材。人物、料理及食材使用作者留存的原 PNG，网页所需原图另见[素材目录](HTML/izakaya_icons_pack/)；料理台与黑暗物质分别从本地留存的上游 [AnYiEE/touhou-mystia-izakaya-assistant](https://github.com/AnYiEE/touhou-mystia-izakaya-assistant) 的 `public/assets/sprites/cooker.png`、`public/assets/sprites/recipe.png` 原格位裁出。仅裁去透明边距，按需使用整数倍最近邻缩放，不经 AI 重绘。完整上游图集未纳入分发，原网页资源未新增或修改。
+
+图示依次说明五格配方与加料、完整人物偏好匹配、标签覆盖、配方禁忌及独立流行情境；它是规则示意，非游戏截图。图标涉及的游戏角色与美术归属沿用上述游戏素材声明，图示制作不改变原素材的权利归属。
 
 图中禁忌案例同时参照 BWIKI 的[臭豆腐条目](https://wiki.biligame.com/tmi/臭豆腐)及[黑暗物质条目](https://wiki.biligame.com/tmi/黑暗物质)：前者列明甜、果味禁忌，后者说明标签冲突可产生黑暗物质。流行随机事件与标签覆盖的机制说明参考[《东方夜雀食堂攻略：强迫症的做菜指南》](https://www.bilibili.com/opus/722047645466492949)。琪露诺喜欢“流行·厌恶”、厌恶“流行·喜爱”的案例同时参照 BWIKI 的[琪露诺条目](https://wiki.biligame.com/tmi/顾客:琪露诺)。角色的流行偏好取自原工作簿，触发标签的输入与派生逻辑以原程序为准；这些社区资料用于解释游戏背景，不替代程序实现说明。
 
