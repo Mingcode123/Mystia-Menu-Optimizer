@@ -362,7 +362,20 @@ $`R(p)`$ 的单位仍为件／日。$`K`$ 固定时，最小化每份件数 $`C(
 
 **问题与变化：** `singlePLAN_cover3.py` 保留每客一套方案、全部订单复用以及同一余量计算，将第一目标改为达标后的喜好收益封顶：达到三项喜爱后，额外命中不再提高优化优先级。
 
-**阈值依据：** 三分目标服务于触发稀客奖励符卡的备菜需求。对于具有奖励符卡的稀客，常规评价下料理与酒水合计净分至少为 4、同时满足料理和酒水的点单要求，才达到触发奖励符卡的粉色评价。因此，在点单要求得到满足、酒水至少贡献 1 分且预算允许的使用条件下，料理净分达到 3 即可满足这一评分需求。本模型只规划料理，将 3 分设为默认门槛，并在达标后优先节约食材；酒水选择、当次点单和实际符卡触发仍由玩家在游戏中确认。规则依据见[稀客评价与符卡说明](https://www.bilibili.com/read/cv13517861/)。
+<a id="zh-spellcard"></a>
+
+**三分门槛与奖励符卡：** 本项目的得分统计料理侧的喜好与厌恶命中，游戏评价还计入酒水喜好。对于具有奖励符卡的稀客，正常营业中的粉色评价按以下条件判定；此处以预算允许且没有其他强制改判效果为前提。[规则参考](https://steamcommunity.com/sharedfiles/filedetails/?id=2760533649&l=schinese)
+
+| 料理状态 | 当次点单要求 | 粉评的分数条件 |
+| :---: | :---: | :---: |
+| 未启用「夜雀之歌」 | 料理、酒水分别满足所要求的标签 | 料理与酒水合计净分至少为 4 |
+| 「夜雀之歌」已生效 | 忽略料理和酒水的点单要求 | 料理与酒水合计净分仍须至少为 4 |
+
+夜雀系列厨具在完美完成节奏小游戏后可使料理获得相应效果。这里要求效果实际生效；其作用是解除点单限制，四分门槛仍然保留。[夜雀厨具说明](https://www.bilibili.com/read/cv13517861/)
+
+据此，一种可行的使用过程是：**选取料理净分至少 3 的方案 → 搭配至少贡献 1 分的酒水 → 满足双点单，或使「夜雀之歌」生效 → 达到粉评并触发奖励符卡。** 在效果已生效的条件下，固定的达标料理可以应对不同点单；三分因而可作为料理侧的备菜目标，达标后再优先节约食材。
+
+**程序范围：** 规划器计算料理、加料和厨具类型；酒水选择、厨具系列、效果是否生效及预算可支付性均未进入该优化模型，须在游戏中确认。HTML 可通过 `Required Tag` 指定当次料理要求；后期 Python 单方案入口不读取当次点单。上述过程说明方案的使用条件，候选达标本身不构成无条件触发符卡的保证。
 
 **约束与假设：** 沿用单客单方案、无厌恶准入、最低净分及假设订单量。覆盖收益封顶用于合格方案之间的排序，准入门槛保持原设定。
 
@@ -1289,7 +1302,20 @@ This step changes both order allocation and the first priority. The earlier mode
 
 **Problem and change:** `singlePLAN_cover3.py` retains one plan per guest, its reuse for all orders, and the same slack calculation. The first objective now caps preference benefit after qualification: beyond three liked matches, additional matches no longer increase optimization priority.
 
-**Threshold rationale:** The three-point target supports meal preparation for rare guests' reward spell cards. For guests with a reward spell card, ordinary rating rules require a combined dish-and-drink net score of at least 4, with both requested tags satisfied, to yield the pink rating that triggers the card. A dish score of 3 therefore meets the scoring requirement when the requests are satisfied, the drink contributes at least 1 point, and the meal is within budget. This model plans dishes only, using 3 as the default threshold and prioritizing ingredient savings after qualification. Drink selection, the current requests, and actual spell-card activation remain in-game decisions. See the [guest rating and spell-card reference](https://www.bilibili.com/read/cv13517861/).
+<a id="en-spellcard"></a>
+
+**Three-point threshold and reward spell cards:** The project score counts liked and disliked matches on the dish; the game also counts liked drink tags. For guests with reward spell cards, pink ratings during ordinary service follow the conditions below, assuming the meal is affordable and no other effect overrides the rating. [Rule reference](https://steamcommunity.com/sharedfiles/filedetails/?id=2760533649&l=schinese)
+
+| Dish state | Current order requirements | Score required for a pink rating |
+| :---: | :---: | :---: |
+| 「Night Sparrow Song」 is inactive | The dish and drink each satisfy their requested tag | Combined dish-and-drink net score of at least 4 |
+| 「Night Sparrow Song」 is active | Dish and drink requests are ignored | Combined dish-and-drink net score still at least 4 |
+
+Night Sparrow Series cookware can apply the effect after a perfect rhythm minigame. The effect must actually be active: it removes the request restriction while retaining the four-point threshold. [Cookware reference](https://www.bilibili.com/read/cv13517861/)
+
+One valid usage sequence is therefore: **choose a dish plan scoring at least 3 → pair it with a drink contributing at least 1 point → satisfy both requests or activate 「Night Sparrow Song」 → obtain a pink rating and trigger the reward spell card.** With the effect active, a fixed qualifying dish can serve different requests. Three points can thus be used as the dish-side preparation target, followed by ingredient savings after qualification.
+
+**Program scope:** The planner evaluates dishes, additions, and cookware types. Drink selection, cookware series, effect activation, and affordability are outside this optimization model and require in-game confirmation. HTML accepts the current dish request through `Required Tag`; the later Python single-plan entry points do not read the current order. This sequence specifies usage conditions; candidate eligibility alone does not guarantee spell-card activation.
 
 **Constraints and assumptions:** Retain one plan per guest, zero-dislike eligibility, the minimum net score, and assumed order volume. Capped coverage benefit ranks eligible plans, while admission thresholds retain their existing settings.
 
