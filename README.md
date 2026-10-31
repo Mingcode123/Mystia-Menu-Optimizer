@@ -510,7 +510,7 @@ N_{g,d}=\sum_{k=0}^{s_d}\binom{n_{g,d}+k-1}{k}
 
 ```math
 B(j,r,\gamma)=\gamma+r\Delta_j,\qquad
-B(j,r,\gamma)<S_{\min}\ \Longrightarrow\ \text{prune}.
+B(j,r,\gamma) < S_{\min}\ \Longrightarrow\ \text{prune}.
 ```
 
 料理级预检使用 $`\beta_{g,d}+s_d\Delta_1`$。该估计重复累计喜爱标签并忽略厌恶扣分；在所有可能新增喜爱均被初始项与增量覆盖时，它构成安全上界。原实现的流行可达性检查仅看直接标签，可能漏计凑满五件生成「大份」后触发的流行。相关食材筛选和最多三种中性补位也限制候选范围。叶节点仍须重新计算最终标签并检查厌恶与最低分，边界见[优化模型与算法边界](docs/design.md)。
@@ -1228,7 +1228,7 @@ Set $`\Delta_{n_{g,d}+1}=0`$ for the empty suffix. Each of the three $`\eta`$ te
 
 ```math
 B(j,r,\gamma)=\gamma+r\Delta_j,\qquad
-B(j,r,\gamma)<S_{\min}\ \Longrightarrow\ \text{prune}.
+B(j,r,\gamma) < S_{\min}\ \Longrightarrow\ \text{prune}.
 ```
 
 The dish-level precheck uses $`\beta_{g,d}+s_d\Delta_1`$. This estimate counts repeated liked tags and ignores dislike penalties. It is a safe upper bound when its initial terms and increments cover every possible newly acquired like. The original trend-reachability check uses only direct tags and can miss a trend triggered by 「Large portion」 generated when all five slots are filled. Relevant-ingredient filtering and the cutoff of at most three neutral fillers also limit the candidate scope. At each leaf, final tags are recalculated and checked for dislikes and the minimum score; details appear in the [optimization model and algorithm boundaries (Chinese)](docs/design.md).
