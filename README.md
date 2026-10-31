@@ -264,8 +264,8 @@ i_{\mathrm{out}}\in\arg\max_{j\in M(i)}q_j
 Python PLAN 在评分准入中增加“无厌恶命中”条件，因此沿用上一节的净分门槛即可得到：
 
 ```math
-H_g^{D}(p)=0,\qquad S_g(p)\geS_{\min}
-\quad\Longrightarrow\quad H_g^{L}(p)\geS_{\min}
+H_g^{D}(p)=0,\qquad S_g(p)\ge S_{\min}
+\quad\Longrightarrow\quad H_g^{L}(p)\ge S_{\min}
 ```
 
 配方禁忌、持有料理及候选规约按对应 Python 版本执行。HTML 与 Python 的处理并不完全相同，因此下文分别定义各版本的候选集合，不把 Python 结果直接视为网页结果的子集。
@@ -844,8 +844,8 @@ The following table maps the notation in this chapter to that used in the figure
 Python PLAN adds a zero-disliked-match eligibility condition. Retaining the previous section's net-score threshold therefore gives:
 
 ```math
-H_g^{D}(p)=0,\qquad S_g(p)\geS_{\min}
-\quad\Longrightarrow\quad H_g^{L}(p)\geS_{\min}
+H_g^{D}(p)=0,\qquad S_g(p)\ge S_{\min}
+\quad\Longrightarrow\quad H_g^{L}(p)\ge S_{\min}
 ```
 
 Recipe prohibitions, dish ownership, and candidate reduction follow the corresponding Python version. HTML and Python do not process every condition identically, so their candidate sets are defined separately below; Python results are not assumed to be a subset of browser results.
