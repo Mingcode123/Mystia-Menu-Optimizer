@@ -517,7 +517,7 @@ H_g^{\mathrm D}(p)=\sum_j z_j(T(p))z_j(\mathcal D_g).
 仅对达标组合构造用于展示的标签集合与候选对象，并保留原标签插入顺序和中文排序规则。高级过滤、子集过滤、采购向量与 Top-N 并列处理仍接收相同顺序的候选。主线程另缓存每行的检索文本，避免每次搜索重复拼接字符串。
 
 <details>
-<summary><strong>点击展开旧版全文 — v1.0.0 · Initial Release，第 3.1 节</strong></summary>
+<summary><strong>点击展开旧版全文 — v1.0.0 · Initial Release</strong></summary>
 
 ### 3.1 给定食材池的组合枚举
 
@@ -576,7 +576,7 @@ U(H_g^{\mathrm L}(q))=3,\quad C(p)>C(q)
 此优化用于四个 `singlePLAN_cover3*` 入口。默认候选池函数仍可返回完整原候选池；未封顶的 `singlePLAN` 和历史 `detailedPLAN` 保留各自搜索方式。针对重复料理名或含多重集键分隔符的食材名，程序沿用不加此界限的枚举，以保留既有缓存行为。Python 仍以 CPU 串行执行；该界限无需 GPU 或多进程。
 
 <details>
-<summary><strong>点击展开旧版全文 — v1.0.0 · Initial Release，第 3.2 节</strong></summary>
+<summary><strong>点击展开旧版全文 — v1.0.0 · Initial Release</strong></summary>
 
 ### 3.2 Python DFS 的喜爱命中估计
 
@@ -615,7 +615,7 @@ f_{g,j}(a)\ge f_{g,j}(b)\quad(j=1,2,3),\qquad
 其中 $`f_{g,j}`$ 为目标向量的第 $`j`$ 个分量。被支配者的词典序目标必然较差，因而可在保留候选内删除。未封顶的 `singlePLAN` 用 $`H_g^{\mathrm L}(p)`$ 替代 $`U(H_g^{\mathrm L}(p))`$。记 $`\mathrm{best}_g(\mathcal P)`$ 为从非空候选集 $`\mathcal P`$ 中按 $`\mathbf f_g`$ 选取方案的函数；三项全同后，依次采用售价降序、料理名升序、加料字符串升序的平局规则。`nCookware` 的正常路径直接扫描每厨具候选并保留 best，不构建该 Pareto 前沿。
 
 <details>
-<summary><strong>点击展开旧版全文 — v1.0.0 · Initial Release，第 3.3 节</strong></summary>
+<summary><strong>点击展开旧版全文 — v1.0.0 · Initial Release</strong></summary>
 
 ### 3.3 单客候选的支配过滤与词典序选择
 
@@ -685,7 +685,7 @@ R_{\mathrm{old}}\ge\lambda\ \Longleftrightarrow
 每种实际使用的食材贡献一个分量。程序缓存最佳向量，再按固定候选顺序重建首个达到该向量的组合。变长向量按 Python 元组规则比较：首个不同分量较大者优先，完整前缀相同时较长者优先。缓存状态仍可能大量增长；该历史路线的阈值搜索未被 `nCookware` 正常主流程调用。
 
 <details>
-<summary><strong>点击展开旧版全文 — v1.0.0 · Initial Release，第 3.4 节</strong></summary>
+<summary><strong>点击展开旧版全文 — v1.0.0 · Initial Release</strong></summary>
 
 ### 3.4 历史多方案的阈值搜索与状态复用
 
@@ -767,7 +767,7 @@ O\left(N_{\mathrm{cand}}+\binom{|H|}{n}|G|n\right),\qquad O(|G||H|).
 前者不含候选 DFS 的生成成本，后者仅计每客每厨具 best 表。相关筛选、等价代表与补位截断决定实际候选范围。单机对照见 3.6 节，跨设备性能尚未系统测量。具体调用关系见[系统架构](docs/architecture.md)，完整最优性边界见[优化模型与算法边界](docs/design.md)。
 
 <details>
-<summary><strong>点击展开旧版全文 — v1.0.0 · Initial Release，第 3.5 节</strong></summary>
+<summary><strong>点击展开旧版全文 — v1.0.0 · Initial Release</strong></summary>
 
 ### 3.5 共同厨具的预计算与集合枚举
 
@@ -1485,7 +1485,7 @@ Here $`\mathbf 1`$ is an event indicator; $`\lor`$ and $`\land`$ denote componen
 Display tag sets and candidate objects are materialized only for qualifying combinations, preserving original tag insertion order and Chinese collation. Upgrade filtering, subset filtering, procurement vectors, and Top-N ties continue to receive candidates in the same order. The main thread also caches each row's search text to avoid repeated string construction.
 
 <details>
-<summary><strong>Click to expand the full text — v1.0.0 · Initial Release, Section 3.1</strong></summary>
+<summary><strong>Click to expand the full text — v1.0.0 · Initial Release</strong></summary>
 
 ### 3.1 Enumerating combinations from a given ingredient pool
 
@@ -1544,7 +1544,7 @@ The bound operates at two levels:
 This optimization applies to the four `singlePLAN_cover3*` entries. The candidate-pool function still returns the full original pool by default; uncapped `singlePLAN` and historical `detailedPLAN` retain their search methods. Inputs with duplicate dish names or ingredient names containing multiset-key delimiters use enumeration without this bound, preserving existing cache behavior. Python remains sequential on the CPU; the bound requires neither a GPU nor multiprocessing.
 
 <details>
-<summary><strong>Click to expand the full text — v1.0.0 · Initial Release, Section 3.2</strong></summary>
+<summary><strong>Click to expand the full text — v1.0.0 · Initial Release</strong></summary>
 
 ### 3.2 The liked-match estimate in Python DFS
 
@@ -1583,7 +1583,7 @@ f_{g,j}(a)\ge f_{g,j}(b)\quad(j=1,2,3),\qquad
 Here $`f_{g,j}`$ is component $`j`$ of the objective vector. A dominated candidate has a strictly worse lexicographic objective and can therefore be removed within the retained candidate set. Uncapped `singlePLAN` uses $`H_g^{\mathrm L}(p)`$ in place of $`U(H_g^{\mathrm L}(p))`$. Define $`\mathrm{best}_g(\mathcal P)`$ to select a plan from nonempty candidate set $`\mathcal P`$ by $`\mathbf f_g`$. If all three criteria tie, it compares selling price in descending order, then dish name and addition string in ascending order. The normal `nCookware` path scans candidates directly to retain the best per cookware type, without constructing this Pareto frontier.
 
 <details>
-<summary><strong>Click to expand the full text — v1.0.0 · Initial Release, Section 3.3</strong></summary>
+<summary><strong>Click to expand the full text — v1.0.0 · Initial Release</strong></summary>
 
 ### 3.3 Dominance filtering and lexicographic selection for one guest
 
@@ -1653,7 +1653,7 @@ After finding $`\lambda^\star`$, the program further maximizes the complete asce
 Each used ingredient type contributes one component. The program caches the best vector, then reconstructs the first combination attaining it in a fixed candidate order. Variable-length vectors follow Python tuple comparison: the larger first differing component wins; when one is a complete prefix of the other, the longer vector wins. The cached state set can still grow substantially. This historical threshold-search route is not called by the normal `nCookware` workflow.
 
 <details>
-<summary><strong>Click to expand the full text — v1.0.0 · Initial Release, Section 3.4</strong></summary>
+<summary><strong>Click to expand the full text — v1.0.0 · Initial Release</strong></summary>
 
 ### 3.4 Threshold search and state reuse for the historical multiple-plan model
 
@@ -1735,7 +1735,7 @@ O\left(N_{\mathrm{cand}}+\binom{|H|}{n}|G|n\right),\qquad O(|G||H|).
 The first expression excludes candidate-generation DFS, and the second counts only the guest-by-cookware best table. Relevant-ingredient filtering, equivalence representatives, and filler cutoffs determine the actual candidate scope. Section 3.6 reports a single-machine comparison; cross-device performance has not been systematically measured. Call relationships appear in the [architecture guide (Chinese)](docs/architecture.md), with the full optimality boundaries in the [optimization model and algorithm boundaries (Chinese)](docs/design.md).
 
 <details>
-<summary><strong>Click to expand the full text — v1.0.0 · Initial Release, Section 3.5</strong></summary>
+<summary><strong>Click to expand the full text — v1.0.0 · Initial Release</strong></summary>
 
 ### 3.5 Precomputation and enumeration for shared cookware
 
