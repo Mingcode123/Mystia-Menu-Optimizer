@@ -35,9 +35,9 @@
 
 <a id="zh-tag-figure"></a>
 
-[![五节机制图：五格配方、喜好匹配、标签覆盖、配方禁忌与流行。蓝色表示料理标签，橙色表示食材标签，青绿色表示厨具标签，紫色表示人物喜爱，石板灰表示人物厌恶，浅红色表示配方禁忌。料理台与海苔×1仅满足饭团配方，占1格、余4格；加蜂蜜后占2格、余3格。料理标签不等于基础食材标签的并集，加料才带入标签。A、B均展示灵梦完整偏好：喜爱「高级」「饱腹」「甜」「不可思议」「实惠」「流行·喜爱」，厌恶「下酒」「昂贵」「流行·厌恶」。A：饭团加蜂蜜，命中「饱腹」「实惠」「甜」，3项喜爱减0项厌恶，得分3。B：饭团加猪肉，「肉」覆盖「素」，命中「饱腹」「实惠」，得分为2减0等于2。饭团无配方禁忌。C：蜂蜜的「甜」触发臭豆腐禁忌，其他搭配不能抵消；游戏结果为黑暗物质，Python nCookware在评分前排除。A、B、C无流行。独立流行情境中，当期触发标签随随机事件变化，人物对流行的偏好固定，程序读取输入条件；「甜」流行时，含「甜」方案保留该标签并获得「流行·喜爱」。琪露诺喜爱「流行·厌恶」、厌恶「流行·喜爱」。](https://raw.githubusercontent.com/Mingcode123/Mystia-Menu-Optimizer/85a23a5e0c1caa84730e40594c2e3dc597a94e0c/docs/images/tag-example.png)](https://raw.githubusercontent.com/Mingcode123/Mystia-Menu-Optimizer/85a23a5e0c1caa84730e40594c2e3dc597a94e0c/docs/images/tag-example.png)
+[![五节机制图：五格配方、喜好匹配、标签覆盖、配方禁忌与流行。蓝色表示料理标签，橙色表示食材标签，青绿色表示厨具标签，紫色表示人物喜爱，石板灰表示人物厌恶，浅红色表示配方禁忌。料理台与海苔×1仅满足饭团配方，占1格、余4格；加蜂蜜后占2格、余3格。料理标签不等于基础食材标签的并集，加料才带入标签。A、B均展示灵梦完整偏好：喜爱「高级」「饱腹」「甜」「不可思议」「实惠」「流行·喜爱」，厌恶「下酒」「昂贵」「流行·厌恶」。A：饭团加蜂蜜，命中「饱腹」「实惠」「甜」，3项喜爱减0项厌恶，得分3。B：饭团加猪肉，「肉」覆盖「素」，命中「饱腹」「实惠」，得分为2减0等于2。饭团无配方禁忌。C：蜂蜜的「甜」触发臭豆腐禁忌，其他搭配不能抵消；游戏结果为黑暗物质，Python nCookware在评分前排除。A、B、C无流行。独立流行情境中，当期触发标签随随机事件变化，人物对流行的偏好固定，程序读取输入条件；「甜」流行时，饭团加蜂蜜方案保留「甜」并获得「流行·喜爱」，对灵梦命中4项喜爱、0项厌恶，得分4。下方琪露诺喜爱「流行·厌恶」、厌恶「流行·喜爱」。](https://raw.githubusercontent.com/Mingcode123/Mystia-Menu-Optimizer/f53653594bd5c9df07b864f32c97ba5a0fbc9eb7/docs/images/tag-example.png)](https://raw.githubusercontent.com/Mingcode123/Mystia-Menu-Optimizer/f53653594bd5c9df07b864f32c97ba5a0fbc9eb7/docs/images/tag-example.png)
 
-*图 1. 配方、加料与标签匹配机制。A、B、C 均无流行，末节为独立流行情境；本图为规则示意，游戏图标使用原像素。* [SVG 矢量原图](https://raw.githubusercontent.com/Mingcode123/Mystia-Menu-Optimizer/85a23a5e0c1caa84730e40594c2e3dc597a94e0c/docs/images/tag-example.svg)。标签依据[原工作簿](东方夜雀食堂.xlsx)；禁忌组合在游戏中产生黑暗物质，Python `nCookware` 在评分前排除，网页差异见[网页使用说明](docs/web-guide.md)。规则与素材来源见[第三方声明](THIRD_PARTY_NOTICES.md)。
+*图 1. 配方、加料与标签匹配机制。A、B、C 均无流行，末节以相同方案展示「甜」流行后的 4−0=4，再列琪露诺的流行偏好；本图为规则示意，游戏图标使用原像素。* [SVG 矢量原图](https://raw.githubusercontent.com/Mingcode123/Mystia-Menu-Optimizer/f53653594bd5c9df07b864f32c97ba5a0fbc9eb7/docs/images/tag-example.svg)。标签依据[原工作簿](东方夜雀食堂.xlsx)；禁忌组合在游戏中产生黑暗物质，Python `nCookware` 在评分前排除，网页差异见[网页使用说明](docs/web-guide.md)。规则与素材来源见[第三方声明](THIRD_PARTY_NOTICES.md)。
 
 第一章以单客方案与共同厨具配置模型为主体，对应实现简称 `nCookware`；历史多方案模型用于说明决策单位与目标的变化。五格与配方禁忌属于制作条件，喜好门槛与无厌恶准入属于规划政策。
 
@@ -45,7 +45,17 @@
 
 ## 1. 数学模型：从游戏决策到优化任务
 
-### 1.1 问题抽象
+### 1.1 模型演进总览
+
+项目持续研究的是如何选择备菜方案；随需求明确而改变的，是**选一个什么对象、哪些方案可以进入比较，以及“更优”按什么顺序判断**。网页首先提供达标候选查询；Python 规划进一步定义多标签方案组合、每客单方案、覆盖收益封顶和共同厨具配置。HTML 与 Python 是共享工作簿的独立入口，图中的箭头表示决策定义的递进，不表示前后端调用或精确开发时间线。
+
+[![模型演进：网页按喜好减厌恶的净分筛选多个候选；历史多方案为每个可行喜好标签选方案，先最少预期件数再最大最低供给余量；单客模型改为先最大喜好覆盖、再最少件数和最大余量；cover3把覆盖收益封顶为3；厨具模型从固定排除扩展到选择恰好n种共同设备。排版修改、CPU提速和利润分析另行区分。](https://raw.githubusercontent.com/Mingcode123/Mystia-Menu-Optimizer/f53653594bd5c9df07b864f32c97ba5a0fbc9eb7/docs/images/model-evolution.png)](https://raw.githubusercontent.com/Mingcode123/Mystia-Menu-Optimizer/f53653594bd5c9df07b864f32c97ba5a0fbc9eb7/docs/images/model-evolution.png)
+
+*图 2. 决策单位、目标与约束的演进。箭头按问题依赖组织；每种模型的“最优”仅针对其评价政策和保留候选成立。* [SVG 矢量原图](https://raw.githubusercontent.com/Mingcode123/Mystia-Menu-Optimizer/f53653594bd5c9df07b864f32c97ba5a0fbc9eb7/docs/images/model-evolution.svg)。
+
+从网页到规划层，关键变化是从返回合格候选，推进到按明确的目标顺序选定规划方案。从多方案到单方案，订单分配和决策单位同时改变；从未封顶到 `cover3`，改变的是第 4 项及更多喜好命中的边际收益；从固定厨具到 `nCookware`，设备集合成为新增决策变量。以下先完整定义单客与共同厨具模型，再对照历史多方案和网页筛选，避免混用各分支的目标。
+
+### 1.2 问题抽象
 
 本模型的决策对象是一份基础料理及其追加食材组合；在厨具配置层面，还需选择一组共同可用的设备。游戏中的备菜需求对应以下数学任务：
 
@@ -59,9 +69,9 @@
 
 喜好覆盖采用封顶收益，达到 3 项后不再因额外命中增加该项效用。食材件数衡量单位数量，供给余量衡量假设日需求后的资源压力；两者分别对应不同的备菜取舍。供给在此作为比较指标，未设为必须满足的库存硬约束。模型范围集中在料理与设备选择，未联合描述酒水、完整满意度或现金利润。
 
-### 1.2 符号、参数与决策变量
+### 1.3 符号、参数与决策变量
 
-以下符号描述单客模型与厨具配置；历史多方案模型的专用符号在 1.6 节定义。
+以下符号描述单客模型与厨具配置；历史多方案模型的专用符号在 1.7 节定义。
 
 | 符号 | 类型 | 含义与单位 |
 | --- | --- | --- |
@@ -73,6 +83,8 @@
 | $`T(p)`$ | 派生集合 | 处理料理、厨具、售价、加料、覆盖与流行后的最终标签集合 |
 | $`P_g, N_g`$ | 顾客参数 | 经流行条件处理后的喜好标签集合与厌恶标签集合 |
 | $`h_g(p), a_g(p)`$ | 评价量 | 分别为喜好与厌恶命中的标签数量 |
+| $`s_g(p)`$ | 评价量 | 偏好净分，即喜好命中数减厌恶命中数 |
+| $`\kappa(d)`$ | 配方参数 | 制作料理所需的厨具 |
 | $`\tau`$ | 准入参数 | 最低喜好命中数；`nCookware` 默认值为 3 |
 | $`K`$ | 需求参数 | 每位顾客的假设日订单量，单位为单／日，默认值为 5 |
 | $`q_i`$ | 供给参数 | 食材的经验日供给量，单位为件／日，对应 Total Daily Quantity（TDQ） |
@@ -84,7 +96,7 @@
 
 其中，基础料理选择、追加用量和共同厨具集合属于决策；配方、顾客标签、供给估计和订单假设作为给定输入。最终标签与评价指标由这些输入和决策计算得到。
 
-### 1.3 用量、标签与可行性
+### 1.4 用量、标签与可行性
 
 食材总用量和件数定义为：
 
@@ -97,7 +109,8 @@ L(p)=\sum_i c_i(p)
 
 ```math
 h_g(p)=\left|T(p)\cap P_g\right|,\qquad
-a_g(p)=\left|T(p)\cap N_g\right|
+a_g(p)=\left|T(p)\cap N_g\right|,\qquad
+s_g(p)=h_g(p)-a_g(p)
 ```
 
 `nCookware` 的规则模型要求满足五格限制、最低喜好门槛及无厌恶命中：
@@ -108,7 +121,7 @@ L(p)\le5,\qquad h_g(p)\ge\tau,\qquad a_g(p)=0
 
 候选还受已拥有料理、配方禁忌及可用厨具条件限制。流行喜爱与厌恶分别由指定标签触发；未指定某方向的触发标签时，该方向的流行标签从顾客偏好与厌恶中移除。浏览器查询采用净分筛选，其评价量为 $`h_g(p)-a_g(p)`$，与本节单客规划的准入条件不同。
 
-### 1.4 单客目标函数
+### 1.5 单客目标函数
 
 每位顾客的假设订单均采用同一方案。食材的日需求为每份用量乘以日订单量，最低供给余量及覆盖收益定义为：
 
@@ -117,7 +130,14 @@ R(p)=\min_{i:c_i(p)>0}\left(q_i-Kc_i(p)\right),\qquad
 U(h)=\min(h,3)
 ```
 
-单客方案按以下词典序目标比较：
+未封顶的 `singlePLAN` 首先追求更多喜好命中：
+
+```math
+\max_{p\in\mathcal C_g}^{\mathrm{lex}}
+\left(h_g(p),\;-L(p),\;R(p)\right)
+```
+
+`cover3` 及后续分支将第一项改为封顶效用，得到：
 
 ```math
 \max_{p\in\mathcal C_g}^{\mathrm{lex}}
@@ -128,7 +148,9 @@ U(h)=\min(h,3)
 
 最低门槛与覆盖上限具有不同作用：前者控制候选准入，后者定义效用。在默认门槛 3 下，合格候选的覆盖收益均为 3，因此后续比较主要取决于食材件数和最低供给余量。余量可为负，表示对应假设需求超过经验日供给。
 
-### 1.5 共同厨具配置与求解范围
+例如，图 1 的饭团加蜂蜜在「甜」触发流行喜爱时，原始得分为 4，封顶效用仍为 3。封顶不删除第 4 个命中标签，也不把原始得分改成 3；它只改变方案比较的收益定义。
+
+### 1.6 共同厨具配置与求解范围
 
 可用厨具来自已拥有料理对应的设备。所选集合满足：
 
@@ -138,18 +160,48 @@ S\subseteq H,\qquad |S|=n
 
 `nCookware` 先计算每客每厨具的最佳保留候选，再枚举共同厨具集合。集合评价依次使用覆盖收益总和、食材件数总和、逐客最低供给余量之和，并对无解顾客设置惩罚。在默认三分门槛下，第一项等价于优先增加有解顾客数。食材用量仍按顾客独立核算，未共同扣减库存。
 
-标签等价代表选择与中性补位截断会限制 $`\mathcal C_g`$。因此，候选集内的目标比较尚不构成全部合法食材组合上的全局最优性证明。集合目标、平局规则与反例见[优化模型与算法边界](docs/design.md)。
-
-### 1.6 历史多方案模型
-
-早期按喜好标签配置多个方案。设日订单量 $`K`$ 在 $`m>0`$ 个具有可行候选的喜好标签方案之间均分，$`u_i`$ 表示所选方案对食材 $`i`$ 的累计用量，$`q_i`$ 沿用上述日供给定义。预期食材件数与最低供给余量分别为：
+令 $`\mathcal C_g(S)=\{p\in\mathcal C_g:\kappa(d)\in S\}`$，$`p_g^*(S)`$ 为其中按单客目标选出的方案；$`G_S`$ 为有方案的顾客集合，$`z_S`$ 为无方案顾客数。原程序的集合评价写为：
 
 ```math
+\max_{S\subseteq H,\ |S|=n}^{\mathrm{lex}}
+\left(
+\sum_{g\in G_S}U(h_g(p_g^*(S))),\;
+-\left[\sum_{g\in G_S}L(p_g^*(S))+10^9z_S\right],\;
+\sum_{g\in G_S}R(p_g^*(S))-10^{18}z_S
+\right)
+```
+
+两项常数来自原实现的无解惩罚；模型并不要求所有顾客必须有方案。其可分解结构来自“给定共同厨具后，各客独立评价”的设定。`limitedCookware` 分支仅从给定集合中排除指定设备，没有把设备集合本身作为优化变量。
+
+标签等价代表选择与中性补位截断会限制 $`\mathcal C_g`$。因此，候选集内的目标比较尚不构成全部合法食材组合上的全局最优性证明。集合目标、平局规则与反例见[优化模型与算法边界](docs/design.md)。
+
+### 1.7 历史多方案模型
+
+历史 `detailedPLAN` 按喜好标签配置多个方案。对每个具有候选的目标喜好标签 $`t`$，在包含该标签且通过准入的子池中执行原食材升级与追加子集过滤，从保留候选中选择方案 $`p_t`$；同一料理方案可以承担多个标签的订单份额。设日订单量 $`K`$ 在 $`m>0`$ 个具有可行候选的喜好标签方案之间均分，$`u_i`$ 表示所选方案对食材 $`i`$ 的累计用量，$`q_i`$ 沿用上述日供给定义。预期食材件数与最低供给余量分别为：
+
+```math
+u_i=\sum_t c_i(p_t),\qquad
 E_{\mathrm{old}}=\frac{K}{m}\sum_i u_i,\qquad
 R_{\mathrm{old}}=\min_{i:u_i>0}\left(q_i-\frac{K}{m}u_i\right)
 ```
 
-该模型先最小化 $`E_{\mathrm{old}}`$，再在并列组合中最大化 $`R_{\mathrm{old}}`$。订单均分属于模型假设，缺少对应的实测概率估计；没有可行标签时不生成方案。单客模型改变了决策单位与评价顺序，相关设计过程见第 2 章。
+其目标为：
+
+```math
+\min_{(p_t)_t}^{\mathrm{lex}}\left(E_{\mathrm{old}},\;-R_{\mathrm{old}}\right)
+```
+
+第一目标在固定标签数下可按标签拆分，所以程序先保留各标签全部并列最少件数方案；第二目标再比较组合的共同食材消耗；最低余量相同时，继续最大化完整的升序余量向量。对给定余量阈值 $`\lambda`$，判定是否存在组合使所有实际用料满足 $`q_i-(K/m)u_i\ge\lambda`$，据此采用二分与 DFS 搜索。这里最大化的是一位顾客的多方案组合余量，不是多个顾客共享库存的余量。订单均分属于模型假设，缺少对应的实测概率估计；没有可行标签时不生成方案。单客模型改变了决策单位与评价顺序，相关设计过程见第 2 章。
+
+### 1.8 网页筛选与规划目标的区别
+
+网页给定顾客、净分门槛和可选筛选条件，返回保留候选集合。令 $`\mathcal C_g^{\mathrm{web}}`$ 为网页按其枚举和过滤规则生成的候选，其核心得分条件为：
+
+```math
+\mathcal W_g(\tau)=\left\{p\in\mathcal C_g^{\mathrm{web}}:s_g(p)\ge\tau\right\}
+```
+
+这是候选筛选条件，而不是一个跨料理的唯一最优目标。网页允许用喜好命中抵消厌恶扣分，Python PLAN 则提前排除任何厌恶命中；两者的配方禁忌解析和持有条件也有差异。开启网页采购推荐后，在每道料理内部比较食材日供给的排序向量并保留不差于第 N 名阈值的全部候选及并列，尚未采用“日供给减假设消耗”的余量模型。具体排序与过滤规则见[优化模型与算法边界](docs/design.md)及[网页使用说明](docs/web-guide.md)。
 
 <a id="zh-evolution"></a>
 
@@ -157,12 +209,12 @@ R_{\mathrm{old}}=\min_{i:u_i>0}\left(q_i-\frac{K}{m}u_i\right)
 
 ### 2.1 从备菜问题到可比较的目标
 
-项目起点是寻找满足顾客要求的备菜方案。随着规则和使用条件明确，“最优”的含义逐步落实为决策单位、准入条件和比较顺序。早期还考虑过按实际利润排序；后续规划主线采用食材件数与供给余量表达资源需求，价格和利润保留为独立分析。
+项目起点是寻找满足顾客要求的备菜方案。随着规则和使用条件明确，“最优”的含义逐步落实为决策单位、准入条件和比较顺序。早期需求还包括按实际利润排序；后续规划主线采用食材件数与供给余量表达资源需求，普客、酒水、价格和利润保留为独立分析支线。
 
 | 决策问题 | 模型调整 | 取舍依据与影响 |
 | --- | --- | --- |
 | 为多个喜好标签分别准备什么 | 每个可覆盖标签配置方案，按订单均分假设估计总用量；先最少预期件数，再最大最低供给余量 | 不同标签分别承担订单份额；并列最少件数的方案仍需保留，因为食材分配会影响供给压力 |
-| 每位顾客固定准备什么 | 决策单位改为一位顾客的一套方案；先比较喜好覆盖，再比较件数与余量 | 需求改为每位稀客固定输出一套方案，以减少逐客备菜选择；该方案承担其假设订单，目标转向单份料理的覆盖与消耗 |
+| 每位顾客固定准备什么 | 决策单位改为一位顾客的一套方案；先比较喜好覆盖，再比较件数与余量 | 需求明确改为每位稀客固定输出一套方案；不再按各标签均分订单，该方案承担全部假设订单，目标转向单份料理的覆盖与消耗 |
 | 达标后是否继续追求更多命中 | 将覆盖收益封顶为 3 | 达标后优先控制用料；额外命中仍可存在，但不再增加第一目标收益 |
 | 有限设备如何服务多位顾客 | 从指定厨具排除扩展到选择恰好 n 种共同厨具 | 单客方案需适配共同设备；默认门槛下，集合评价首先增加有合格方案的顾客数 |
 
@@ -211,6 +263,8 @@ R_{\mathrm{old}}=\min_{i:u_i>0}\left(q_i-\frac{K}{m}u_i\right)
 
 图 1 中，饭团加蜂蜜命中灵梦 3 项喜好、0 项厌恶；饭团加猪肉命中 2 项喜好、0 项厌恶。在默认 `nCookware` 条件下，前者满足喜好门槛，后者未达门槛。臭豆腐加蜂蜜触发配方禁忌，在该规划流程中于评分前排除。
 
+独立流行情境中，同一份饭团加蜂蜜因「甜」触发「流行·喜爱」，命中 4 项喜好、0 项厌恶，原始得分为 4；总用料仍为 2 件，`cover3` 的效用仍为 3。此结果已用原工作簿与原候选生成函数分别在无流行和有流行条件下核对。
+
 该例区分了制作冲突与偏好准入。通过门槛只表明候选可以参加后续比较，尚不能据此判定饭团加蜂蜜在全部候选中最优。
 
 ### 4.2 覆盖封顶如何改变选择
@@ -239,6 +293,7 @@ R_{\mathrm{old}}=\min_{i:u_i>0}\left(q_i-\frac{K}{m}u_i\right)
 
 | 已有核对 | 观测 | 支持的结论 |
 | --- | --- | --- |
+| 原函数流行对照 | 原工作簿、灵梦、饭团加蜂蜜；无流行为 3 分，「甜」流行为 4 分；均为 2 件食材、0 项厌恶，封顶效用均为 3 | 流行增加命中，覆盖封顶仅改变优化效用 |
 | 完整工作簿网页案例 | 博丽灵梦、阈值 3，启用加料子集过滤与等价去重：生成 4,372 条候选，搜索「饭团」后为 59 行，XLSX 导出同为 59 行 | 指定条件下查询与导出行为一致 |
 | 小规模 Python 对照 | 12 种食材、8 道料理、3 位顾客、5 种厨具；无流行、选择 3 种厨具。原件与副本共 4 次运行，XLSX 除时间元数据外一致 | 指定条件下发布副本保持原有计算行为 |
 
@@ -368,9 +423,9 @@ Recipe prohibitions are preparation restrictions of a dish, whereas dislikes bel
 
 <a id="en-tag-figure"></a>
 
-[![Five sections explain ingredient slots, preference matching, tag overrides, recipe prohibitions, and trends. Blue denotes dish tags, orange ingredient tags, teal cookware tags, purple guest likes, slate gray guest dislikes, and pale red recipe prohibitions. A prep counter and one seaweed satisfy only the rice-ball recipe: one slot filled and four empty; adding honey leaves two filled and three empty. Dish tags are not the union of required-ingredient tags; additions contribute tags. A and B show all Reimu food preferences: likes 「High-grade」「Filling」「Sweet」「Wondrous」「Affordable」「Liked trend」; dislikes 「Pub food」「Expensive」「Disliked trend」. A: rice ball with honey matches 「Filling」「Affordable」「Sweet」, scoring 3 liked minus 0 disliked matches = 3. B: rice ball with pork replaces 「Vegetarian」 with 「Meat」, matches 「Filling」「Affordable」, and scores 2 minus 0 = 2. Rice ball has no recipe prohibitions. C: honey triggers stinky tofu's 「Sweet」 prohibition, which other additions cannot cancel; the game produces Dark Matter, while Python nCookware excludes the plan before scoring. A, B, and C have no trends. The separate trend example distinguishes random trigger tags from fixed guest attitudes; the program reads supplied conditions. When 「Sweet」 is popular, a plan keeps 「Sweet」 and gains 「Liked trend」. Cirno likes 「Disliked trend」 and dislikes 「Liked trend」.](https://raw.githubusercontent.com/Mingcode123/Mystia-Menu-Optimizer/85a23a5e0c1caa84730e40594c2e3dc597a94e0c/docs/images/tag-example-en.png)](https://raw.githubusercontent.com/Mingcode123/Mystia-Menu-Optimizer/85a23a5e0c1caa84730e40594c2e3dc597a94e0c/docs/images/tag-example-en.png)
+[![Five sections explain ingredient slots, preference matching, tag overrides, recipe prohibitions, and trends. Blue denotes dish tags, orange ingredient tags, teal cookware tags, purple guest likes, slate gray guest dislikes, and pale red recipe prohibitions. A prep counter and one seaweed satisfy only the rice-ball recipe: one slot filled and four empty; adding honey leaves two filled and three empty. Dish tags are not the union of required-ingredient tags; additions contribute tags. A and B show all Reimu food preferences: likes 「High-grade」「Filling」「Sweet」「Wondrous」「Affordable」「Liked trend」; dislikes 「Pub food」「Expensive」「Disliked trend」. A: rice ball with honey matches 「Filling」「Affordable」「Sweet」, scoring 3 liked minus 0 disliked matches = 3. B: rice ball with pork replaces 「Vegetarian」 with 「Meat」, matches 「Filling」「Affordable」, and scores 2 minus 0 = 2. Rice ball has no recipe prohibitions. C: honey triggers stinky tofu's 「Sweet」 prohibition, which other additions cannot cancel; the game produces Dark Matter, while Python nCookware excludes the plan before scoring. A, B, and C have no trends. The separate trend example distinguishes random trigger tags from fixed guest attitudes; the program reads supplied conditions. When 「Sweet」 is popular, rice ball with honey keeps 「Sweet」 and gains 「Liked trend」, matching 4 of Reimu's likes and 0 dislikes for a score of 4. Below, Cirno likes 「Disliked trend」 and dislikes 「Liked trend」.](https://raw.githubusercontent.com/Mingcode123/Mystia-Menu-Optimizer/f53653594bd5c9df07b864f32c97ba5a0fbc9eb7/docs/images/tag-example-en.png)](https://raw.githubusercontent.com/Mingcode123/Mystia-Menu-Optimizer/f53653594bd5c9df07b864f32c97ba5a0fbc9eb7/docs/images/tag-example-en.png)
 
-*Figure 1. Recipes, additions, and tag matching. A, B, and C have no trends; the final section presents a separate trend scenario. This is a rule illustration using the original pixels of game icons.* [Vector SVG](https://raw.githubusercontent.com/Mingcode123/Mystia-Menu-Optimizer/85a23a5e0c1caa84730e40594c2e3dc597a94e0c/docs/images/tag-example-en.svg). Tags follow the [original workbook](东方夜雀食堂.xlsx). A prohibited combination produces Dark Matter in the game; Python `nCookware` excludes it before scoring. Browser differences are described in the [browser guide (Chinese)](docs/web-guide.md). See the [third-party notices (Chinese)](THIRD_PARTY_NOTICES.md) for rule and artwork sources.
+*Figure 1. Recipes, additions, and tag matching. A, B, and C have no trends; the final section shows the same plan scoring 4−0=4 when 「Sweet」 is popular, followed by Cirno's trend preferences. This is a rule illustration using the original pixels of game icons.* [Vector SVG](https://raw.githubusercontent.com/Mingcode123/Mystia-Menu-Optimizer/f53653594bd5c9df07b864f32c97ba5a0fbc9eb7/docs/images/tag-example-en.svg). Tags follow the [original workbook](东方夜雀食堂.xlsx). A prohibited combination produces Dark Matter in the game; Python `nCookware` excludes it before scoring. Browser differences are described in the [browser guide (Chinese)](docs/web-guide.md). See the [third-party notices (Chinese)](THIRD_PARTY_NOTICES.md) for rule and artwork sources.
 
 Chapter 1 focuses on the single-guest and shared cookware models, whose implementation is abbreviated as `nCookware`. The historical multiple-plan model illustrates changes in the decision unit and objectives. The five-slot limit and recipe prohibitions are preparation conditions; the liked-tag threshold and zero-dislike eligibility are planning policies.
 
@@ -378,7 +433,17 @@ Chapter 1 focuses on the single-guest and shared cookware models, whose implemen
 
 ## 1. Mathematical model: from gameplay decisions to optimization
 
-### 1.1 Problem abstraction
+### 1.1 Overview of model evolution
+
+The continuing problem is how to choose preparation plans. What changes as requirements become explicit is **the decision unit, eligibility for comparison, and the ordered definition of a better result**. The browser first provides qualifying-candidate queries; Python planning defines tag-specific plan combinations, one plan per guest, capped coverage utility, and shared cookware selection. HTML and Python are independent entry points sharing a workbook. Arrows represent dependencies between decision definitions, not frontend/backend calls or a precisely dated development timeline.
+
+[![Model evolution: the browser filters several candidates by liked minus disliked matches; the historical model selects a plan per feasible liked tag, first minimizing expected units and then maximizing minimum supply slack; the single-guest model prioritizes liked coverage, units, and slack; cover3 caps coverage benefit at 3; cookware configuration moves from fixed exclusions to selecting exactly n shared types. Presentation changes, CPU acceleration, and profit analysis are distinguished.](https://raw.githubusercontent.com/Mingcode123/Mystia-Menu-Optimizer/f53653594bd5c9df07b864f32c97ba5a0fbc9eb7/docs/images/model-evolution-en.png)](https://raw.githubusercontent.com/Mingcode123/Mystia-Menu-Optimizer/f53653594bd5c9df07b864f32c97ba5a0fbc9eb7/docs/images/model-evolution-en.png)
+
+*Figure 2. Evolution of decision units, objectives, and constraints. Arrows follow problem dependencies; optimality is relative to each model's evaluation policy and retained candidates.* [Vector SVG](https://raw.githubusercontent.com/Mingcode123/Mystia-Menu-Optimizer/f53653594bd5c9df07b864f32c97ba5a0fbc9eb7/docs/images/model-evolution-en.svg).
+
+Moving from browser queries to planning advances from returning eligible candidates to selecting planning solutions by an explicit objective order. Moving from multiple plans to one plan changes both order allocation and the decision unit. Moving from uncapped coverage to `cover3` changes the marginal benefit of a fourth or subsequent liked match. Moving from fixed cookware to `nCookware` makes the equipment set an additional decision variable. The following sections first define the single-guest and shared-cookware models, then contrast historical multiple-plan optimization and browser filtering so that their objectives remain distinct.
+
+### 1.2 Problem abstraction
 
 The decision unit is a base dish with a combination of additional ingredients. At the cookware level, a common equipment set must also be selected. Meal-preparation requirements map to mathematical tasks as follows:
 
@@ -392,9 +457,9 @@ The decision unit is a base dish with a combination of additional ingredients. A
 
 Preference coverage has capped utility: matching more than 3 liked tags does not increase that benefit. Ingredient units measure quantity, while supply slack measures resource pressure under assumed daily demand. They represent distinct preparation tradeoffs. Supply is a comparison criterion rather than a hard inventory constraint. The model focuses on dishes and equipment and does not jointly represent drinks, full satisfaction, or cash profit.
 
-### 1.2 Notation, parameters, and decision variables
+### 1.3 Notation, parameters, and decision variables
 
-The following notation describes the single-guest model and cookware configuration. Symbols specific to the historical multiple-plan model are defined in Section 1.6.
+The following notation describes the single-guest model and cookware configuration. Symbols specific to the historical multiple-plan model are defined in Section 1.7.
 
 | Symbol | Type | Meaning and units |
 | --- | --- | --- |
@@ -406,6 +471,8 @@ The following notation describes the single-guest model and cookware configurati
 | $`T(p)`$ | Derived set | Final tags after processing dish, cookware, price, additions, overrides, and trends |
 | $`P_g, N_g`$ | Guest parameters | Liked-tag and disliked-tag sets after trend-condition processing |
 | $`h_g(p), a_g(p)`$ | Evaluation quantities | Counts of liked and disliked tags matched, respectively |
+| $`s_g(p)`$ | Evaluation quantity | Preference net score: liked minus disliked matches |
+| $`\kappa(d)`$ | Recipe parameter | Cookware required to prepare the dish |
 | $`\tau`$ | Eligibility parameter | Minimum liked-tag count; the `nCookware` default is 3 |
 | $`K`$ | Demand parameter | Assumed orders per guest per day; the default is 5 |
 | $`q_i`$ | Supply parameter | Empirical ingredient supply in units per day, recorded as Total Daily Quantity (TDQ) |
@@ -417,7 +484,7 @@ The following notation describes the single-guest model and cookware configurati
 
 The base dish, additional quantities, and shared cookware set are decisions. Recipes, guest tags, supply estimates, and assumed orders are given inputs. Final tags and evaluation quantities are computed from those inputs and decisions.
 
-### 1.3 Quantities, tags, and feasibility
+### 1.4 Quantities, tags, and feasibility
 
 Total use of each ingredient and the ingredient-unit count are defined as:
 
@@ -430,7 +497,8 @@ Base ingredients contribute to quantities and occupied slots without adding thei
 
 ```math
 h_g(p)=\left|T(p)\cap P_g\right|,\qquad
-a_g(p)=\left|T(p)\cap N_g\right|
+a_g(p)=\left|T(p)\cap N_g\right|,\qquad
+s_g(p)=h_g(p)-a_g(p)
 ```
 
 The `nCookware` rule model requires the five-slot limit, the minimum liked-tag threshold, and no disliked-tag matches:
@@ -441,7 +509,7 @@ L(p)\le5,\qquad h_g(p)\ge\tau,\qquad a_g(p)=0
 
 Candidates are also restricted by owned dishes, recipe prohibitions, and available cookware. Liked and disliked trends are triggered by separately specified tags. When no trigger is supplied for a trend direction, that trend tag is removed from guest preference and dislike sets. The browser instead filters on the net score $`h_g(p)-a_g(p)`$, which differs from the single-guest planning eligibility conditions in this section.
 
-### 1.4 Single-guest objective
+### 1.5 Single-guest objective
 
 One plan serves all assumed orders for a guest. Daily ingredient demand is per-dish use multiplied by daily orders. Minimum supply slack and coverage benefit are:
 
@@ -450,7 +518,14 @@ R(p)=\min_{i:c_i(p)>0}\left(q_i-Kc_i(p)\right),\qquad
 U(h)=\min(h,3)
 ```
 
-Single-guest plans are compared using the lexicographic objective:
+The uncapped `singlePLAN` model first seeks more liked matches:
+
+```math
+\max_{p\in\mathcal C_g}^{\mathrm{lex}}
+\left(h_g(p),\;-L(p),\;R(p)\right)
+```
+
+The `cover3` and subsequent branches replace the first criterion with capped utility:
 
 ```math
 \max_{p\in\mathcal C_g}^{\mathrm{lex}}
@@ -461,7 +536,9 @@ The criteria maximize coverage benefit, minimize ingredient units, and maximize 
 
 The minimum threshold controls eligibility, while the coverage cap defines utility. At the default threshold of 3, qualifying candidates all have a coverage benefit of 3, so subsequent comparisons primarily depend on ingredient units and minimum supply slack. Negative slack indicates that the corresponding assumed demand exceeds empirical daily supply.
 
-### 1.5 Shared cookware and solution scope
+For example, the rice-ball-and-honey plan in Figure 1 has a raw score of 4 when 「Sweet」 triggers the liked trend, while its capped utility remains 3. The cap neither removes the fourth matched tag nor changes the raw score to 3; it changes only the benefit used to compare plans.
+
+### 1.6 Shared cookware and solution scope
 
 Available cookware is determined by the equipment associated with owned dishes. The selected set satisfies:
 
@@ -471,18 +548,48 @@ S\subseteq H,\qquad |S|=n
 
 `nCookware` first computes the best retained candidate for each guest and cookware type, then enumerates shared cookware sets. It compares total coverage benefit, total ingredient units, and the sum of per-guest minimum supply slack values, with penalties for guests lacking a feasible plan. At the default three-point threshold, the first criterion prioritizes the number of guests with a plan. Ingredient demand remains independently accounted for per guest, without joint inventory deductions.
 
-Equivalent-ingredient representative selection and the neutral-filler cutoff restrict $`\mathcal C_g`$. Objective comparison within this set therefore does not establish global optimality over all legal ingredient combinations. The set-level objective, tie-breaking rules, and a counterexample appear in the [optimization model and algorithm boundaries (Chinese)](docs/design.md).
-
-### 1.6 Historical multiple-plan model
-
-An earlier model assigns multiple plans by liked tag. Assume daily orders $`K`$ are distributed equally among $`m>0`$ tag-specific plans with feasible candidates. Let $`u_i`$ denote total use of ingredient $`i`$ across the selected plans; $`q_i`$ retains the daily-supply definition above. Expected ingredient units and minimum supply slack are:
+Let $`\mathcal C_g(S)=\{p\in\mathcal C_g:\kappa(d)\in S\}`$, with $`p_g^*(S)`$ the plan selected by the single-guest objective. Let $`G_S`$ contain guests with a plan and $`z_S`$ count guests without one. The original program evaluates sets as:
 
 ```math
+\max_{S\subseteq H,\ |S|=n}^{\mathrm{lex}}
+\left(
+\sum_{g\in G_S}U(h_g(p_g^*(S))),\;
+-\left[\sum_{g\in G_S}L(p_g^*(S))+10^9z_S\right],\;
+\sum_{g\in G_S}R(p_g^*(S))-10^{18}z_S
+\right)
+```
+
+The constants are the original implementation's penalties for missing plans; feasibility for every guest is not required. Decomposition follows from independent guest evaluations once shared cookware is fixed. The `limitedCookware` branch only excludes specified equipment from a given set; it does not optimize the equipment set itself.
+
+Equivalent-ingredient representative selection and the neutral-filler cutoff restrict $`\mathcal C_g`$. Objective comparison within this set therefore does not establish global optimality over all legal ingredient combinations. The set-level objective, tie-breaking rules, and a counterexample appear in the [optimization model and algorithm boundaries (Chinese)](docs/design.md).
+
+### 1.7 Historical multiple-plan model
+
+The historical `detailedPLAN` model assigns plans by liked tag. For each target liked tag $`t`$ with candidates, apply the original ingredient-upgrade and addition-subset filters to the eligible tag-specific pool, then select $`p_t`$ from its retained candidates; the same recipe plan may serve the order shares of several tags. Assume daily orders $`K`$ are distributed equally among $`m>0`$ tag-specific plans with feasible candidates. Let $`u_i`$ denote total use of ingredient $`i`$ across the selected plans; $`q_i`$ retains the daily-supply definition above. Expected ingredient units and minimum supply slack are:
+
+```math
+u_i=\sum_t c_i(p_t),\qquad
 E_{\mathrm{old}}=\frac{K}{m}\sum_i u_i,\qquad
 R_{\mathrm{old}}=\min_{i:u_i>0}\left(q_i-\frac{K}{m}u_i\right)
 ```
 
-This model first minimizes $`E_{\mathrm{old}}`$, then maximizes $`R_{\mathrm{old}}`$ among ties. Equal order allocation is a modeling assumption without a corresponding measured probability estimate. No plan is produced when no tag has a feasible candidate. The single-guest model changes both the decision unit and the evaluation order; Chapter 2 describes that design evolution.
+Its objective is:
+
+```math
+\min_{(p_t)_t}^{\mathrm{lex}}\left(E_{\mathrm{old}},\;-R_{\mathrm{old}}\right)
+```
+
+At a fixed tag count, the first objective separates by tag, so all candidates tied for minimum units are retained for each tag. The second objective compares their combined ingredient use; ties in minimum slack are resolved by maximizing the full sorted slack vector. For a slack threshold $`\lambda`$, the program checks whether a combination satisfies $`q_i-(K/m)u_i\ge\lambda`$ for every ingredient used, using binary search and DFS. This maximizes slack across one guest's multiple plans, not shared inventory across guests. Equal order allocation is a modeling assumption without a corresponding measured probability estimate. No plan is produced when no tag has a feasible candidate. The single-guest model changes both the decision unit and the evaluation order; Chapter 2 describes that design evolution.
+
+### 1.8 Browser filtering versus planning objectives
+
+Given a guest, a net-score threshold, and optional filters, the browser returns retained candidates. Let $`\mathcal C_g^{\mathrm{web}}`$ denote candidates generated under its enumeration and filtering rules. The core score condition is:
+
+```math
+\mathcal W_g(\tau)=\left\{p\in\mathcal C_g^{\mathrm{web}}:s_g(p)\ge\tau\right\}
+```
+
+This defines a candidate filter, not a unique optimum across dishes. Browser queries allow liked matches to offset disliked matches, whereas Python PLAN excludes any disliked match before comparison; recipe-prohibition parsing and ownership conditions also differ. Optional browser procurement ranking compares sorted daily-supply vectors within each dish and keeps every candidate at least as good as the Nth-place threshold, including ties. It does not use supply minus assumed demand. Ranking and filtering details appear in the [optimization model and algorithm boundaries (Chinese)](docs/design.md) and [browser guide (Chinese)](docs/web-guide.md).
 
 <a id="en-evolution"></a>
 
@@ -490,12 +597,12 @@ This model first minimizes $`E_{\mathrm{old}}`$, then maximizes $`R_{\mathrm{old
 
 ### 2.1 From preparation problems to comparable objectives
 
-The project began by seeking preparation plans that meet guest requirements. As rules and use conditions became clearer, the meaning of an optimal plan was progressively specified through the decision unit, eligibility conditions, and comparison order. Early requirements also considered ranking by actual profit. The subsequent planning models express resource requirements through ingredient units and supply slack, while prices and profit remain subjects of separate analysis.
+The project began by seeking preparation plans that meet guest requirements. As rules and use conditions became clearer, the meaning of an optimal plan was progressively specified through the decision unit, eligibility conditions, and comparison order. Early requirements also included ranking by actual profit. The subsequent planning models express resource requirements through ingredient units and supply slack, while regular guests, drinks, prices, and profit remain separate analysis branches.
 
 | Decision problem | Model change | Rationale and consequences |
 | --- | --- | --- |
 | What to prepare for several liked tags | Assign a plan to each coverable tag and estimate total use under equal order allocation; first minimize expected ingredient units, then maximize minimum supply slack | Different tags account for separate order shares; candidates tied for minimum units must still be retained because ingredient allocation affects supply pressure |
-| What fixed plan to prepare for each guest | Change the decision unit to one plan per guest; compare preference coverage, then units and slack | The requirement became a fixed plan for each rare guest to reduce per-guest preparation choices; that plan serves the guest's assumed orders, shifting the objective to the coverage and consumption of one dish |
+| What fixed plan to prepare for each guest | Change the decision unit to one plan per guest; compare preference coverage, then units and slack | The requirement explicitly became one fixed plan per rare guest; orders are no longer split by tag, and the chosen plan serves all assumed orders, shifting the objective to the coverage and consumption of one dish |
 | Whether to pursue additional matches after qualification | Cap coverage benefit at 3 | Prioritize ingredient use after meeting the coverage target; additional matches may remain, but no longer increase the first objective |
 | How limited equipment can serve several guests | Extend specified cookware exclusions to the selection of exactly n shared cookware types | Guest-specific plans must fit the common equipment set; at the default threshold, set evaluation first increases the number of guests with qualifying plans |
 
@@ -544,6 +651,8 @@ The following cases explain the effects of eligibility rules, objective changes,
 
 In Figure 1, rice ball with honey matches 3 of Reimu's likes and 0 dislikes; rice ball with pork matches 2 likes and 0 dislikes. Under the default `nCookware` conditions, the former meets the liked-tag threshold and the latter does not. Stinky tofu with honey triggers a recipe prohibition and is excluded before scoring in this planning workflow.
 
+In the separate trend scenario, the same rice ball with honey gains 「Liked trend」 because it contains 「Sweet」. It matches 4 likes and 0 dislikes, for a raw score of 4, while still using 2 ingredient units and retaining utility 3 under `cover3`. Both trend conditions were checked using the original workbook and candidate-generation functions.
+
 This case distinguishes preparation conflicts from preference-based eligibility. Passing the threshold only permits a candidate to enter subsequent comparisons; it does not establish that rice ball with honey is optimal among all candidates.
 
 ### 4.2 How capped coverage changes the choice
@@ -572,6 +681,7 @@ The choices have identical tags and ingredient counts, but distributing use acro
 
 | Existing check | Observation | Supported conclusion |
 | --- | --- | --- |
+| Trend comparison using original functions | Original workbook, Reimu, rice ball with honey: raw score 3 without trends and 4 with 「Sweet」 popular; both use 2 ingredient units, match 0 dislikes, and have capped utility 3 | The trend adds a match; the coverage cap affects only optimization utility |
 | Browser case using the complete workbook | 博丽灵梦, threshold 3, addition-subset filtering and equivalent-ingredient deduplication enabled: 4,372 candidates; 59 rows after searching for 「饭团」, and 59 rows in the XLSX export | Query and export behavior agree under the specified conditions |
 | Small Python comparison | 12 ingredients, 8 dishes, 3 guests, and 5 cookware types; no trends and 3 selected cookware types. Four runs across the original and copied programs produced matching XLSX contents except for time metadata | The distributed copy preserves the original computational behavior under the specified conditions |
 
