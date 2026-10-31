@@ -10,7 +10,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
-Distributed file: web/vendor/xlsx.full.min.js
+Distributed file: HTML/xlsx.full.min.js
 SheetJS version: 0.20.3
 SHA256: cc015130aa8521e7f088f88898eba949ccdcbfb38df0bd129b44b7273c3a6f41
 The library file is copied without modification, including its original header:

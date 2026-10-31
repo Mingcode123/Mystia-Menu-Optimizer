@@ -743,7 +743,7 @@ python -m http.server 8000 --bind 127.0.0.1
 
 第二条通过「水产」触发「流行·厌恶」，扣分后仍达到网页的 3 分门槛。两条候选同时保留，体现网页查询中净分与过滤选项的共同作用。下一节的 Python 规划采用无厌恶准入，并按 cover3 目标选择每客方案；其候选范围与评价顺序独立定义。
 
-**导出：** 保持上述搜索结果，点击“下载 CSV”，实测导出 5 条数据、8 列，内容与页面逐行一致。页面也提供“下载 XLSX”，其工作表名为 `结果`；字段与导出边界见[输入输出规范](docs/input-output.md)，操作说明见[网页使用说明](docs/web-guide.md)。
+**导出：** 保持上述搜索结果，分别点击“下载 CSV”和“下载 XLSX”，两种格式均导出 5 条数据、8 列，内容与页面逐行一致。XLSX 工作表名为 `结果`；字段与导出边界见[输入输出规范](docs/input-output.md)，操作说明见[网页使用说明](docs/web-guide.md)。
 
 ### 4.3 Python：生成完整稀客菜单
 
@@ -905,7 +905,7 @@ R(p)=\min(47-5\times1,\ 68-5\times1)=42.
 
 ### 4.6 验证范围
 
-网页案例记录当前实现的一次完整查询、搜索筛选及 CSV 导出，核对了 264 条候选中的 5 条可见记录与导出内容。本章历史菜单核对使用 v1.0.0；当前 Python 与该版本的等价性由第三章的独立差分验证覆盖。
+网页案例覆盖当前实现的完整查询、搜索筛选及 CSV、XLSX 导出，核对了 264 条候选中的 5 条可见记录与两种导出格式。本章历史菜单核对使用 v1.0.0；当前 Python 与该版本的等价性由第三章的独立差分验证覆盖。
 
 复现按角色姓名比较料理、厨具和总食材多重集，不比较食材排列及表格版式。原程序、输入工作簿和历史结果文件的运行前后哈希一致。全量核对及既有网页、发布副本检查见[验证记录](docs/verification.md)；目标封顶和候选压缩的说明性算例见[优化模型与算法边界](docs/design.md)。
 
@@ -1683,7 +1683,7 @@ Two records have the exact dish name 饭团 (rice ball). Both use the prep count
 
 The second plan gains 「Disliked trend」 through 「Aquatic」 and still meets the browser's 3-point threshold after the penalty. Retaining both candidates illustrates the combined effect of net-score eligibility and filter settings. The Python planner in the next section requires zero disliked matches and selects plans using cover3; its candidate scope and evaluation order are defined independently.
 
-**Export:** With the search active, clicking “下载 CSV” (Download CSV) exported 5 data rows and 8 columns, matching the displayed records row by row. “下载 XLSX” (Download XLSX) is also available and uses a sheet named `结果`. Fields and export boundaries appear in the [input/output reference (Chinese)](docs/input-output.md); operations appear in the [browser guide (Chinese)](docs/web-guide.md).
+**Export:** With the search active, both “下载 CSV” (Download CSV) and “下载 XLSX” (Download XLSX) exported 5 data rows and 8 columns, matching the displayed records row by row. The XLSX sheet is named `结果`. Fields and export boundaries appear in the [input/output reference (Chinese)](docs/input-output.md); operations appear in the [browser guide (Chinese)](docs/web-guide.md).
 
 ### 4.3 Python: generating a complete rare-guest menu
 
@@ -1845,7 +1845,7 @@ Cocoa beans produce one more liked match, but both plans have capped benefit 3 a
 
 ### 4.6 Verification scope
 
-The browser case records one complete query, search filter, and CSV export in the current implementation. The five visible records filtered from 264 candidates match the export. The historical menu reproduction in this chapter uses v1.0.0; equivalence with the current Python implementation is covered by the separate differential checks in Chapter 3.
+The browser case covers a complete query, search filter, and CSV and XLSX exports in the current implementation. The five visible records filtered from 264 candidates match both export formats. The historical menu reproduction in this chapter uses v1.0.0; equivalence with the current Python implementation is covered by the separate differential checks in Chapter 3.
 
 Reproduction compares dish, cookware, and total ingredient multiset by guest name, excluding ingredient order and worksheet layout. Hashes of the original program, input workbook, and historical result file were unchanged before and after execution. The full comparison and existing browser and distributed-file checks appear in the [verification record (Chinese)](docs/verification.md); explanatory examples for objective capping and candidate compression appear in the [optimization model and algorithm boundaries (Chinese)](docs/design.md).
 
