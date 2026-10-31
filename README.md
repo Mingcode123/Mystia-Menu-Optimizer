@@ -14,7 +14,7 @@
 
 [数学模型](#zh-model) · [设计依据与演进](#zh-evolution) · [数据与假设](#zh-data) · [案例与验证](#zh-verification) · [求解与复现](#zh-methods) · [局限](#zh-limits) · [贡献与文档](#zh-sources)
 
-**机制与术语** &nbsp; <a href="#zh-tag-figure"><img src="docs/images/jump-to-figure-zh.png" alt="看机制图" width="104" height="28" align="middle"></a>
+**机制与术语** &nbsp; <a href="#zh-tag-figure"><img src="docs/images/jump-to-figure-zh.png" alt="直接看机制图" width="132" height="28" align="middle"></a>
 
 制作与评价分为三个步骤：
 
@@ -402,7 +402,7 @@ The author's main work comprises identifying gameplay problems, clarifying rule 
 
 [Mathematical model](#en-model) · [Design rationale and evolution](#en-evolution) · [Data and assumptions](#en-data) · [Cases and verification](#en-verification) · [Solution methods and reproduction](#en-methods) · [Limitations](#en-limits) · [Contributions and documentation](#en-sources)
 
-**Mechanics and terminology** &nbsp; <a href="#en-tag-figure"><img src="docs/images/jump-to-figure-en.png" alt="View diagram" width="132" height="28" align="middle"></a>
+**Mechanics and terminology** &nbsp; <a href="#en-tag-figure"><img src="docs/images/jump-to-figure-en.png" alt="Jump to diagram" width="156" height="28" align="middle"></a>
 
 Preparation and evaluation follow three steps:
 
