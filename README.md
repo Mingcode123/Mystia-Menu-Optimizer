@@ -661,6 +661,20 @@ python Python/singlePLAN_cover3_mixIng_nCookware.py
 
 默认输出位于 `稀客料理表/single_mixIng_nCookware/`，文件名按流行标签与所选厨具生成，含 14 列的 `Plans` 表，图标列为空占位。显式相对输入、输出路径以脚本目录 `Python/` 为基准解析。参数及字段见[输入输出规范](docs/input-output.md)；得分表和利润表由独立分析脚本生成。
 
+<a id="zh-case-selection"></a>
+
+#### 整张菜单的生成过程
+
+程序以工作簿中已持有的 163 道料理与 58 位稀客为范围，在本例条件下为每位顾客选定一套方案。先为每客、每种厨具保存最佳候选，再在指定厨具集合内确定最终方案；输出时将基础食材与加料合并为总食材列。
+
+[![整张历史菜单的生成过程及灵梦候选比较](https://raw.githubusercontent.com/Mingcode123/Mystia-Menu-Optimizer/ebba2fd8d7b5ff273eeea0e290101d5a98a3f3d6/docs/images/case-selection.png)](https://raw.githubusercontent.com/Mingcode123/Mystia-Menu-Optimizer/ebba2fd8d7b5ff273eeea0e290101d5a98a3f3d6/docs/images/case-selection.png)
+
+[查看矢量图（SVG）](https://raw.githubusercontent.com/Mingcode123/Mystia-Menu-Optimizer/ebba2fd8d7b5ff273eeea0e290101d5a98a3f3d6/docs/images/case-selection.svg)
+
+图中灵梦的三个饭团组合用于展开准入与比较规则。零加料饭团只有 2 分，其搜索分支提前结束；蜂蜜与可可豆均达标，封顶收益和件数相同，最终由最低供给余量区分。完整搜索还比较其他料理。三项指标完全相同时，程序依次按售价降序、料理名称及加料字符串升序确定结果。
+
+本例五种厨具全部可用，仅有一个设备配置；选择范围为原程序实际保留的候选，供给余量逐客核算。各阶段的候选总数未留存，图中不据此推算搜索规模。
+
 ### 4.3 历史结果展示
 
 历史成品保存 58 位角色的料理、厨具及总食材列表，每份使用 1–3 件食材。五种厨具均有记录：料理台 24 条、煮锅 18 条、油锅 8 条、烧烤架 6 条、蒸锅 2 条。这里选择了全部五种厨具，未产生设备子集之间的取舍。在上述复现条件下，现存原程序重现了全部 58 条保存方案。
@@ -1413,6 +1427,20 @@ Respond to the console prompts in this order:
 | Allowed cookware count | Type `5`, then press Enter | Use the prep counter, frying pan, grill, pot, and steamer |
 
 By default, output goes to `稀客料理表/single_mixIng_nCookware/`. Its filename encodes the trend tags and selected cookware, and its `Plans` sheet contains 14 columns with empty icon placeholders. Explicit relative input and output paths are resolved from the script directory, `Python/`. Parameters and fields appear in the [input/output reference (Chinese)](docs/input-output.md); separate analysis scripts produce the score and profit tables.
+
+<a id="en-case-selection"></a>
+
+#### How the complete menu is generated
+
+The program uses the workbook's 163 owned dishes and 58 rare guests to select one plan per guest under this case's settings. It first stores the best candidate for each guest and cookware type, then selects the final plan within the specified equipment set. Base ingredients and additions are combined into the total-ingredients columns for output.
+
+[![Complete historical-menu selection flow and Reimu candidate comparison](https://raw.githubusercontent.com/Mingcode123/Mystia-Menu-Optimizer/ebba2fd8d7b5ff273eeea0e290101d5a98a3f3d6/docs/images/case-selection-en.png)](https://raw.githubusercontent.com/Mingcode123/Mystia-Menu-Optimizer/ebba2fd8d7b5ff273eeea0e290101d5a98a3f3d6/docs/images/case-selection-en.png)
+
+[View vector figure (SVG)](https://raw.githubusercontent.com/Mingcode123/Mystia-Menu-Optimizer/ebba2fd8d7b5ff273eeea0e290101d5a98a3f3d6/docs/images/case-selection-en.svg)
+
+The three Reimu rice-ball combinations illustrate eligibility and comparison. The rice ball without additions scores only 2, so its search branch ends early. Honey and cocoa both qualify, tie on capped benefit and ingredient count, and are separated by minimum supply slack. The full search also compares other dishes. When all three criteria tie, the program uses selling price in descending order, followed by dish name and the additions string in ascending order.
+
+All five cookware types are available in this case, leaving one equipment configuration. Selection covers candidates retained by the original program, with supply slack calculated independently per guest. Candidate counts at intermediate stages were not recorded, so the diagram does not infer search size from them.
 
 ### 4.3 Historical results
 
