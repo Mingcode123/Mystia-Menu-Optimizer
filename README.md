@@ -53,7 +53,7 @@
 
 *图 2. 决策单位、目标与约束的演进。箭头按问题依赖组织；每种模型的“最优”仅针对其评价政策和保留候选成立。* [SVG 矢量原图](https://raw.githubusercontent.com/Mingcode123/Mystia-Menu-Optimizer/53cee219714977bd0df5bd3f36ecc8880528f46c/docs/images/model-evolution.svg)。
 
-以下以 HTML 为起点，按 `detailedPLAN`、`singlePLAN`、`cover3` 的顺序展开，再单列输出格式、固定厨具与共同厨具分支。每节先说明决策问题和相对上一模型的变化，再定义新增量与公式；已有符号保持原义，候选集合按对应实现区分。
+以下以 HTML 为起点，按 `detailedPLAN`、`singlePLAN`、`cover3` 的顺序展开，再单列输出格式、固定厨具与共同厨具分支。各模型沿用基本符号，候选集合按对应实现区分。
 
 ### 1.2 HTML：定义方案、筛选候选与比较采购条件
 
@@ -74,14 +74,14 @@
 
 #### 1.2.2 共同模型：方案、标签与准入
 
-符号尽量对应英文含义：$`g`$ 为 Guest，$`d`$ 为 Dish，$`i`$ 为 Ingredient，$`p`$ 为 Plan。固定顾客 $`g`$ 后，决策是选择料理 $`d`$ 及加料向量 $`a`$：
+令 $`g`$ 表示顾客（Guest），$`d`$ 表示料理（Dish），$`i`$ 表示食材（Ingredient），$`p`$ 表示方案（Plan）。固定顾客 $`g`$ 后，决策是选择料理 $`d`$ 及加料向量 $`a`$：
 
 ```math
 p=(d,a),\qquad a_i\in\mathbb Z_{\ge0},\qquad
 c_i(p)=b_i(d)+a_i,\qquad C(p)=\sum_i c_i(p)\le5
 ```
 
-| 符号 | 英文对应与含义 | 单位 |
+| 符号 | 定义 | 单位 |
 | --- | --- | --- |
 | $`b_i(d)`$ | Base：料理配方规定的食材用量，是给定参数 | 件／份 |
 | $`a_i`$、$`A(p)=(a_i)_i`$ | Addition：追加该食材的件数，以及完整加料向量，是决策量 | 件／份 |
@@ -243,11 +243,11 @@ i_{\mathrm{out}}\in\arg\max_{j\in M(i)}q_j
 由此，HTML 阶段的模型完整地分为**准入条件、两种方案删减政策、食材等价近似与采购排序**。后续 Python 版本将进一步定义自动选定方案的目标，而非直接把这套网页过滤流程视为唯一的最优解定义。
 
 <details>
-<summary>与既有图稿及补充说明的符号对照</summary>
+<summary>与图稿及补充文档的符号对照</summary>
 
-本章使用英文含义较直观的记号；既有图稿及部分补充文档仍沿用旧记号，对应关系如下，模型含义不变。
+下表列出本章与图稿、补充文档所用记号的对应关系。
 
-| 本章记号 | 既有记号 | 含义 |
+| 本章记号 | 图稿及补充文档 | 含义 |
 | --- | --- | --- |
 | $`a_i`$ | $`x_i`$ | 加料件数 |
 | $`C(p)`$ | $`L(p)`$ | 总食材件数 |
@@ -633,7 +633,7 @@ The continuing problem is how to choose preparation plans. What changes as requi
 
 *Figure 2. Evolution of decision units, objectives, and constraints. Arrows follow problem dependencies; optimality is relative to each model's evaluation policy and retained candidates.* [Vector SVG](https://raw.githubusercontent.com/Mingcode123/Mystia-Menu-Optimizer/53cee219714977bd0df5bd3f36ecc8880528f46c/docs/images/model-evolution-en.svg).
 
-The following sections start with HTML, continue through `detailedPLAN`, `singlePLAN`, and `cover3`, then separate output formatting, fixed cookware, and shared cookware into distinct branches. Each section first states the decision problem and its change from the preceding model, then defines new quantities and equations. Existing symbols retain their meanings, while candidate sets are distinguished by implementation.
+The following sections start with HTML, continue through `detailedPLAN`, `singlePLAN`, and `cover3`, then separate output formatting, fixed cookware, and shared cookware into distinct branches. The models share basic notation, while candidate sets are distinguished by implementation.
 
 ### 1.2 HTML: defining plans, filtering candidates, and comparing procurement conditions
 
@@ -654,14 +654,14 @@ The execution order is **exclude ingredient names forbidden by the dish → opti
 
 #### 1.2.2 Common model: plans, tags, and admission
 
-Symbols follow their English meanings where possible: $`g`$ denotes Guest, $`d`$ Dish, $`i`$ Ingredient, and $`p`$ Plan. For a fixed guest $`g`$, the decision selects a dish $`d`$ and an addition vector $`a`$:
+Let $`g`$ denote a guest, $`d`$ a dish, $`i`$ an ingredient, and $`p`$ a plan. For a fixed guest $`g`$, the decision selects a dish $`d`$ and an addition vector $`a`$:
 
 ```math
 p=(d,a),\qquad a_i\in\mathbb Z_{\ge0},\qquad
 c_i(p)=b_i(d)+a_i,\qquad C(p)=\sum_i c_i(p)\le5
 ```
 
-| Symbol | English meaning and definition | Unit |
+| Symbol | Definition | Unit |
 | --- | --- | --- |
 | $`b_i(d)`$ | Base: ingredient quantity required by the dish's recipe; a given parameter | Units per serving |
 | $`a_i`$, $`A(p)=(a_i)_i`$ | Addition: quantity of the added ingredient and the complete addition vector; decision variables | Units per serving |
@@ -823,11 +823,11 @@ If no supply value is known, the current representative remains. Ties follow rep
 The HTML model therefore comprises **admission conditions, two candidate-removal policies, an ingredient-equivalence approximation, and procurement ranking**. Subsequent Python versions introduce objectives for selecting plans automatically, rather than treating this webpage filtering pipeline as the sole definition of optimality.
 
 <details>
-<summary>Notation correspondence with existing figures and supplementary documents</summary>
+<summary>Notation correspondence with figures and supplementary documents</summary>
 
-This chapter uses symbols with more direct English associations. Existing figures and some supplementary documents retain earlier symbols; the following correspondence preserves their model meanings.
+The following table maps the notation in this chapter to that used in the figures and supplementary documents.
 
-| This chapter | Earlier notation | Meaning |
+| This chapter | Figures and supplementary documents | Meaning |
 | --- | --- | --- |
 | $`a_i`$ | $`x_i`$ | Addition count |
 | $`C(p)`$ | $`L(p)`$ | Total ingredient count |
