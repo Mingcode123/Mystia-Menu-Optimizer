@@ -49,7 +49,7 @@
 
 备菜决策包含两个层次：确定一份料理的制作方案，以及在满足条件的方案之间作出选择。各版本共享食材用量与标签匹配的基本定义；候选生成规则、订单假设和优化目标分别由具体模型规定。
 
-**对象与记号。** 令 $`g`$ 表示顾客，$`d`$ 表示料理，$`i`$ 表示食材，$`t`$ 表示标签，$`p`$ 表示制作方案。候选与偏好集合采用花体，向量采用粗体；下标标识对象，括号上标 $`(r)`$ 标识过滤阶段，正体角标标识固定类别。$`v`$ 为模型版本索引，$`\star`$ 标识按对应目标选出的最优保留方案。
+**对象与记号：** 令 $`g`$ 表示顾客，$`d`$ 表示料理，$`i`$ 表示食材，$`t`$ 表示标签，$`p`$ 表示制作方案。候选与偏好集合采用花体，向量采用粗体；下标标识对象，括号上标 $`(r)`$ 标识过滤阶段，正体角标标识固定类别。$`v`$ 为模型版本索引，$`\star`$ 标识按对应目标选出的最优保留方案。
 
 | 符号 | 定义 | 单位或类型 |
 | --- | --- | --- |
@@ -64,23 +64,25 @@
 | $`q_i`$ | 食材的经验日供给量，来自工作簿 TDQ | 件／日 |
 | $`K`$ | 每位顾客的假设日订单量；Python 规划默认取 5 | 单／日 |
 
-**方案与制作约束。** 一份方案由所选料理与加料件数组成。基础食材和加料共同占用最多五个格子，重复使用同种食材逐件计数：
+**方案与制作约束：** 一份方案由所选料理与加料件数组成。基础食材和加料共同占用最多五个格子，重复使用同种食材逐件计数：
 
 ```math
-\begin{aligned}
-p&=(d,\mathbf A),\qquad \mathbf A=(a_i)_i,\qquad a_i\in\mathbb Z_{\ge0},\\
-c_i(p)&=b_i(d)+a_i(p),\qquad C(p)=\sum_i c_i(p)\le5.
-\end{aligned}
+\begin{gathered}
+p=(d,\mathbf A),\quad \mathbf A=(a_i)_i,\quad a_i\in\mathbb Z_{\ge0},\\
+c_i(p)=b_i(d)+a_i(p),\quad C(p)=\sum_i c_i(p)\le5.
+\end{gathered}
 ```
 
 基础食材满足配方并占用格数，其标签不自动并入料理；加料带入食材标签。$`T(p)`$ 表示当前版本依据料理、厨具、售价、加料及覆盖、流行等规则得到的最终标签集合，同名标签只保留一次。顾客对流行词条的喜恶固定，当期触发条件决定方案是否获得相应标签。配方禁忌与候选处理范围须按所用入口解释，HTML 与 Python 的具体行为见[网页使用说明](docs/web-guide.md)及[优化模型与算法边界](docs/design.md)。
 
-**匹配与得分。** 喜爱命中数、厌恶命中数和净分定义为：
+**匹配与得分：** 喜爱命中数、厌恶命中数和净分定义为：
 
 ```math
-H_g^{\mathrm L}(p)=\left|T(p)\cap\mathcal L_g\right|,\qquad
-H_g^{\mathrm D}(p)=\left|T(p)\cap\mathcal D_g\right|,\qquad
+\begin{gathered}
+H_g^{\mathrm L}(p)=\left|T(p)\cap\mathcal L_g\right|,\\
+H_g^{\mathrm D}(p)=\left|T(p)\cap\mathcal D_g\right|,\\
 S_g(p)=H_g^{\mathrm L}(p)-H_g^{\mathrm D}(p)
+\end{gathered}
 ```
 
 净分描述方案与顾客偏好的匹配情况；是否达标、达标后如何比较，属于各版本的准入与评价政策。$`\mathrm{lex}`$ 表示词典序：先比较目标向量的第一项，只有相同时才比较下一项。
@@ -121,7 +123,7 @@ S_g(p)=H_g^{\mathrm L}(p)-H_g^{\mathrm D}(p)
 
 #### 1.2.2 准入条件与初始候选
 
-**约束与判定。** 基础配方与加料总件数不超过五件；用户还可设置必含标签、排除标签和最低净分。基础配方不足五件、追加后总用料达到五件时，网页加入「大份」；料理自身已有的「大份」也会保留。
+**约束与判定：** 基础配方与加料总件数不超过五件；用户还可设置必含标签、排除标签和最低净分。基础配方不足五件、追加后总用料达到五件时，网页加入「大份」；料理自身已有的「大份」也会保留。
 
 令 $`\mathcal B_d^{\mathrm{web}}`$ 为网页针对料理 $`d`$ 实际枚举的方案池；它受原配方处理及等价去重选项影响。未指定的标签条件取空集。进入后续过滤的达标候选为：
 
@@ -136,7 +138,7 @@ S_g(p)\ge S_{\min},\quad R_{\mathrm T}\subseteq T(p),\quad E_{\mathrm T}\cap T(p
 
 #### 1.2.3 等价去重：压缩加料食材池
 
-**目的。** 如果两种食材提供完全相同的非空标签，先只枚举一个代表，减少重复的标签组合。这里的等价依据是食材自身标签，不是售价、供给量或方案最终标签。
+**目的：** 如果两种食材提供完全相同的非空标签，先只枚举一个代表，减少重复的标签组合。这里的等价依据是食材自身标签，不是售价、供给量或方案最终标签。
 
 定义等价关系及等价组：
 
@@ -152,7 +154,7 @@ E(i)=\{j:j\sim i\}
 
 #### 1.2.4 食材高级过滤：比较指定的基础替代
 
-**目的。** 若额外标签并非达标所必需，可以优先保留由标签更少的食材构成的方案。“高级”在此按标签包含关系定义，不代表食材价格、稀有度或游戏等级。
+**目的：** 若额外标签并非达标所必需，可以优先保留由标签更少的食材构成的方案。“高级”在此按标签包含关系定义，不代表食材价格、稀有度或游戏等级。
 
 在该料理实际用于枚举的食材池中，对食材 $`i`$ 寻找满足下式的基础替代 $`j`$：
 
@@ -163,10 +165,11 @@ E(i)=\{j:j\sim i\}
 原程序从识别出的替代项中选标签数最少者，同数量时按中文名称顺序选择，记为 $`B_d(i)`$（Base representative）；没有替代项时取 $`B_d(i)=i`$。将方案的**所有加料同时**映射到这些代表，得到基础加料向量：
 
 ```math
-\begin{aligned}
-a_j^{\mathrm{base}}(p)&=\sum_{i:B_d(i)=j}a_i(p),\\
-\mathbf A^{\mathrm{base}}(p)&=(a_j^{\mathrm{base}}(p))_j,\qquad p^{\mathrm{base}}=(d,\mathbf A^{\mathrm{base}}(p)).
-\end{aligned}
+\begin{gathered}
+a_j^{\mathrm{base}}(p)=\sum_{i:B_d(i)=j}a_i(p),\\
+\mathbf A^{\mathrm{base}}(p)=(a_j^{\mathrm{base}}(p))_j,\\
+p^{\mathrm{base}}=(d,\mathbf A^{\mathrm{base}}(p)).
+\end{gathered}
 ```
 
 当 $`\mathbf A^{\mathrm{base}}(p)\ne \mathbf A(p)`$ 时，该方案被视为含高级加料。开启高级过滤后，删除条件为：
@@ -185,7 +188,7 @@ $`F_{\mathrm U}`$ 是该过滤的“考虑得分”开关：开启为 1，关闭
 
 #### 1.2.5 加料子集过滤：比较能否少加食材
 
-**目的。** 若保留方案仅使用当前方案的一部分加料即可达标，则按用户政策省略更多加料的方案。这里比较食材的**件数向量**，不是食材名称集合或标签集合：
+**目的：** 若保留方案仅使用当前方案的一部分加料即可达标，则按用户政策省略更多加料的方案。这里比较食材的**件数向量**，不是食材名称集合或标签集合：
 
 ```math
 \mathbf A(p')\preceq \mathbf A(p)\quad\Longleftrightarrow\quad
@@ -206,9 +209,9 @@ $`F_{\mathrm S}`$ 是子集过滤的“考虑得分”开关：关闭时，已�
 
 #### 1.2.6 采购推荐：按供给向量确定保留边界
 
-**目的。** 在 $`\mathcal C_{g,d}^{(2)}`$ 中，优先考虑供给较充足的用料组合。此时还没有每日订单量假设，也不从供给中扣减消耗；比较在每道料理内部进行。
+**目的：** 在 $`\mathcal C_{g,d}^{(2)}`$ 中，优先考虑供给较充足的用料组合。此时还没有每日订单量假设，也不从供给中扣减消耗；比较在每道料理内部进行。
 
-**有效供给值。** 沿用经验日供给量 $`q_i`$，令 $`M(i)\subseteq E(i)`$ 为程序全局分组记录中，与该食材对应且有已知供给值的成员。网页使用：
+**有效供给值：** 沿用经验日供给量 $`q_i`$，令 $`M(i)\subseteq E(i)`$ 为程序全局分组记录中，与该食材对应且有已知供给值的成员。网页使用：
 
 ```math
 \widetilde q_i=
@@ -221,7 +224,7 @@ q_i,& |M(i)|=0\text{ and }q_i\text{ is known},\\
 
 单成员组有值时，上式就是自身供给；无组内记录时先回退到食材自身的供给记录，仍缺失才取 0。均值取自全局组，不只取该料理允许的成员；即使未开启等价去重，采购比较仍使用这一有效值。
 
-**比较向量。** 每份方案中，每一件基础食材和加料各贡献一次有效供给值，按升序组成向量 $`\mathbf V(p)`$（Vector）：
+**比较向量：** 每份方案中，每一件基础食材和加料各贡献一次有效供给值，按升序组成向量 $`\mathbf V(p)`$（Vector）：
 
 ```math
 \mathbf V(p)=\mathrm{sort}_{\uparrow}
@@ -238,7 +241,7 @@ q_i,& |M(i)|=0\text{ and }q_i\text{ is known},\\
 
 这是一种优先比较最低供给值的词典序规则，不是最大化供给总和。原实现用 $`10^{-9}`$ 作为数值比较容差；向量并列时按加料件数、加料名称键稳定排序。
 
-**Top-N 与并列。** 设过滤后有 $`m_{g,d}`$ 个候选，将其按上述顺序记为 $`p_1,\ldots,p_{m_{g,d}}`$，$`N\ge1`$ 为用户指定的排名阈值。为说明去重如何影响边界，定义方案权重 $`W(p)`$（Weight）：
+**Top-N 与并列：** 设过滤后有 $`m_{g,d}`$ 个候选，将其按上述顺序记为 $`p_1,\ldots,p_{m_{g,d}}`$，$`N\ge1`$ 为用户指定的排名阈值。为说明去重如何影响边界，定义方案权重 $`W(p)`$（Weight）：
 
 ```math
 W(p)=
@@ -251,15 +254,17 @@ W(p)=
 无加料时空乘积为 1。边界位置记为 $`k_{\mathrm{cut}}`$，最终保留集合为：
 
 ```math
-k_{\mathrm{cut}}=\min\left\{k:\sum_{j=1}^{k}W(p_j)\ge N\right\},\qquad
+\begin{gathered}
+k_{\mathrm{cut}}=\min\left\{k:\sum_{j=1}^{k}W(p_j)\ge N\right\},\\
 \mathcal R_{g,d}=\{p_j:\mathbf V(p_j)\succeq \mathbf V(p_{k_{\mathrm{cut}}})\}
+\end{gathered}
 ```
 
 若累计权重不足 $`N`$，取 $`k_{\mathrm{cut}}=m_{g,d}`$；无候选时输出为空。未去重时，边界就是第 $`\min(N,m_{g,d})`$ 个方案；去重时按该料理可用等价组大小累积权重。**Top-N 用于确定供给向量边界，并列全部保留，因此输出行数不一定为 N，也不是取 N 个不同向量组。**
 
 权重是原程序的阈值补偿规则，不能一般性地解释为精确还原去重前的方案数。例如，同一两成员组重复追加两件时，权重为 $`2^2=4`$，但无序组合实际只有三种。因此不据此宣称开关去重前后的 Top-N 结果严格等价。
 
-**输出名称。** 同时开启采购推荐与等价去重时，最终显示的加料还会替换为全局等价组中已知原始供给量最大的成员：
+**输出名称：** 同时开启采购推荐与等价去重时，最终显示的加料还会替换为全局等价组中已知原始供给量最大的成员：
 
 ```math
 i_{\mathrm{out}}\in\arg\max_{j\in M(i)}q_j
@@ -277,9 +282,9 @@ i_{\mathrm{out}}\in\arg\max_{j\in M(i)}q_j
 
 ### 1.3 detailedPLAN：为各目标标签选择多套方案
 
-**问题与变化。** `detailedPLAN.py` 将任务从返回候选推进为自动选定一组方案：针对一位顾客的每个可行目标喜好标签，分别准备应对方案。评价顺序改为**预计食材件数最少，其次最低供给余量最大**。
+**问题与变化：** `detailedPLAN.py` 将任务从返回候选推进为自动选定一组方案：针对一位顾客的每个可行目标喜好标签，分别准备应对方案。评价顺序改为**预计食材件数最少，其次最低供给余量最大**。
 
-**约束与假设。** Python PLAN 在评分准入中增加“无厌恶命中”条件，因此沿用上一节的净分门槛即可得到：
+**约束与假设：** Python PLAN 在评分准入中增加“无厌恶命中”条件，因此沿用上一节的净分门槛即可得到：
 
 ```math
 H_g^{\mathrm D}(p)=0,\qquad S_g(p)\ge S_{\min}
@@ -288,7 +293,7 @@ H_g^{\mathrm D}(p)=0,\qquad S_g(p)\ge S_{\min}
 
 配方禁忌、持有料理及候选规约按对应 Python 版本执行。HTML 与 Python 的处理并不完全相同，因此下文分别定义各版本的候选集合，不把 Python 结果直接视为网页结果的子集。
 
-**新增决策与订单假设。** 对目标标签 $`t\in \mathcal L_g`$，令 $`\mathcal C_{g,t}`$ 为包含该标签、通过准入，并按原程序逐料理、逐目标标签应用升级／子集过滤后汇集的候选。定义：
+**新增决策与订单假设：** 对目标标签 $`t\in \mathcal L_g`$，令 $`\mathcal C_{g,t}`$ 为包含该标签、通过准入，并按原程序逐料理、逐目标标签应用升级／子集过滤后汇集的候选。定义：
 
 ```math
 J_g=\left\{t\in \mathcal L_g:\mathcal C_{g,t}\ne\varnothing\right\},\qquad
@@ -300,14 +305,16 @@ m_g=|J_g|,\qquad p_t\in\mathcal C_{g,t}\quad(t\in J_g)
 沿用 $`c_i(p)`$ 和原始日供给 $`q_i`$，令 $`u_i`$ 为各标签所选方案对食材的累计用量。预期日食材件数 $`E_{\mathrm{old}}`$ 与最低供给余量 $`R_{\mathrm{old}}`$ 为：
 
 ```math
-u_i=\sum_{t\in J_g}c_i(p_t),\qquad
-E_{\mathrm{old}}=\frac{K}{m_g}\sum_i u_i,\qquad
+\begin{gathered}
+u_i=\sum_{t\in J_g}c_i(p_t),\\
+E_{\mathrm{old}}=\frac{K}{m_g}\sum_i u_i,\\
 R_{\mathrm{old}}=\min_{i:u_i>0}\left(q_i-\frac{K}{m_g}u_i\right)
+\end{gathered}
 ```
 
 后二者单位均为件／日。与网页比较供给值不同，这里开始扣除假设订单对应的消耗；均分是假设，尚无对应的实测订单概率估计。
 
-**目标函数。**
+**目标函数：**
 
 ```math
 \min_{\substack{p_t\in\mathcal C_{g,t}\\t\in J_g}}^{\mathrm{lex}}
@@ -318,21 +325,23 @@ R_{\mathrm{old}}=\min_{i:u_i>0}\left(q_i-\frac{K}{m_g}u_i\right)
 
 ### 1.4 singlePLAN：将每标签方案改为每客一个方案
 
-**问题与变化。** `singlePLAN.py` 将决策从方案族 $`(p_t)_{t\in J_g}`$ 改为单个 $`p`$：同一位顾客的全部假设订单采用这一套方案。同时，目标顺序改为**喜爱命中最多，其次食材件数最少，最后最低供给余量最大**。
+**问题与变化：** `singlePLAN.py` 将决策从方案族 $`(p_t)_{t\in J_g}`$ 改为单个 $`p`$：同一位顾客的全部假设订单采用这一套方案。同时，目标顺序改为**喜爱命中最多，其次食材件数最少，最后最低供给余量最大**。
 
-**约束与假设。** 保留制作条件、净分门槛和无厌恶准入；决策变量改为一套方案 $`p`$，同一顾客的 $`K`$ 单全部使用它。
+**约束与假设：** 保留制作条件、净分门槛和无厌恶准入；决策变量改为一套方案 $`p`$，同一顾客的 $`K`$ 单全部使用它。
 
-**用量与余量。** 每日消耗不再按标签分配，食材需求与余量改为：
+**用量与余量：** 每日消耗不再按标签分配，食材需求与余量改为：
 
 ```math
+\begin{gathered}
 \frac{K}{m_g}\sum_{t\in J_g}c_i(p_t)
-\quad\longrightarrow\quad Kc_i(p),\qquad
+\quad\longrightarrow\quad Kc_i(p),\\
 R(p)=\min_{i:c_i(p)>0}\left(q_i-Kc_i(p)\right)
+\end{gathered}
 ```
 
 $`R(p)`$ 的单位仍为件／日。$`K`$ 固定时，最小化每份件数 $`C(p)`$ 等价于最小化该客人的日件数 $`KC(p)`$；原实现直接比较每份件数。
 
-**目标函数。** 令 $`\mathcal C_g^{\mathrm{single}}`$ 表示该版本生成并保留的合格候选：
+**目标函数：** 令 $`\mathcal C_g^{\mathrm{single}}`$ 表示该版本生成并保留的合格候选：
 
 ```math
 \max_{p\in\mathcal C_g^{\mathrm{single}}}^{\mathrm{lex}}
@@ -343,17 +352,19 @@ $`R(p)`$ 的单位仍为件／日。$`K`$ 固定时，最小化每份件数 $`C(
 
 ### 1.5 cover3：保留单方案，将喜好收益封顶为 3
 
-**问题与变化。** `singlePLAN_cover3.py` 保留每客一套方案、全部订单复用以及同一余量计算，只调整第一目标：三项喜爱已经足够，额外命中不再提高优化优先级。
+**问题与变化：** `singlePLAN_cover3.py` 保留每客一套方案、全部订单复用以及同一余量计算，只调整第一目标：三项喜爱已经足够，额外命中不再提高优化优先级。
 
-**约束与假设。** 保留单客单方案、无厌恶准入、最低净分及假设订单量。覆盖收益封顶只改变合格方案间的排序，不改变准入门槛。
+**约束与假设：** 保留单客单方案、无厌恶准入、最低净分及假设订单量。覆盖收益封顶只改变合格方案间的排序，不改变准入门槛。
 
-**新增效用与目标函数。** 以 $`U(h)`$ 表示命中数为 $`h`$ 时用于方案比较的覆盖收益（Utility），候选集合相应记为 $`\mathcal C_g^{\mathrm{cover3}}`$：
+**新增效用与目标函数：** 以 $`U(h)`$ 表示命中数为 $`h`$ 时用于方案比较的覆盖收益（Utility），候选集合相应记为 $`\mathcal C_g^{\mathrm{cover3}}`$：
 
 ```math
-U(h)=\min(h,3),\qquad
+\begin{gathered}
+U(h)=\min(h,3),\\
 \left(H_g^{\mathrm L}(p),-C(p),R(p)\right)
 \quad\longrightarrow\quad
 \left(U(H_g^{\mathrm L}(p)),-C(p),R(p)\right)
+\end{gathered}
 ```
 
 ```math
@@ -367,15 +378,15 @@ U(h)=\min(h,3),\qquad
 
 ### 1.6 输出格式分支：mixedingredients
 
-**问题与变化。** `singlePLAN_cover3_mixedingredients.py` 调整结果的阅读和使用方式，将基础食材与加料合写为 `Ingredient1` 至 `Ingredient5`，按原输出约定排列并保留表格合并。
+**问题与变化：** `singlePLAN_cover3_mixedingredients.py` 调整结果的阅读和使用方式，将基础食材与加料合写为 `Ingredient1` 至 `Ingredient5`，按原输出约定排列并保留表格合并。
 
 该分支沿用 1.5 节的决策与目标。$`p,c_i(p),C(p),T(p),H_g^{\mathrm L}(p),S_g(p),R(p),U(H_g^{\mathrm L}(p))`$ 的含义和计算不变；基础与追加用量合并展示不会使基础食材标签重新加入料理。它是输出表达的调整，不增加新的优化变量或目标。
 
 ### 1.7 固定厨具分支：limitedCookware
 
-**问题与变化。** `singlePLAN_cover3_mixIng_limitedCookware.py` 在既定设备条件下为各客人选方案：由玩家指定排除哪些厨具，目标仍沿用 cover3。原文件默认排除烧烤架、蒸锅。
+**问题与变化：** `singlePLAN_cover3_mixIng_limitedCookware.py` 在既定设备条件下为各客人选方案：由玩家指定排除哪些厨具，目标仍沿用 cover3。原文件默认排除烧烤架、蒸锅。
 
-**约束与决策。** 令 $`\kappa(d)`$ 表示料理所需厨具，$`S_0`$ 表示排除指定设备后可用的厨具集合。以 $`v`$ 表示当前设备模型的版本，$`\mathcal C_g^v`$ 为该版本应用设备集合限制前的合格候选；定义限制操作：
+**约束与决策：** 令 $`\kappa(d)`$ 表示料理所需厨具，$`S_0`$ 表示排除指定设备后可用的厨具集合。以 $`v`$ 表示当前设备模型的版本，$`\mathcal C_g^v`$ 为该版本应用设备集合限制前的合格候选；定义限制操作：
 
 ```math
 \mathcal C_g^v(S)=
@@ -386,9 +397,9 @@ U(h)=\min(h,3),\qquad
 
 ### 1.8 共同厨具分支：nCookware
 
-**问题与变化。** `singlePLAN_cover3_mixIng_nCookware.py` 将设备集合本身纳入决策：给定可用厨具数量，程序选择具体设备，并为各顾客配置一套可用方案。它与固定排除分支是两种设备配置方式，输入不需要先经过 `limitedCookware`。
+**问题与变化：** `singlePLAN_cover3_mixIng_nCookware.py` 将设备集合本身纳入决策：给定可用厨具数量，程序选择具体设备，并为各顾客配置一套可用方案。它与固定排除分支是两种设备配置方式，输入不需要先经过 `limitedCookware`。
 
-**约束与决策。** 令 $`G`$ 为本次规划的顾客集合，$`H`$ 为已拥有料理对应的可用厨具集合，$`n`$ 为本次采用的厨具种类数。设备集合从固定 $`S_0`$ 改为待选择的 $`S`$：
+**约束与决策：** 令 $`G`$ 为本次规划的顾客集合，$`H`$ 为已拥有料理对应的可用厨具集合，$`n`$ 为本次采用的厨具种类数。设备集合从固定 $`S_0`$ 改为待选择的 $`S`$：
 
 ```math
 S\subseteq H,\qquad |S|=n
@@ -396,14 +407,16 @@ S\subseteq H,\qquad |S|=n
 
 沿用 1.7 节的限制操作，此时 $`v=\mathrm{nCookware}`$。对给定 $`S`$，令 $`p_g^\star(S)`$ 为从 $`\mathcal C_g^v(S)`$ 中按 cover3 目标选出的方案；有方案的顾客构成 $`G_S`$，无方案人数为 $`z_S=|G\setminus G_S|`$。
 
-**集合层目标。** 单客的评价顺序保留；新增外层比较，将各客评价汇总，并计入原程序的无解惩罚：
+**集合层目标：** 单客的评价顺序保留；新增外层比较，将各客评价汇总，并计入原程序的无解惩罚：
 
 ```math
 \max_{S\subseteq H,\ |S|=n}^{\mathrm{lex}}
 \left(
-\sum_{g\in G_S}U(H_g^{\mathrm L}(p_g^\star(S))),\;
--\left[\sum_{g\in G_S}C(p_g^\star(S))+10^9z_S\right],\;
+\begin{gathered}
+\sum_{g\in G_S}U(H_g^{\mathrm L}(p_g^\star(S))),\\
+-\left[\sum_{g\in G_S}C(p_g^\star(S))+10^9z_S\right],\\
 \sum_{g\in G_S}R(p_g^\star(S))-10^{18}z_S
+\end{gathered}
 \right)
 ```
 
@@ -651,7 +664,7 @@ Preparation models build on plans, ingredient quantities, and tag matching, dist
 
 Preparation decisions have two levels: specifying how to prepare one dish and choosing among plans that satisfy the requirements. The versions share basic definitions of ingredient use and tag matching; each model specifies its own candidate-generation rules, order assumptions, and optimization objectives.
 
-**Objects and notation.** Let $`g`$ denote a guest, $`d`$ a dish, $`i`$ an ingredient, $`t`$ a tag, and $`p`$ a preparation plan. Candidate and preference sets use calligraphic letters, and vectors use boldface. Subscripts identify objects, parenthesized superscripts $`(r)`$ identify filtering stages, and upright subscripts or superscripts identify fixed categories. $`v`$ indexes model versions, and $`\star`$ marks the best retained plan under the corresponding objective.
+**Objects and notation:** Let $`g`$ denote a guest, $`d`$ a dish, $`i`$ an ingredient, $`t`$ a tag, and $`p`$ a preparation plan. Candidate and preference sets use calligraphic letters, and vectors use boldface. Subscripts identify objects, parenthesized superscripts $`(r)`$ identify filtering stages, and upright subscripts or superscripts identify fixed categories. $`v`$ indexes model versions, and $`\star`$ marks the best retained plan under the corresponding objective.
 
 | Symbol | Definition | Unit or type |
 | --- | --- | --- |
@@ -666,23 +679,25 @@ Preparation decisions have two levels: specifying how to prepare one dish and ch
 | $`q_i`$ | Empirical daily ingredient supply, from the workbook's TDQ field | Units per day |
 | $`K`$ | Assumed daily order count per guest; the Python planners use 5 by default | Orders per day |
 
-**Plans and preparation constraints.** A plan consists of a selected dish and its addition quantities. Base ingredients and additions together occupy at most five slots; repeated use of the same ingredient is counted unit by unit:
+**Plans and preparation constraints:** A plan consists of a selected dish and its addition quantities. Base ingredients and additions together occupy at most five slots; repeated use of the same ingredient is counted unit by unit:
 
 ```math
-\begin{aligned}
-p&=(d,\mathbf A),\qquad \mathbf A=(a_i)_i,\qquad a_i\in\mathbb Z_{\ge0},\\
-c_i(p)&=b_i(d)+a_i(p),\qquad C(p)=\sum_i c_i(p)\le5.
-\end{aligned}
+\begin{gathered}
+p=(d,\mathbf A),\quad \mathbf A=(a_i)_i,\quad a_i\in\mathbb Z_{\ge0},\\
+c_i(p)=b_i(d)+a_i(p),\quad C(p)=\sum_i c_i(p)\le5.
+\end{gathered}
 ```
 
 Base ingredients satisfy the recipe and occupy slots, but their tags do not automatically transfer to the dish; additions introduce ingredient tags. $`T(p)`$ denotes the final tag set produced by the current version's rules for dishes, cookware, selling price, additions, overrides, and trends. Each distinct tag appears only once. A guest's trend preferences are fixed, while current trigger conditions determine whether a plan receives the corresponding tags. Recipe prohibitions and candidate-processing scope must be interpreted for the chosen entry point; HTML and Python behavior is detailed in the [web guide](docs/web-guide.md) and [optimization model and algorithm boundaries](docs/design.md).
 
-**Matching and scoring.** Liked matches, disliked matches, and the net score are defined as:
+**Matching and scoring:** Liked matches, disliked matches, and the net score are defined as:
 
 ```math
-H_g^{\mathrm L}(p)=\left|T(p)\cap\mathcal L_g\right|,\qquad
-H_g^{\mathrm D}(p)=\left|T(p)\cap\mathcal D_g\right|,\qquad
+\begin{gathered}
+H_g^{\mathrm L}(p)=\left|T(p)\cap\mathcal L_g\right|,\\
+H_g^{\mathrm D}(p)=\left|T(p)\cap\mathcal D_g\right|,\\
 S_g(p)=H_g^{\mathrm L}(p)-H_g^{\mathrm D}(p)
+\end{gathered}
 ```
 
 The net score describes how a plan matches a guest's preferences. Eligibility and comparison after qualification are determined by each version's admission and evaluation policies. $`\mathrm{lex}`$ denotes lexicographic order: compare the first objective-vector component, and consider the next only when the preceding components tie.
@@ -723,7 +738,7 @@ The execution order is **exclude ingredient names forbidden by the dish → opti
 
 #### 1.2.2 Admission conditions and initial candidates
 
-**Constraints and admission.** Base ingredients and additions together use at most five units. The user may also specify required tags, excluded tags, and a minimum net score. When the base recipe uses fewer than five units and additions bring the total to five, the webpage adds 「Large portion」; a dish’s existing 「Large portion」 tag is retained.
+**Constraints and admission:** Base ingredients and additions together use at most five units. The user may also specify required tags, excluded tags, and a minimum net score. When the base recipe uses fewer than five units and additions bring the total to five, the webpage adds 「Large portion」; a dish’s existing 「Large portion」 tag is retained.
 
 Let $`\mathcal B_d^{\mathrm{web}}`$ be the plan pool actually enumerated by the webpage for dish $`d`$; it depends on the original recipe handling and the equivalence-deduplication option. Unspecified tag requirements use empty sets. Qualified candidates entering the subsequent filters are:
 
@@ -738,7 +753,7 @@ This is a minimum net-score condition: a threshold of 3 also admits scores of 4 
 
 #### 1.2.3 Equivalence deduplication: reducing the addition ingredient pool
 
-**Purpose.** When two ingredients provide exactly the same nonempty tag set, enumerate a single representative to reduce repeated tag combinations. Equivalence is based on the ingredients' own tags, not their price, supply, or the plan's final tags.
+**Purpose:** When two ingredients provide exactly the same nonempty tag set, enumerate a single representative to reduce repeated tag combinations. Equivalence is based on the ingredients' own tags, not their price, supply, or the plan's final tags.
 
 Define the equivalence relation and classes as:
 
@@ -754,7 +769,7 @@ This step reduces **addition** choices only; the base recipe remains unchanged, 
 
 #### 1.2.4 Ingredient-upgrade filter: comparing designated base alternatives
 
-**Purpose.** When extra tags are unnecessary for qualification, prefer retaining plans made with ingredients carrying fewer tags. “Advanced” is defined here by tag inclusion, not ingredient price, rarity, or game level.
+**Purpose:** When extra tags are unnecessary for qualification, prefer retaining plans made with ingredients carrying fewer tags. “Advanced” is defined here by tag inclusion, not ingredient price, rarity, or game level.
 
 Within the ingredient pool actually used to enumerate the dish, consider ingredient $`i`$ and seek a base alternative $`j`$ satisfying:
 
@@ -765,10 +780,11 @@ Within the ingredient pool actually used to enumerate the dish, consider ingredi
 The original program selects the recognized alternative with the fewest tags, breaking ties by Chinese name order. Denote it by $`B_d(i)`$ (Base representative); if no alternative exists, set $`B_d(i)=i`$. Map **all additions simultaneously** to these representatives to obtain the base addition vector:
 
 ```math
-\begin{aligned}
-a_j^{\mathrm{base}}(p)&=\sum_{i:B_d(i)=j}a_i(p),\\
-\mathbf A^{\mathrm{base}}(p)&=(a_j^{\mathrm{base}}(p))_j,\qquad p^{\mathrm{base}}=(d,\mathbf A^{\mathrm{base}}(p)).
-\end{aligned}
+\begin{gathered}
+a_j^{\mathrm{base}}(p)=\sum_{i:B_d(i)=j}a_i(p),\\
+\mathbf A^{\mathrm{base}}(p)=(a_j^{\mathrm{base}}(p))_j,\\
+p^{\mathrm{base}}=(d,\mathbf A^{\mathrm{base}}(p)).
+\end{gathered}
 ```
 
 A plan is considered to contain advanced additions when $`\mathbf A^{\mathrm{base}}(p)\ne \mathbf A(p)`$. With the upgrade filter enabled, it is removed when:
@@ -787,7 +803,7 @@ For example, one ingredient may carry 「Sweet」, and another 「Sweet」「Pre
 
 #### 1.2.5 Addition-subset filter: comparing smaller additions
 
-**Purpose.** If a retained plan qualifies using only some of the current plan's additions, omit the larger addition plan according to the selected policy. The comparison concerns **ingredient-count vectors**, not sets of ingredient names or tags:
+**Purpose:** If a retained plan qualifies using only some of the current plan's additions, omit the larger addition plan according to the selected policy. The comparison concerns **ingredient-count vectors**, not sets of ingredient names or tags:
 
 ```math
 \mathbf A(p')\preceq \mathbf A(p)\quad\Longleftrightarrow\quad
@@ -808,9 +824,9 @@ For example, “honey ×1” is an addition subset of “honey ×2”, but not c
 
 #### 1.2.6 Procurement recommendation: setting a cutoff by supply vectors
 
-**Purpose.** Within $`\mathcal C_{g,d}^{(2)}`$, favor ingredient combinations with better availability. At this stage, no daily order volume is assumed and consumption is not deducted from supply. Comparisons remain within each dish.
+**Purpose:** Within $`\mathcal C_{g,d}^{(2)}`$, favor ingredient combinations with better availability. At this stage, no daily order volume is assumed and consumption is not deducted from supply. Comparisons remain within each dish.
 
-**Effective supply.** Retaining empirical daily supply $`q_i`$, let $`M(i)\subseteq E(i)`$ denote the members associated with that ingredient in the program's global group records that have known supply values. The webpage uses:
+**Effective supply:** Retaining empirical daily supply $`q_i`$, let $`M(i)\subseteq E(i)`$ denote the members associated with that ingredient in the program's global group records that have known supply values. The webpage uses:
 
 ```math
 \widetilde q_i=
@@ -823,7 +839,7 @@ q_i,& |M(i)|=0\text{ and }q_i\text{ is known},\\
 
 For a singleton class with a known value, this equals the ingredient's own supply. With no group record, it first falls back to the ingredient's own supply record, then to 0 if that is also missing. The mean uses the global class, not only members allowed for the current dish. Procurement comparisons use this effective value even when equivalence deduplication is disabled.
 
-**Comparison vector.** Each unit of a base ingredient or addition contributes one effective supply value. Sorting these values in ascending order gives $`\mathbf V(p)`$ (Vector):
+**Comparison vector:** Each unit of a base ingredient or addition contributes one effective supply value. Sorting these values in ascending order gives $`\mathbf V(p)`$ (Vector):
 
 ```math
 \mathbf V(p)=\mathrm{sort}_{\uparrow}
@@ -840,7 +856,7 @@ Here, $`\biguplus`$ denotes concatenation preserving repeated elements, and $`\{
 
 This lexicographic rule prioritizes the lowest supply values rather than maximizing total supply. The original implementation uses a numerical comparison tolerance of $`10^{-9}`$; vector ties are ordered stably by addition count and addition-name key.
 
-**Top-N and ties.** Let $`m_{g,d}`$ be the number of filtered candidates. Write them in ranking order as $`p_1,\ldots,p_{m_{g,d}}`$, with $`N\ge1`$ the user-specified ranking threshold. To describe how deduplication affects the cutoff, define plan weight $`W(p)`$ (Weight):
+**Top-N and ties:** Let $`m_{g,d}`$ be the number of filtered candidates. Write them in ranking order as $`p_1,\ldots,p_{m_{g,d}}`$, with $`N\ge1`$ the user-specified ranking threshold. To describe how deduplication affects the cutoff, define plan weight $`W(p)`$ (Weight):
 
 ```math
 W(p)=
@@ -853,15 +869,17 @@ W(p)=
 With no additions, the empty product is 1. Denote the cutoff position by $`k_{\mathrm{cut}}`$. The retained set is:
 
 ```math
-k_{\mathrm{cut}}=\min\left\{k:\sum_{j=1}^{k}W(p_j)\ge N\right\},\qquad
+\begin{gathered}
+k_{\mathrm{cut}}=\min\left\{k:\sum_{j=1}^{k}W(p_j)\ge N\right\},\\
 \mathcal R_{g,d}=\{p_j:\mathbf V(p_j)\succeq \mathbf V(p_{k_{\mathrm{cut}}})\}
+\end{gathered}
 ```
 
 If cumulative weight is below $`N`$, use $`k_{\mathrm{cut}}=m_{g,d}`$; if there are no candidates, output is empty. Without deduplication, the cutoff is the $`\min(N,m_{g,d})`$-th plan. With deduplication, weights accumulate according to the sizes of the dish's available equivalence classes. **Top-N determines a supply-vector cutoff, and all ties are retained. The output therefore need not contain N rows, nor does the rule select N distinct vector groups.**
 
 The weight is the original program's cutoff-compensation rule, not a generally exact reconstruction of the number of plans before deduplication. For example, adding two units from the same two-member class gives weight $`2^2=4`$, whereas there are only three unordered combinations. Strict equivalence of Top-N results with deduplication on and off is therefore not claimed.
 
-**Output names.** When both procurement recommendation and equivalence deduplication are enabled, displayed additions are also replaced by the global equivalent with the highest known raw supply:
+**Output names:** When both procurement recommendation and equivalence deduplication are enabled, displayed additions are also replaced by the global equivalent with the highest known raw supply:
 
 ```math
 i_{\mathrm{out}}\in\arg\max_{j\in M(i)}q_j
@@ -879,9 +897,9 @@ Equivalence deduplication reduces the ingredient pool before enumeration and is 
 
 ### 1.3 detailedPLAN: select plans for individual target tags
 
-**Problem and change.** `detailedPLAN.py` advances from returning candidates to automatically selecting a collection of plans: one response plan for each feasible target liked tag of a guest. The evaluation order becomes **minimum expected ingredient units, followed by maximum minimum supply slack**.
+**Problem and change:** `detailedPLAN.py` advances from returning candidates to automatically selecting a collection of plans: one response plan for each feasible target liked tag of a guest. The evaluation order becomes **minimum expected ingredient units, followed by maximum minimum supply slack**.
 
-**Constraints and assumptions.** Python PLAN adds a zero-disliked-match eligibility condition. Retaining the previous section's net-score threshold therefore gives:
+**Constraints and assumptions:** Python PLAN adds a zero-disliked-match eligibility condition. Retaining the previous section's net-score threshold therefore gives:
 
 ```math
 H_g^{\mathrm D}(p)=0,\qquad S_g(p)\ge S_{\min}
@@ -890,7 +908,7 @@ H_g^{\mathrm D}(p)=0,\qquad S_g(p)\ge S_{\min}
 
 Recipe prohibitions, dish ownership, and candidate reduction follow the corresponding Python version. HTML and Python do not process every condition identically, so their candidate sets are defined separately below; Python results are not assumed to be a subset of browser results.
 
-**New decisions and order assumptions.** For a target tag $`t\in \mathcal L_g`$, let $`\mathcal C_{g,t}`$ contain eligible candidates that include the tag, collected after the original upgrade/subset filters are applied separately for each dish and target tag. Define:
+**New decisions and order assumptions:** For a target tag $`t\in \mathcal L_g`$, let $`\mathcal C_{g,t}`$ contain eligible candidates that include the tag, collected after the original upgrade/subset filters are applied separately for each dish and target tag. Define:
 
 ```math
 J_g=\left\{t\in \mathcal L_g:\mathcal C_{g,t}\ne\varnothing\right\},\qquad
@@ -902,14 +920,16 @@ The decision is now a family of plans $`(p_t)_{t\in J_g}`$. Several tags may sel
 Retaining $`c_i(p)`$ and the original daily supply $`q_i`$, let $`u_i`$ be the cumulative use of an ingredient across the plans selected for the tags. Expected daily ingredient units $`E_{\mathrm{old}}`$ and minimum supply slack $`R_{\mathrm{old}}`$ are:
 
 ```math
-u_i=\sum_{t\in J_g}c_i(p_t),\qquad
-E_{\mathrm{old}}=\frac{K}{m_g}\sum_i u_i,\qquad
+\begin{gathered}
+u_i=\sum_{t\in J_g}c_i(p_t),\\
+E_{\mathrm{old}}=\frac{K}{m_g}\sum_i u_i,\\
 R_{\mathrm{old}}=\min_{i:u_i>0}\left(q_i-\frac{K}{m_g}u_i\right)
+\end{gathered}
 ```
 
 Both latter quantities are measured in units per day. Unlike the browser's comparison of supply values, this model subtracts consumption implied by assumed orders. Equal allocation is an assumption without a corresponding empirical estimate of order probabilities.
 
-**Objective.**
+**Objective:**
 
 ```math
 \min_{\substack{p_t\in\mathcal C_{g,t}\\t\in J_g}}^{\mathrm{lex}}
@@ -920,21 +940,23 @@ With $`m_g`$ fixed, minimizing expected units separates by tag. The program ther
 
 ### 1.4 singlePLAN: replace plans per tag with one plan per guest
 
-**Problem and change.** `singlePLAN.py` replaces the family $`(p_t)_{t\in J_g}`$ with a single $`p`$: all assumed orders for the same guest use this one plan. The objective order also changes to **maximum liked matches, followed by minimum ingredient units, then maximum minimum supply slack**.
+**Problem and change:** `singlePLAN.py` replaces the family $`(p_t)_{t\in J_g}`$ with a single $`p`$: all assumed orders for the same guest use this one plan. The objective order also changes to **maximum liked matches, followed by minimum ingredient units, then maximum minimum supply slack**.
 
-**Constraints and assumptions.** Retain preparation conditions, the minimum net score, and zero-dislike eligibility. The decision becomes one plan $`p`$, used for all $`K`$ orders from the same guest.
+**Constraints and assumptions:** Retain preparation conditions, the minimum net score, and zero-dislike eligibility. The decision becomes one plan $`p`$, used for all $`K`$ orders from the same guest.
 
-**Consumption and slack.** Daily consumption is no longer distributed by tag; ingredient demand and slack become:
+**Consumption and slack:** Daily consumption is no longer distributed by tag; ingredient demand and slack become:
 
 ```math
+\begin{gathered}
 \frac{K}{m_g}\sum_{t\in J_g}c_i(p_t)
-\quad\longrightarrow\quad Kc_i(p),\qquad
+\quad\longrightarrow\quad Kc_i(p),\\
 R(p)=\min_{i:c_i(p)>0}\left(q_i-Kc_i(p)\right)
+\end{gathered}
 ```
 
 $`R(p)`$ remains measured in units per day. For fixed $`K`$, minimizing units per serving $`C(p)`$ is equivalent to minimizing this guest's daily units $`KC(p)`$; the original implementation directly compares units per serving.
 
-**Objective.** Let $`\mathcal C_g^{\mathrm{single}}`$ denote the eligible candidates generated and retained by this version:
+**Objective:** Let $`\mathcal C_g^{\mathrm{single}}`$ denote the eligible candidates generated and retained by this version:
 
 ```math
 \max_{p\in\mathcal C_g^{\mathrm{single}}}^{\mathrm{lex}}
@@ -945,17 +967,19 @@ This step changes both order allocation and the first priority. The earlier mode
 
 ### 1.5 cover3: retain one plan and cap preference benefit at 3
 
-**Problem and change.** `singlePLAN_cover3.py` retains one plan per guest, its reuse for all orders, and the same slack calculation. Only the first objective changes: three liked matches are sufficient, and additional matches no longer increase optimization priority.
+**Problem and change:** `singlePLAN_cover3.py` retains one plan per guest, its reuse for all orders, and the same slack calculation. Only the first objective changes: three liked matches are sufficient, and additional matches no longer increase optimization priority.
 
-**Constraints and assumptions.** Retain one plan per guest, zero-dislike eligibility, the minimum net score, and assumed order volume. Capping coverage benefit changes only ranking among eligible plans, not admission.
+**Constraints and assumptions:** Retain one plan per guest, zero-dislike eligibility, the minimum net score, and assumed order volume. Capping coverage benefit changes only ranking among eligible plans, not admission.
 
-**New utility and objective.** Let $`U(h)`$ denote the coverage utility used to compare plans with $`h`$ liked matches, with the corresponding candidate set denoted by $`\mathcal C_g^{\mathrm{cover3}}`$:
+**New utility and objective:** Let $`U(h)`$ denote the coverage utility used to compare plans with $`h`$ liked matches, with the corresponding candidate set denoted by $`\mathcal C_g^{\mathrm{cover3}}`$:
 
 ```math
-U(h)=\min(h,3),\qquad
+\begin{gathered}
+U(h)=\min(h,3),\\
 \left(H_g^{\mathrm L}(p),-C(p),R(p)\right)
 \quad\longrightarrow\quad
 \left(U(H_g^{\mathrm L}(p)),-C(p),R(p)\right)
+\end{gathered}
 ```
 
 ```math
@@ -969,15 +993,15 @@ The threshold $`S_{\min}`$ controls eligibility, while the capped function $`U`$
 
 ### 1.6 Output-format branch: mixedingredients
 
-**Problem and change.** `singlePLAN_cover3_mixedingredients.py` changes how results are read and used. It combines base ingredients and additions into `Ingredient1` through `Ingredient5`, follows the original output ordering, and retains merged table cells.
+**Problem and change:** `singlePLAN_cover3_mixedingredients.py` changes how results are read and used. It combines base ingredients and additions into `Ingredient1` through `Ingredient5`, follows the original output ordering, and retains merged table cells.
 
 This branch retains the decisions and objective of Section 1.5. The meanings and calculations of $`p,c_i(p),C(p),T(p),H_g^{\mathrm L}(p),S_g(p),R(p),U(H_g^{\mathrm L}(p))`$ remain unchanged. Displaying base and additional quantities together does not add base-ingredient tags to the dish. This is a presentation change with no new optimization variable or objective.
 
 ### 1.7 Fixed-cookware branch: limitedCookware
 
-**Problem and change.** `singlePLAN_cover3_mixIng_limitedCookware.py` selects plans for guests under predetermined equipment conditions. The player specifies which cookware to exclude, while the objective remains that of cover3. The original file excludes the grill and steamer by default.
+**Problem and change:** `singlePLAN_cover3_mixIng_limitedCookware.py` selects plans for guests under predetermined equipment conditions. The player specifies which cookware to exclude, while the objective remains that of cover3. The original file excludes the grill and steamer by default.
 
-**Constraints and decision.** Let $`\kappa(d)`$ denote the cookware required by a dish, and $`S_0`$ the cookware set available after specified exclusions. Let $`v`$ identify the current equipment-model version and $`\mathcal C_g^v`$ denote its eligible candidates before restriction to an equipment set. Define the restriction operation:
+**Constraints and decision:** Let $`\kappa(d)`$ denote the cookware required by a dish, and $`S_0`$ the cookware set available after specified exclusions. Let $`v`$ identify the current equipment-model version and $`\mathcal C_g^v`$ denote its eligible candidates before restriction to an equipment set. Define the restriction operation:
 
 ```math
 \mathcal C_g^v(S)=
@@ -988,9 +1012,9 @@ This section uses $`v=\mathrm{limited}`$ and $`S=S_0`$, comparing candidates in 
 
 ### 1.8 Shared-cookware branch: nCookware
 
-**Problem and change.** `singlePLAN_cover3_mixIng_nCookware.py` makes the equipment set itself a decision. Given the number of cookware types to use, the program selects the specific equipment and assigns an available plan to each guest. This and fixed exclusion are two equipment-configuration approaches; input does not need to pass through `limitedCookware` first.
+**Problem and change:** `singlePLAN_cover3_mixIng_nCookware.py` makes the equipment set itself a decision. Given the number of cookware types to use, the program selects the specific equipment and assigns an available plan to each guest. This and fixed exclusion are two equipment-configuration approaches; input does not need to pass through `limitedCookware` first.
 
-**Constraints and decision.** Let $`G`$ be the guests included in the current planning task, $`H`$ the available cookware associated with owned dishes, and $`n`$ the number of cookware types used in this task. The fixed equipment set $`S_0`$ becomes a set $`S`$ to be chosen:
+**Constraints and decision:** Let $`G`$ be the guests included in the current planning task, $`H`$ the available cookware associated with owned dishes, and $`n`$ the number of cookware types used in this task. The fixed equipment set $`S_0`$ becomes a set $`S`$ to be chosen:
 
 ```math
 S\subseteq H,\qquad |S|=n
@@ -998,14 +1022,16 @@ S\subseteq H,\qquad |S|=n
 
 Retain the restriction operation from Section 1.7, now with $`v=\mathrm{nCookware}`$. For a given $`S`$, let $`p_g^\star(S)`$ be the plan selected from $`\mathcal C_g^v(S)`$ by the cover3 objective. Guests with a plan form $`G_S`$, and the number without one is $`z_S=|G\setminus G_S|`$.
 
-**Set-level objective.** The single-guest evaluation order is retained. A new outer comparison aggregates guest evaluations and includes the original program's penalties for missing plans:
+**Set-level objective:** The single-guest evaluation order is retained. A new outer comparison aggregates guest evaluations and includes the original program's penalties for missing plans:
 
 ```math
 \max_{S\subseteq H,\ |S|=n}^{\mathrm{lex}}
 \left(
-\sum_{g\in G_S}U(H_g^{\mathrm L}(p_g^\star(S))),\;
--\left[\sum_{g\in G_S}C(p_g^\star(S))+10^9z_S\right],\;
+\begin{gathered}
+\sum_{g\in G_S}U(H_g^{\mathrm L}(p_g^\star(S))),\\
+-\left[\sum_{g\in G_S}C(p_g^\star(S))+10^9z_S\right],\\
 \sum_{g\in G_S}R(p_g^\star(S))-10^{18}z_S
+\end{gathered}
 \right)
 ```
 
