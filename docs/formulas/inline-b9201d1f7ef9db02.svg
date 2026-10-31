@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='utf-8'?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="8.3283px" height="14.9435px" viewBox="62.046513 54.172042 6.246202 11.207598" role="img" aria-labelledby="formula-description">
+<desc id="formula-description">\mathbf 1</desc><style>svg{color:#1f2328}g{fill:currentColor}@media(prefers-color-scheme:dark){svg{color:#f0f6fc}}</style><defs>
+<path id="g2-49" d="M4.653549-8.432877C4.653549-8.822914 4.62665-8.822914 4.196264-8.822914C3.200996-7.962142 1.708095-7.962142 1.412204-7.962142H1.156663V-7.383811H1.412204C1.882939-7.383811 2.595766-7.464508 3.133748-7.639352V-.578331H1.264259V0C1.829141-.026899 3.241345-.026899 3.873474-.026899S5.931258-.026899 6.496139 0V-.578331H4.653549V-8.432877Z" />
+<use id="g14-49" xlink:href="#g2-49" transform="scale(.888889)" />
+</defs>
+<g id="page135">
+<use x="61.768369" y="62.764633" xlink:href="#g14-49" />
+</g>
+</svg>

@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='utf-8'?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="10.8628px" height="13.0944px" viewBox="61.675903 54.865442 8.147073 9.820798" role="img" aria-labelledby="formula-description">
+<desc id="formula-description">\lor</desc><style>svg{color:#1f2328}g{fill:currentColor}@media(prefers-color-scheme:dark){svg{color:#f0f6fc}}</style><defs>
+<path id="g7-95" d="M8.123537-7.504857C8.204234-7.679701 8.217684-7.7066 8.217684-7.773848C8.217684-7.921793 8.096638-8.042839 7.948692-8.042839C7.814197-8.042839 7.733499-7.948692 7.639352-7.746949L4.478705-.63213L1.318057-7.760399C1.210461-8.01594 1.102864-8.042839 1.008717-8.042839C.860772-8.042839 .739726-7.921793 .739726-7.773848C.739726-7.746949 .739726-7.72005 .820423-7.558655L4.169365 .01345C4.276961 .242092 4.357659 .29589 4.478705 .29589C4.653549 .29589 4.693898 .201743 4.774595 .01345L8.123537-7.504857Z" />
+<use id="g17-95" xlink:href="#g7-95" transform="scale(.888889)" />
+</defs>
+<g id="page136">
+<use x="61.768369" y="62.764633" xlink:href="#g17-95" />
+</g>
+</svg>
