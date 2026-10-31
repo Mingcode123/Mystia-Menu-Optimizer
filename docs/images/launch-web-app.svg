@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="304" height="48" viewBox="0 0 304 48" role="img" aria-labelledby="title">
+  <title id="title">在线使用 / Launch Web App</title>
+  <path fill="#d8c4b2" d="M4 6h296v38H4z"/>
+  <path fill="#78516d" d="M4 2h292v4h4v36h-4v4H4v-4H0V6h4z"/>
+  <path fill="#f5ead4" d="M18 14h4v4h6v4h6v4h-6v4h-6v4h-4z"/>
+  <text x="46" y="30" fill="#fff8ed" font-family="Arial, 'Microsoft YaHei', 'Noto Sans CJK SC', sans-serif" font-size="17" font-weight="700">在线使用 / Launch Web App</text>
+</svg>

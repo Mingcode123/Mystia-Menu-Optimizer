@@ -14,7 +14,9 @@
 
 作者的主要工作是提出游玩问题、梳理规则语义、记录供给与价格、确定目标和约束，并通过角色案例核对结果；代码实现、部分算法推导与调试使用 AI 辅助。本文重点说明这些建模选择及其影响，结果解释限定于给定数据、假设和实际保留的候选范围。
 
-[数学模型](#zh-model) · [数据与建模依据](#zh-data) · [求解算法](#zh-algorithms) · [完整案例](#zh-verification) · [贡献与资料](#zh-sources)
+<a href="https://mingcode123.github.io/Mystia-Menu-Optimizer/"><img src="docs/images/launch-web-app.svg" alt="在线使用 HTML" width="304" height="48"></a>
+
+[数学模型](#zh-model) · [数据与建模依据](#zh-data) · [求解算法](#zh-algorithms) · [使用案例](#zh-verification) · [贡献与资料](#zh-sources)
 
 **机制与术语** &nbsp; <a href="#zh-tag-figure"><img src="docs/images/jump-to-figure-zh.png" alt="直接看机制图" width="132" height="28" align="middle"></a>
 
@@ -669,41 +671,67 @@ O\left(N_{\mathrm{cand}}+\binom{|H|}{n}|G|n\right),\qquad O(|G||H|).
 
 <a id="zh-verification"></a>
 
-## 4. 完整案例：「流行·厌恶」为「水产」时的稀客菜单
+## 4. 使用案例：从单客方案查询到稀客菜单规划
 
-### 4.1 情境与数据来源
+### 4.1 共同情境与数据来源
 
-本例在「水产」触发「流行·厌恶」、五种厨具均可用的条件下，为稀客选择料理与加料。评价采用 cover3 模型：达到最低分且无厌恶命中后，依次比较封顶喜爱收益、食材件数和最低供给余量。
+本章在「流行·厌恶」为「水产」、未设置「流行·喜爱」的条件下，展示两类决策：先用 HTML 查询博丽灵梦可接受的料理与加料，再用 Python 为 58 位稀客各选一套方案。网页按净分与过滤条件保留候选；Python cover3 在达到最低分且无厌恶命中的条件下，依次比较封顶喜爱收益、食材件数和最低供给余量。
 
-案例取自作者保存的[历史菜单存档](docs/case-study.md)，包含 58 条角色记录。文件名标注「流行·厌恶：水产」与五种厨具，其中的 `5` 表示厨具数量。
+两类入口独立读取根目录的 [东方夜雀食堂.xlsx](东方夜雀食堂.xlsx)，网页导出不作为 Python 的输入。原工作簿提供食材标签、料理配方、顾客偏好和按名称关联的日供给。程序读取已保存的单元格结果；修改公式或其输入后，需在支持相应公式的电子表格软件中重算并保存。
 
-历史复现采用 v1.0.0 的程序及根目录 [东方夜雀食堂.xlsx](东方夜雀食堂.xlsx)，每日订单 $`K=5`$、最低分 $`S_{\min}=3`$ 使用该版本默认值。展示中的料理、厨具和食材来自历史存档；评分与余量为这些明确条件下的补充核算。
+网页案例为当前实现的实际操作记录。完整菜单取自作者保存的[历史菜单存档](docs/case-study.md)，包含 58 条角色记录；文件名中的 `5` 表示厨具数量。历史复现采用 v1.0.0 程序及同一原工作簿，每日订单 $`K=5`$、最低分 $`S_{\min}=3`$ 使用该版本默认值。料理、厨具和食材来自历史存档；评分与余量为这些明确条件下的补充核算。
 
 <a id="zh-methods"></a>
 <a id="zh-problem"></a>
 <a id="zh-running"></a>
+<a id="zh-web-case"></a>
 
-### 4.2 输入与运行
+### 4.2 HTML：查询灵梦的候选方案
 
-原工作簿提供食材标签、料理配方、顾客偏好和按名称关联的日供给。程序读取已保存的单元格结果；修改公式或其输入后，需在支持相应公式的电子表格软件中重算并保存。网页和 Python 分别解析这份工作簿，彼此独立运行。
-
-以下命令从仓库根目录执行，完整依赖要求 Python 3.11 或更新版本：
-
-```sh
-python -m pip install -r requirements.txt
-```
-
-网页可用于检查单客候选。启动静态服务：
+**目标与操作：** 检查同一角色在给定流行条件下有哪些达标方案，以及加料如何影响得分与用料。可直接[打开在线网页](https://mingcode123.github.io/Mystia-Menu-Optimizer/)，或使用 Python 3 从仓库根目录启动本地静态服务：
 
 ```sh
 python -m http.server 8000 --bind 127.0.0.1
 ```
 
-访问 <http://127.0.0.1:8000>。页面自动读取同目录工作簿，也支持手动导入 XLSX；按人物、得分和筛选条件查询后，可导出 CSV 或含 `结果` 表的 XLSX。具体操作见[网页使用说明](docs/web-guide.md)。
+访问 <http://127.0.0.1:8000>，等待页面自动读取工作簿；也可通过“选择 Excel”手动导入。按以下设置点击“开始计算”：
 
-本例的配餐入口为：
+| 控件 | 本例设置 |
+| :---: | :---: |
+| 稀客；得分阈值 | 博丽灵梦；3 |
+| 流行·喜爱附着 tag；流行·厌恶附着 tag | 留空；`水产` |
+| Required Tag；Excluded Tag | 均留空 |
+| 加料子集过滤；食材高级过滤 | 均勾选；两项“考虑得分”均不勾选 |
+| 等价食材去重（仅加料）；依采购推荐（按 TDQ） | 均勾选；Top n 为 3 |
+| 导出限制 | 0，不限制导出行数 |
+
+两项“考虑得分”的删除条件分别见[食材高级过滤](#124-食材高级过滤比较指定的基础替代)与[加料子集过滤](#125-加料子集过滤比较能否少加食材)。
+
+**实际结果：** 计算完成后得到 264 条候选。在结果区搜索框输入“饭团”，页面显示 5 条记录，包含饭团、炙猪肉饭团和温暖饭团。搜索按文本包含关系筛选已计算结果，不重新生成候选。
+
+[![HTML 实际查询结果：博丽灵梦，流行厌恶水产，共 264 条候选，搜索饭团后显示 5 条](https://raw.githubusercontent.com/Mingcode123/Mystia-Menu-Optimizer/e53cb65b0f1a2630612933d6a84f8f5c1e8f7b78/docs/images/web-case-results.jpg)](https://raw.githubusercontent.com/Mingcode123/Mystia-Menu-Optimizer/e53cb65b0f1a2630612933d6a84f8f5c1e8f7b78/docs/images/web-case-results.jpg)
+
+*实际网页结果区截图，展示当前界面与原游戏图标。* [查看含输入参数的界面截图](https://raw.githubusercontent.com/Mingcode123/Mystia-Menu-Optimizer/e53cb65b0f1a2630612933d6a84f8f5c1e8f7b78/docs/images/web-case-overview.jpg)。
+
+其中，料理名恰为“饭团”的两条记录如下；两者均使用料理台，基础食材为海苔×1。喜爱与厌恶命中项按页面最终标签和灵梦偏好核对：
+
+| 加料 | 命中喜爱 | 命中厌恶 | 净分 | 总食材数 |
+| :---: | :---: | :---: | :---: | :---: |
+| 蜂蜜×1 | 「饱腹」「实惠」「甜」 | 0 项 | 3−0=3 | 2 |
+| 三文鱼×1、葡萄×1 | 「饱腹」「高级」「实惠」「甜」 | 「流行·厌恶」 | 4−1=3 | 3 |
+
+第二条通过「水产」触发「流行·厌恶」，扣分后仍达到网页的 3 分门槛。两条候选同时保留，体现网页查询中净分与过滤选项的共同作用。下一节的 Python 规划采用无厌恶准入，并按 cover3 目标选择每客方案；其候选范围与评价顺序独立定义。
+
+**导出：** 保持上述搜索结果，点击“下载 CSV”，实测导出 5 条数据、8 列，内容与页面逐行一致。页面也提供“下载 XLSX”，其工作表名为 `结果`；字段与导出边界见[输入输出规范](docs/input-output.md)，操作说明见[网页使用说明](docs/web-guide.md)。
+
+### 4.3 Python：生成完整稀客菜单
+
+**目标与运行：** 在相同流行条件下，为全部 58 位稀客各选一套方案，并统一确定允许使用的厨具。本例选满五种厨具，评价采用 cover3 模型。
+
+从仓库根目录安装依赖并运行配餐入口，要求 Python 3.11 或更新版本：
 
 ```sh
+python -m pip install -r requirements.txt
 python Python/singlePLAN_cover3_mixIng_nCookware.py
 ```
 
@@ -731,26 +759,94 @@ python Python/singlePLAN_cover3_mixIng_nCookware.py
 
 本例五种厨具全部可用，仅有一个设备配置；选择范围为原程序实际保留的候选，供给余量逐客核算。各阶段的候选总数未留存，图中不据此推算搜索规模。
 
-### 4.3 历史结果展示
+### 4.4 历史菜单结果
 
 历史成品保存 58 位角色的料理、厨具及总食材列表，每份使用 1–3 件食材。五种厨具均有记录：料理台 24 条、煮锅 18 条、油锅 8 条、烧烤架 6 条、蒸锅 2 条。这里选择了全部五种厨具，未产生设备子集之间的取舍。在上述复现条件下，现存原程序重现了全部 58 条保存方案。
 
 以下摘录 8 条代表性记录；完整 58 条记录及来源见[案例附录](docs/case-study.md)。
 
-| 角色 | 料理 | 厨具 | 总食材 | 件数 | 原表行 |
-| :---: | :---: | :---: | :---: | :---: | :---: |
-| <img src="HTML/izakaya_icons_pack/customer_rare/007_%E5%8D%9A%E4%B8%BD%E7%81%B5%E6%A2%A6.png" width="46" height="46" alt="博丽灵梦"><br>博丽灵梦 | <img src="HTML/izakaya_icons_pack/recipe/007_%E9%A5%AD%E5%9B%A2.png" width="52" height="52" alt="饭团"><br>饭团 | 料理台 | 蜂蜜、海苔 | 2 | 8 |
-| <img src="HTML/izakaya_icons_pack/customer_rare/015_%E7%90%AA%E9%9C%B2%E8%AF%BA.png" width="46" height="46" alt="琪露诺"><br>琪露诺 | <img src="HTML/izakaya_icons_pack/recipe/032_%E5%87%89%E8%8F%9C%E9%9B%95%E8%8A%B1.png" width="52" height="52" alt="凉菜雕花"><br>凉菜雕花 | 料理台 | 蜂蜜、萝卜 | 2 | 13 |
-| <img src="HTML/izakaya_icons_pack/customer_rare/000_%E8%8E%89%E6%A0%BC%E9%9C%B2.png" width="46" height="46" alt="莉格露"><br>莉格露 | <img src="HTML/izakaya_icons_pack/recipe/097_%E7%8B%AE%E5%AD%90%E5%A4%B4.png" width="52" height="52" alt="狮子头"><br>狮子头 | 煮锅 | 葡萄、牛肉、鸡蛋 | 3 | 2 |
-| <img src="HTML/izakaya_icons_pack/customer_rare/004_%E4%B8%8A%E7%99%BD%E6%B3%BD%E6%85%A7%E9%9F%B3.png" width="46" height="46" alt="上白泽慧音"><br>上白泽慧音 | <img src="HTML/izakaya_icons_pack/recipe/007_%E9%A5%AD%E5%9B%A2.png" width="52" height="52" alt="饭团"><br>饭团 | 料理台 | 海苔 | 1 | 6 |
-| <img src="HTML/izakaya_icons_pack/customer_rare/002_%E6%A9%99.png" width="46" height="46" alt="橙"><br>橙 | <img src="HTML/izakaya_icons_pack/recipe/049_%E8%9C%9C%E6%B1%81%E5%8F%89%E7%83%A7.png" width="52" height="52" alt="蜜汁叉烧"><br>蜜汁叉烧 | 烧烤架 | 蜂蜜、猪肉 | 2 | 4 |
-| <img src="HTML/izakaya_icons_pack/customer_rare/011_%E7%BA%A2%E7%BE%8E%E9%93%83.png" width="46" height="46" alt="红美铃"><br>红美铃 | <img src="HTML/izakaya_icons_pack/recipe/011_%E7%82%92%E8%82%89%E4%B8%9D.png" width="52" height="52" alt="炒肉丝"><br>炒肉丝 | 油锅 | 南瓜、猪肉 | 2 | 12 |
-| <img src="HTML/izakaya_icons_pack/customer_rare/016_%E5%9B%A0%E5%B9%A1%E5%B8%9D.png" width="46" height="46" alt="因幡帝"><br>因幡帝 | <img src="HTML/izakaya_icons_pack/recipe/100_%E6%A8%B1%E8%8A%B1%E5%B8%83%E4%B8%81.png" width="52" height="52" alt="樱花布丁"><br>樱花布丁 | 蒸锅 | 蜂蜜、桃子 | 2 | 17 |
-| <img src="HTML/izakaya_icons_pack/customer_rare/005_%E8%8C%A8%E6%9C%A8%E5%8D%8E%E6%89%87.png" width="46" height="46" alt="茨木华扇"><br>茨木华扇 | <img src="HTML/izakaya_icons_pack/recipe/001_%E8%B1%86%E8%85%90%E5%91%B3%E5%99%8C.png" width="52" height="52" alt="豆腐味噌"><br>豆腐味噌 | 煮锅 | 萝卜、豆腐 | 2 | 7 |
+<table align="center">
+<thead>
+<tr>
+<th align="center">角色</th>
+<th align="center">料理</th>
+<th align="center">厨具</th>
+<th align="center">总食材</th>
+<th align="center">件数</th>
+<th align="center">原表行</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center"><img src="HTML/izakaya_icons_pack/customer_rare/007_%E5%8D%9A%E4%B8%BD%E7%81%B5%E6%A2%A6.png" width="46" height="46" alt="博丽灵梦"><br>博丽灵梦</td>
+<td align="center"><img src="HTML/izakaya_icons_pack/recipe/007_%E9%A5%AD%E5%9B%A2.png" width="52" height="52" alt="饭团"><br>饭团</td>
+<td align="center">料理台</td>
+<td align="center">蜂蜜、海苔</td>
+<td align="center">2</td>
+<td align="center">8</td>
+</tr>
+<tr>
+<td align="center"><img src="HTML/izakaya_icons_pack/customer_rare/015_%E7%90%AA%E9%9C%B2%E8%AF%BA.png" width="46" height="46" alt="琪露诺"><br>琪露诺</td>
+<td align="center"><img src="HTML/izakaya_icons_pack/recipe/032_%E5%87%89%E8%8F%9C%E9%9B%95%E8%8A%B1.png" width="52" height="52" alt="凉菜雕花"><br>凉菜雕花</td>
+<td align="center">料理台</td>
+<td align="center">蜂蜜、萝卜</td>
+<td align="center">2</td>
+<td align="center">13</td>
+</tr>
+<tr>
+<td align="center"><img src="HTML/izakaya_icons_pack/customer_rare/000_%E8%8E%89%E6%A0%BC%E9%9C%B2.png" width="46" height="46" alt="莉格露"><br>莉格露</td>
+<td align="center"><img src="HTML/izakaya_icons_pack/recipe/097_%E7%8B%AE%E5%AD%90%E5%A4%B4.png" width="52" height="52" alt="狮子头"><br>狮子头</td>
+<td align="center">煮锅</td>
+<td align="center">葡萄、牛肉、鸡蛋</td>
+<td align="center">3</td>
+<td align="center">2</td>
+</tr>
+<tr>
+<td align="center"><img src="HTML/izakaya_icons_pack/customer_rare/004_%E4%B8%8A%E7%99%BD%E6%B3%BD%E6%85%A7%E9%9F%B3.png" width="46" height="46" alt="上白泽慧音"><br>上白泽慧音</td>
+<td align="center"><img src="HTML/izakaya_icons_pack/recipe/007_%E9%A5%AD%E5%9B%A2.png" width="52" height="52" alt="饭团"><br>饭团</td>
+<td align="center">料理台</td>
+<td align="center">海苔</td>
+<td align="center">1</td>
+<td align="center">6</td>
+</tr>
+<tr>
+<td align="center"><img src="HTML/izakaya_icons_pack/customer_rare/002_%E6%A9%99.png" width="46" height="46" alt="橙"><br>橙</td>
+<td align="center"><img src="HTML/izakaya_icons_pack/recipe/049_%E8%9C%9C%E6%B1%81%E5%8F%89%E7%83%A7.png" width="52" height="52" alt="蜜汁叉烧"><br>蜜汁叉烧</td>
+<td align="center">烧烤架</td>
+<td align="center">蜂蜜、猪肉</td>
+<td align="center">2</td>
+<td align="center">4</td>
+</tr>
+<tr>
+<td align="center"><img src="HTML/izakaya_icons_pack/customer_rare/011_%E7%BA%A2%E7%BE%8E%E9%93%83.png" width="46" height="46" alt="红美铃"><br>红美铃</td>
+<td align="center"><img src="HTML/izakaya_icons_pack/recipe/011_%E7%82%92%E8%82%89%E4%B8%9D.png" width="52" height="52" alt="炒肉丝"><br>炒肉丝</td>
+<td align="center">油锅</td>
+<td align="center">南瓜、猪肉</td>
+<td align="center">2</td>
+<td align="center">12</td>
+</tr>
+<tr>
+<td align="center"><img src="HTML/izakaya_icons_pack/customer_rare/016_%E5%9B%A0%E5%B9%A1%E5%B8%9D.png" width="46" height="46" alt="因幡帝"><br>因幡帝</td>
+<td align="center"><img src="HTML/izakaya_icons_pack/recipe/100_%E6%A8%B1%E8%8A%B1%E5%B8%83%E4%B8%81.png" width="52" height="52" alt="樱花布丁"><br>樱花布丁</td>
+<td align="center">蒸锅</td>
+<td align="center">蜂蜜、桃子</td>
+<td align="center">2</td>
+<td align="center">17</td>
+</tr>
+<tr>
+<td align="center"><img src="HTML/izakaya_icons_pack/customer_rare/005_%E8%8C%A8%E6%9C%A8%E5%8D%8E%E6%89%87.png" width="46" height="46" alt="茨木华扇"><br>茨木华扇</td>
+<td align="center"><img src="HTML/izakaya_icons_pack/recipe/001_%E8%B1%86%E8%85%90%E5%91%B3%E5%99%8C.png" width="52" height="52" alt="豆腐味噌"><br>豆腐味噌</td>
+<td align="center">煮锅</td>
+<td align="center">萝卜、豆腐</td>
+<td align="center">2</td>
+<td align="center">7</td>
+</tr>
+</tbody>
+</table>
 
 总食材包含基础配方与加料，按历史表顺序列出；每个名称表示 1 件。角色与料理图标直接使用仓库中的原游戏素材。
 
-### 4.4 从灵梦的原存方案到指标复核
+### 4.5 目标取舍：蜂蜜与可可豆
 
 历史第 8 行为博丽灵梦选择饭团与料理台，使用蜂蜜、海苔各一件。对照原配方，海苔是基础原料，蜂蜜为追加食材。
 
@@ -786,7 +882,9 @@ R(p)=\min(47-5\times1,\ 68-5\times1)=42.
 
 可可豆多命中一项喜爱，但封顶后两者的首项目标均为 3，食材件数也相同，因此由供给余量决定先后，蜂蜜方案优先。这组实际候选说明了从“尽量增加命中”转向“满足覆盖目标后节约资源”的选择依据。
 
-### 4.5 验证范围
+### 4.6 验证范围
+
+网页案例记录当前实现的一次完整查询、搜索筛选及 CSV 导出，核对了 264 条候选中的 5 条可见记录与导出内容。下述历史菜单核对使用 v1.0.0；当前 Python 与该版本的等价性由第三章的独立差分验证覆盖。
 
 复现按角色姓名比较料理、厨具和总食材多重集，不比较食材排列及表格版式。原程序、输入工作簿和历史结果文件的运行前后哈希一致。全量核对及既有网页、发布副本检查见[验证记录](docs/verification.md)；目标封顶和候选压缩的说明性算例见[优化模型与算法边界](docs/design.md)。
 
@@ -837,7 +935,9 @@ This project formulates these questions as a discrete decision model. It defines
 
 The author's main work comprises identifying gameplay problems, clarifying rule semantics, recording supply and prices, specifying objectives and constraints, and checking results through character cases. Code implementation, some algorithm derivation, and debugging were AI-assisted. This document focuses on those modeling choices and their consequences. Interpretation of results is bounded by the given data, assumptions, and candidates actually retained.
 
-[Mathematical model](#en-model) · [Data and modeling rationale](#en-data) · [Solution algorithms](#en-algorithms) · [Complete case study](#en-verification) · [Contributions and references](#en-sources)
+<a href="https://mingcode123.github.io/Mystia-Menu-Optimizer/"><img src="docs/images/launch-web-app.svg" alt="Launch the HTML app" width="304" height="48"></a>
+
+[Mathematical model](#en-model) · [Data and modeling rationale](#en-data) · [Solution algorithms](#en-algorithms) · [Usage cases](#en-verification) · [Contributions and references](#en-sources)
 
 **Mechanics and terminology** &nbsp; <a href="#en-tag-figure"><img src="docs/images/jump-to-figure-en.png" alt="Jump to diagram" width="156" height="28" align="middle"></a>
 
@@ -1011,7 +1111,7 @@ A plan is considered to contain advanced additions when $`\mathbf A^{\mathrm{bas
 
 $`F_{\mathrm U}`$ is this filter's “consider score” switch: 1 when enabled and 0 when disabled. When disabled, the existence of the corresponding qualified, nonadvanced base plan suffices to remove the advanced plan. When enabled, the base plan must also score at least as highly. The current plan remains if the base plan was not generated, failed the score threshold, or failed another admission condition.
 
-For example, one ingredient may carry 「Sweet」, and another 「Sweet」「Premium」. The latter plan is evaluated for removal only if the former ingredient is its selected base representative and the complete replacement plan qualifies. The comparison is restricted to **the complete addition replacement produced by the designated base mapping**, with the base recipe preserved. Denote the retained set by $`\mathcal C_{g,d}^{(1)}`$; when the upgrade filter is disabled, it equals $`\mathcal C_{g,d}^{(0)}`$.
+For example, one ingredient may carry 「Sweet」, and another 「Sweet」「High-grade」. The latter plan is evaluated for removal only if the former ingredient is its selected base representative and the complete replacement plan qualifies. The comparison is restricted to **the complete addition replacement produced by the designated base mapping**, with the base recipe preserved. Denote the retained set by $`\mathcal C_{g,d}^{(1)}`$; when the upgrade filter is disabled, it equals $`\mathcal C_{g,d}^{(0)}`$.
 
 #### 1.2.5 Addition-subset filter: comparing smaller additions
 
@@ -1490,41 +1590,67 @@ The interface uses original game icons and pixel borders to organize panels whil
 
 <a id="en-verification"></a>
 
-## 4. Complete case: rare-guest menus with 「Disliked trend」 set to 「Aquatic」
+## 4. Usage cases: from single-guest queries to rare-guest menu planning
 
-### 4.1 Scenario and data sources
+### 4.1 Shared scenario and data sources
 
-This case selects dishes and additions for rare guests when 「Aquatic」 triggers 「Disliked trend」 and all five cookware types are available. It applies the cover3 model: after meeting the minimum score with no disliked matches, candidates are compared by capped preference benefit, ingredient units, and minimum supply slack, in that order.
+This chapter examines two decisions with 「Disliked trend」 set to 「Aquatic」 and no liked-trend condition: using HTML to inspect acceptable dishes and additions for Hakurei Reimu, then using Python to select one plan for each of 58 rare guests. The browser retains candidates by net score and filter settings. Python cover3 requires the minimum score and zero disliked matches, then compares capped preference benefit, ingredient units, and minimum supply slack, in that order.
 
-The case uses the author's [historical menu archive](docs/case-study.md), containing 58 guest records. Its filename identifies 「Disliked trend: Aquatic」 and five cookware types; the `5` denotes the cookware count.
+Both entry points independently read the root [东方夜雀食堂.xlsx](东方夜雀食堂.xlsx); browser exports are not inputs to Python. The original workbook supplies ingredient tags, recipes, guest preferences, and daily supply matched by ingredient name. Programs read saved cell results. After changing formulas or their inputs, recalculate and save the workbook in spreadsheet software supporting those formulas.
 
-Historical reproduction uses the v1.0.0 program and the root [东方夜雀食堂.xlsx](东方夜雀食堂.xlsx), with that version's defaults of daily orders $`K=5`$ and minimum score $`S_{\min}=3`$. Displayed dishes, cookware, and ingredients come from the historical archive; scores and slack are supplementary calculations under these explicit conditions.
+The browser case records an actual run of the current implementation. The complete menu comes from the author's [historical menu archive](docs/case-study.md), containing 58 guest records; the `5` in its filename denotes the cookware count. Historical reproduction uses the v1.0.0 program and the same original workbook, with that version's defaults of daily orders $`K=5`$ and minimum score $`S_{\min}=3`$. Dishes, cookware, and ingredients come from the historical archive; scores and slack are supplementary calculations under these explicit conditions.
 
 <a id="en-methods"></a>
 <a id="en-problem"></a>
 <a id="en-running"></a>
+<a id="en-web-case"></a>
 
-### 4.2 Inputs and execution
+### 4.2 HTML: querying candidates for Reimu
 
-The original workbook supplies ingredient tags, recipes, guest preferences, and daily supply matched by ingredient name. Programs read saved cell results. After changing formulas or their inputs, recalculate and save the workbook in spreadsheet software supporting those formulas. The browser and Python parse this workbook independently.
-
-Run the following commands from the repository root. The complete dependencies require Python 3.11 or later:
-
-```sh
-python -m pip install -r requirements.txt
-```
-
-The browser can inspect candidates for an individual guest. Start the static service:
+**Objective and procedure:** Inspect eligible plans for one guest under the specified trend condition and examine how additions affect score and ingredient use. [Open the web app](https://mingcode123.github.io/Mystia-Menu-Optimizer/) directly, or start a local static service from the repository root with Python 3:
 
 ```sh
 python -m http.server 8000 --bind 127.0.0.1
 ```
 
-Visit <http://127.0.0.1:8000>. The page automatically reads the workbook from the same directory and also accepts manual XLSX imports. Query by guest, score, and filter conditions, then export CSV or XLSX containing the `结果` sheet. See the [browser guide (Chinese)](docs/web-guide.md) for operations.
+Visit <http://127.0.0.1:8000> and wait for the workbook to load automatically, or import it through “选择 Excel” (Select Excel). Apply these settings and click “开始计算” (Start calculation):
 
-Use this planning entry point for the case:
+| Control | Setting for this case |
+| :---: | :---: |
+| Guest; score threshold | 博丽灵梦 (Hakurei Reimu); 3 |
+| Liked-trend anchor; disliked-trend anchor | Empty; `水产` (Aquatic) |
+| Required Tag; Excluded Tag | Both empty |
+| Addition-subset filter; advanced ingredient filter | Both enabled; both “考虑得分” (Consider score) options disabled |
+| Equivalent-addition deduplication; TDQ purchase recommendation | Both enabled; Top n = 3 |
+| Export limit | 0, no row limit |
+
+The removal conditions for the two “Consider score” switches are defined under the [ingredient-upgrade filter](#124-ingredient-upgrade-filter-comparing-designated-base-alternatives) and [addition-subset filter](#125-addition-subset-filter-comparing-smaller-additions).
+
+**Observed results:** The completed query produced 264 candidates. Entering `饭团` (rice ball) in the results search box displayed 5 records, including 饭团, 炙猪肉饭团, and 温暖饭团. Search filters existing results by text containment without regenerating candidates.
+
+[![Actual HTML query: Reimu, disliked trend Aquatic, 264 candidates and 5 records matching the rice-ball search](https://raw.githubusercontent.com/Mingcode123/Mystia-Menu-Optimizer/e53cb65b0f1a2630612933d6a84f8f5c1e8f7b78/docs/images/web-case-results.jpg)](https://raw.githubusercontent.com/Mingcode123/Mystia-Menu-Optimizer/e53cb65b0f1a2630612933d6a84f8f5c1e8f7b78/docs/images/web-case-results.jpg)
+
+*Screenshot of the actual results area, showing the current interface and original game icons.* [View the interface with input parameters](https://raw.githubusercontent.com/Mingcode123/Mystia-Menu-Optimizer/e53cb65b0f1a2630612933d6a84f8f5c1e8f7b78/docs/images/web-case-overview.jpg). The interface retains its Chinese labels.
+
+Two records have the exact dish name 饭团 (rice ball). Both use the prep counter and one seaweed as the base ingredient. The preference matches below were checked against the displayed final tags and Reimu's preferences:
+
+| Additions | Liked matches | Disliked matches | Net score | Total units |
+| :---: | :---: | :---: | :---: | :---: |
+| Honey ×1 | 「Filling」「Affordable」「Sweet」 | 0 | 3−0=3 | 2 |
+| Salmon ×1, grapes ×1 | 「Filling」「High-grade」「Affordable」「Sweet」 | 「Disliked trend」 | 4−1=3 | 3 |
+
+The second plan gains 「Disliked trend」 through 「Aquatic」 and still meets the browser's 3-point threshold after the penalty. Retaining both candidates illustrates the combined effect of net-score eligibility and filter settings. The Python planner in the next section requires zero disliked matches and selects plans using cover3; its candidate scope and evaluation order are defined independently.
+
+**Export:** With the search active, clicking “下载 CSV” (Download CSV) exported 5 data rows and 8 columns, matching the displayed records row by row. “下载 XLSX” (Download XLSX) is also available and uses a sheet named `结果`. Fields and export boundaries appear in the [input/output reference (Chinese)](docs/input-output.md); operations appear in the [browser guide (Chinese)](docs/web-guide.md).
+
+### 4.3 Python: generating a complete rare-guest menu
+
+**Objective and execution:** Under the same trend conditions, select one plan for each of 58 guests and a shared set of allowed cookware. This case selects all five cookware types and applies the cover3 model.
+
+Install the dependencies and run the planner from the repository root with Python 3.11 or later:
 
 ```sh
+python -m pip install -r requirements.txt
 python Python/singlePLAN_cover3_mixIng_nCookware.py
 ```
 
@@ -1552,26 +1678,94 @@ The three Reimu rice-ball combinations illustrate eligibility and comparison. Th
 
 All five cookware types are available in this case, leaving one equipment configuration. Selection covers candidates retained by the original program, with supply slack calculated independently per guest. Candidate counts at intermediate stages were not recorded, so the diagram does not infer search size from them.
 
-### 4.3 Historical results
+### 4.4 Historical menu results
 
 The historical artifact stores dishes, cookware, and total ingredient lists for 58 guests, using 1–3 ingredient units per plan. All five cookware types appear: 24 prep-counter records, 18 pot records, 8 frying-pan records, 6 grill records, and 2 steamer records. All five types are selected in this case, so there is no trade-off between equipment subsets. Under the reproduction settings above, the existing original program reproduced all 58 stored plans.
 
 The following table presents 8 representative records. All 58 records and their sources appear in the [case appendix (Chinese)](docs/case-study.md).
 
-| Guest | Dish | Cookware | Total ingredients | Units | Source row |
-| :---: | :---: | :---: | :---: | :---: | :---: |
-| <img src="HTML/izakaya_icons_pack/customer_rare/007_%E5%8D%9A%E4%B8%BD%E7%81%B5%E6%A2%A6.png" width="46" height="46" alt="博丽灵梦"><br>博丽灵梦 | <img src="HTML/izakaya_icons_pack/recipe/007_%E9%A5%AD%E5%9B%A2.png" width="52" height="52" alt="饭团"><br>饭团 | 料理台 | 蜂蜜、海苔 | 2 | 8 |
-| <img src="HTML/izakaya_icons_pack/customer_rare/015_%E7%90%AA%E9%9C%B2%E8%AF%BA.png" width="46" height="46" alt="琪露诺"><br>琪露诺 | <img src="HTML/izakaya_icons_pack/recipe/032_%E5%87%89%E8%8F%9C%E9%9B%95%E8%8A%B1.png" width="52" height="52" alt="凉菜雕花"><br>凉菜雕花 | 料理台 | 蜂蜜、萝卜 | 2 | 13 |
-| <img src="HTML/izakaya_icons_pack/customer_rare/000_%E8%8E%89%E6%A0%BC%E9%9C%B2.png" width="46" height="46" alt="莉格露"><br>莉格露 | <img src="HTML/izakaya_icons_pack/recipe/097_%E7%8B%AE%E5%AD%90%E5%A4%B4.png" width="52" height="52" alt="狮子头"><br>狮子头 | 煮锅 | 葡萄、牛肉、鸡蛋 | 3 | 2 |
-| <img src="HTML/izakaya_icons_pack/customer_rare/004_%E4%B8%8A%E7%99%BD%E6%B3%BD%E6%85%A7%E9%9F%B3.png" width="46" height="46" alt="上白泽慧音"><br>上白泽慧音 | <img src="HTML/izakaya_icons_pack/recipe/007_%E9%A5%AD%E5%9B%A2.png" width="52" height="52" alt="饭团"><br>饭团 | 料理台 | 海苔 | 1 | 6 |
-| <img src="HTML/izakaya_icons_pack/customer_rare/002_%E6%A9%99.png" width="46" height="46" alt="橙"><br>橙 | <img src="HTML/izakaya_icons_pack/recipe/049_%E8%9C%9C%E6%B1%81%E5%8F%89%E7%83%A7.png" width="52" height="52" alt="蜜汁叉烧"><br>蜜汁叉烧 | 烧烤架 | 蜂蜜、猪肉 | 2 | 4 |
-| <img src="HTML/izakaya_icons_pack/customer_rare/011_%E7%BA%A2%E7%BE%8E%E9%93%83.png" width="46" height="46" alt="红美铃"><br>红美铃 | <img src="HTML/izakaya_icons_pack/recipe/011_%E7%82%92%E8%82%89%E4%B8%9D.png" width="52" height="52" alt="炒肉丝"><br>炒肉丝 | 油锅 | 南瓜、猪肉 | 2 | 12 |
-| <img src="HTML/izakaya_icons_pack/customer_rare/016_%E5%9B%A0%E5%B9%A1%E5%B8%9D.png" width="46" height="46" alt="因幡帝"><br>因幡帝 | <img src="HTML/izakaya_icons_pack/recipe/100_%E6%A8%B1%E8%8A%B1%E5%B8%83%E4%B8%81.png" width="52" height="52" alt="樱花布丁"><br>樱花布丁 | 蒸锅 | 蜂蜜、桃子 | 2 | 17 |
-| <img src="HTML/izakaya_icons_pack/customer_rare/005_%E8%8C%A8%E6%9C%A8%E5%8D%8E%E6%89%87.png" width="46" height="46" alt="茨木华扇"><br>茨木华扇 | <img src="HTML/izakaya_icons_pack/recipe/001_%E8%B1%86%E8%85%90%E5%91%B3%E5%99%8C.png" width="52" height="52" alt="豆腐味噌"><br>豆腐味噌 | 煮锅 | 萝卜、豆腐 | 2 | 7 |
+<table align="center">
+<thead>
+<tr>
+<th align="center">Guest</th>
+<th align="center">Dish</th>
+<th align="center">Cookware</th>
+<th align="center">Total ingredients</th>
+<th align="center">Units</th>
+<th align="center">Source row</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center"><img src="HTML/izakaya_icons_pack/customer_rare/007_%E5%8D%9A%E4%B8%BD%E7%81%B5%E6%A2%A6.png" width="46" height="46" alt="博丽灵梦"><br>博丽灵梦</td>
+<td align="center"><img src="HTML/izakaya_icons_pack/recipe/007_%E9%A5%AD%E5%9B%A2.png" width="52" height="52" alt="饭团"><br>饭团</td>
+<td align="center">料理台</td>
+<td align="center">蜂蜜、海苔</td>
+<td align="center">2</td>
+<td align="center">8</td>
+</tr>
+<tr>
+<td align="center"><img src="HTML/izakaya_icons_pack/customer_rare/015_%E7%90%AA%E9%9C%B2%E8%AF%BA.png" width="46" height="46" alt="琪露诺"><br>琪露诺</td>
+<td align="center"><img src="HTML/izakaya_icons_pack/recipe/032_%E5%87%89%E8%8F%9C%E9%9B%95%E8%8A%B1.png" width="52" height="52" alt="凉菜雕花"><br>凉菜雕花</td>
+<td align="center">料理台</td>
+<td align="center">蜂蜜、萝卜</td>
+<td align="center">2</td>
+<td align="center">13</td>
+</tr>
+<tr>
+<td align="center"><img src="HTML/izakaya_icons_pack/customer_rare/000_%E8%8E%89%E6%A0%BC%E9%9C%B2.png" width="46" height="46" alt="莉格露"><br>莉格露</td>
+<td align="center"><img src="HTML/izakaya_icons_pack/recipe/097_%E7%8B%AE%E5%AD%90%E5%A4%B4.png" width="52" height="52" alt="狮子头"><br>狮子头</td>
+<td align="center">煮锅</td>
+<td align="center">葡萄、牛肉、鸡蛋</td>
+<td align="center">3</td>
+<td align="center">2</td>
+</tr>
+<tr>
+<td align="center"><img src="HTML/izakaya_icons_pack/customer_rare/004_%E4%B8%8A%E7%99%BD%E6%B3%BD%E6%85%A7%E9%9F%B3.png" width="46" height="46" alt="上白泽慧音"><br>上白泽慧音</td>
+<td align="center"><img src="HTML/izakaya_icons_pack/recipe/007_%E9%A5%AD%E5%9B%A2.png" width="52" height="52" alt="饭团"><br>饭团</td>
+<td align="center">料理台</td>
+<td align="center">海苔</td>
+<td align="center">1</td>
+<td align="center">6</td>
+</tr>
+<tr>
+<td align="center"><img src="HTML/izakaya_icons_pack/customer_rare/002_%E6%A9%99.png" width="46" height="46" alt="橙"><br>橙</td>
+<td align="center"><img src="HTML/izakaya_icons_pack/recipe/049_%E8%9C%9C%E6%B1%81%E5%8F%89%E7%83%A7.png" width="52" height="52" alt="蜜汁叉烧"><br>蜜汁叉烧</td>
+<td align="center">烧烤架</td>
+<td align="center">蜂蜜、猪肉</td>
+<td align="center">2</td>
+<td align="center">4</td>
+</tr>
+<tr>
+<td align="center"><img src="HTML/izakaya_icons_pack/customer_rare/011_%E7%BA%A2%E7%BE%8E%E9%93%83.png" width="46" height="46" alt="红美铃"><br>红美铃</td>
+<td align="center"><img src="HTML/izakaya_icons_pack/recipe/011_%E7%82%92%E8%82%89%E4%B8%9D.png" width="52" height="52" alt="炒肉丝"><br>炒肉丝</td>
+<td align="center">油锅</td>
+<td align="center">南瓜、猪肉</td>
+<td align="center">2</td>
+<td align="center">12</td>
+</tr>
+<tr>
+<td align="center"><img src="HTML/izakaya_icons_pack/customer_rare/016_%E5%9B%A0%E5%B9%A1%E5%B8%9D.png" width="46" height="46" alt="因幡帝"><br>因幡帝</td>
+<td align="center"><img src="HTML/izakaya_icons_pack/recipe/100_%E6%A8%B1%E8%8A%B1%E5%B8%83%E4%B8%81.png" width="52" height="52" alt="樱花布丁"><br>樱花布丁</td>
+<td align="center">蒸锅</td>
+<td align="center">蜂蜜、桃子</td>
+<td align="center">2</td>
+<td align="center">17</td>
+</tr>
+<tr>
+<td align="center"><img src="HTML/izakaya_icons_pack/customer_rare/005_%E8%8C%A8%E6%9C%A8%E5%8D%8E%E6%89%87.png" width="46" height="46" alt="茨木华扇"><br>茨木华扇</td>
+<td align="center"><img src="HTML/izakaya_icons_pack/recipe/001_%E8%B1%86%E8%85%90%E5%91%B3%E5%99%8C.png" width="52" height="52" alt="豆腐味噌"><br>豆腐味噌</td>
+<td align="center">煮锅</td>
+<td align="center">萝卜、豆腐</td>
+<td align="center">2</td>
+<td align="center">7</td>
+</tr>
+</tbody>
+</table>
 
 Total ingredients include the base recipe and additions, in the historical sheet order; each listed name represents one unit. Guest and dish icons use the original game assets in this repository. Game names retain their dataset spelling.
 
-### 4.4 Checking Reimu's stored plan against the source data
+### 4.5 Objective tradeoffs: honey and cocoa beans
 
 Historical row 8 selects a rice ball and the prep counter for Hakurei Reimu, using one honey and one seaweed. The original recipe identifies seaweed as the base ingredient and honey as the addition.
 
@@ -1607,7 +1801,9 @@ Two eligible candidates for the same dish illustrate the objective tradeoff. The
 
 Cocoa beans produce one more liked match, but both plans have capped benefit 3 and use two ingredient units. Supply slack therefore determines their order, favoring honey. These actual candidates illustrate the shift from maximizing matches to conserving resources after meeting the coverage target.
 
-### 4.5 Verification scope
+### 4.6 Verification scope
+
+The browser case records one complete query, search filter, and CSV export in the current implementation. The five visible records filtered from 264 candidates match the export. Historical menu reproduction below uses v1.0.0; equivalence with the current Python implementation is covered by the separate differential checks in Chapter 3.
 
 Reproduction compares dish, cookware, and total ingredient multiset by guest name, excluding ingredient order and worksheet layout. Hashes of the original program, input workbook, and historical result file were unchanged before and after execution. The full comparison and existing browser and distributed-file checks appear in the [verification record (Chinese)](docs/verification.md); explanatory examples for objective capping and candidate compression appear in the [optimization model and algorithm boundaries (Chinese)](docs/design.md).
 
