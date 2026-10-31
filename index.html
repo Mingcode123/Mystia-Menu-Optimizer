@@ -682,7 +682,215 @@
       justify-content:flex-end;
       margin-top:10px;
     }
-  </style>
+
+/* Pixel theme */
+/* Native pixel-inspired theme. No external framework, font, or image download. */
+:root{
+  --bg:#f3eee5;
+  --card:#fffdf8;
+  --text:#3d3334;
+  --muted:#73655e;
+  --line:#d9cec1;
+  --soft:#f3ede3;
+  --btn:#85485b;
+  --btnText:#fffdf8;
+  --btn2:#f8f2e9;
+  --btn2Text:#614654;
+  --good:#507663;
+  --warn:#aa752c;
+  --bad:#a44c50;
+  --shadow:4px 4px 0 #e2d7c8;
+  --pixel-edge:#c7b7a6;
+  --focus:#6d4f83;
+  --rt-pad-x:7px;
+  --rt-btn-gap:3px;
+  --rt-btn-w:19px;
+  --col-price:55px;
+  --col-score:82px;
+  --col-dish:125px;
+  --col-cookware:88px;
+  --col-total:108px;
+  --col-base:108px;
+  --col-added:108px;
+  color-scheme:light;
+}
+html{font-size:14px;scroll-padding-top:16px;}
+body{line-height:1.6;background:var(--bg);}
+body > header{
+  position:relative;
+  padding:24px max(24px,calc((100vw - 1760px)/2));
+  background:#4d3a4c;
+  color:#fff8e9;
+  border:0;
+  border-bottom:4px solid #c8a568;
+  box-shadow:0 4px 0 #e5d8c4;
+}
+header h1{
+  display:flex;align-items:center;gap:14px;
+  font-size:23px;letter-spacing:.12em;font-weight:800;
+}
+header h1::before{
+  content:"";display:block;width:40px;height:40px;flex:0 0 40px;
+  background:#fff7e9 url("./HTML/izakaya_icons_pack/recipe/007_饭团.png") center/32px 32px no-repeat;
+  border:2px solid #d7b97e;box-shadow:3px 3px 0 #322a39;
+  image-rendering:pixelated;
+}
+header p{margin:14px 0 0;max-width:1510px;color:#ece1d3;font-size:12px;line-height:1.8;}
+header p strong{color:#f7d990;}
+.wrap{
+  max-width:1808px;margin:0 auto;
+  padding:24px;gap:22px;
+  grid-template-columns:342px minmax(0,1fr);
+}
+.card{
+  min-width:0;border:1px solid var(--pixel-edge);border-radius:3px;
+  box-shadow:var(--shadow);background:var(--card);
+}
+.card .hd,.mainTop{
+  padding:16px 18px;background:#faf5ec;border-bottom:1px solid var(--line);
+  min-height:67px;
+}
+.card .hd strong,.mainTop strong{font-size:15px;letter-spacing:.03em;color:#574052;}
+.card .hd strong::before,.mainTop strong::before{
+  content:"";display:inline-block;vertical-align:2px;
+  width:6px;height:6px;background:#b48b53;margin-right:9px;
+  box-shadow:3px 3px 0 #e5d5b9;
+}
+.card .bd{padding:16px 18px 18px;}
+label{color:#655a57;font-size:12px;font-weight:600;margin-top:14px;margin-bottom:7px;}
+.card .bd > label:first-child{margin-top:0;}
+input[type="text"],input[type="number"],select,.tools input,.tools select,.popoverTop input{
+  min-height:40px;border-radius:3px;padding:9px 11px;
+  color:var(--text);background:#fffefa;border:1px solid #c9bcaf;
+  box-shadow:inset 0 2px 0 #f1e9dc;
+  font-size:12px;
+}
+input:disabled{background:#f3eee7;color:#8e8277;}
+input[type="file"]{
+  padding:10px;border-radius:3px;background:#faf4e9;border:1px dashed #b8a38a;
+  color:#746052;font-size:11px;line-height:1.6;
+}
+input[type="file"]::file-selector-button{
+  background:#e9ddc9;border:1px solid #b6a38d;padding:7px 10px;
+  margin-right:10px;border-radius:2px;color:#59483e;font:inherit;font-weight:700;cursor:pointer;
+}
+input[type="checkbox"]{width:15px;height:15px;flex-shrink:0;accent-color:#80506a;}
+input:focus-visible,select:focus-visible,button:focus-visible,.pickerBtn:focus-visible,.gItem:focus-visible{
+  outline:3px solid #b9a1cb;outline-offset:3px;border-color:#70528a;
+}
+.row{gap:12px;}
+.row.rowWide{grid-template-columns:minmax(0,2fr) minmax(70px,1fr);}
+.row > div{min-width:0;}
+button{
+  border-radius:3px;border:1px solid #6b354a;padding:9px 13px;
+  min-height:39px;background:var(--btn);color:var(--btnText);
+  box-shadow:0 3px 0 #60364a;font-size:12px;line-height:1.45;
+  transition:background-color .12s,box-shadow .12s,transform .12s;
+}
+button.secondary{border-color:#c3b4a3;background:var(--btn2);color:var(--btn2Text);box-shadow:0 2px 0 #d6c7b6;}
+button:not(:disabled):hover{background:#744057;}
+button.secondary:not(:disabled):hover{background:#ede1d3;}
+button:not(:disabled):active{transform:translateY(2px);box-shadow:none;}
+button:disabled{opacity:.48;box-shadow:none;}
+.btns{gap:12px;margin-top:18px;}
+#btnRun{flex:1;min-height:43px;font-size:13px;letter-spacing:.03em;}
+#btnStop{min-width:76px;}
+.hint,.eqGroupBox,.warnBox{
+  border-radius:3px;padding:11px 12px;font-size:11px;line-height:1.75;
+}
+.hint{background:#f0edf4;border-color:#d9cede;color:#68566d;}
+.eqGroupBox{background:#f6f0e7;max-height:180px;}
+.warnBox{background:#fff2d8;border-color:#d7b779;color:#7f5a25;}
+.small{font-size:11px;line-height:1.6;}
+.pill{border-radius:3px;font-size:10px;border-color:#d7c9b5;background:#f2e9d8;color:#7b664b;padding:3px 7px;margin-right:0;}
+.togBlock{gap:11px;padding:12px 0 0;border-top:1px solid #e7ddcf;margin-top:16px;}
+.togMain,.togSub{font-size:12px;font-weight:400;line-height:1.5;gap:7px;}
+.togMain span,.togSub span{font-weight:600;}
+.togSub{width:105px;}
+.tdqTopCtl{gap:5px;}
+.tdqTopCtl input[type="number"]{min-height:28px;height:28px;border-radius:3px;width:55px;min-width:55px;}
+.status{padding:12px 18px;background:#f6f0e5;font-size:11px;gap:10px;}
+.bar{height:9px;border-radius:0;background:#e4dac9;border:1px solid #c7b89f;}
+.bar > i{background:repeating-linear-gradient(90deg,#658572 0,#658572 8px,#577563 8px,#577563 10px);}
+.mainTop{align-items:center;gap:16px;flex-wrap:wrap;}
+.mainTop .meta{font-size:11px;margin-top:3px;}
+.tools{flex:1;gap:10px;align-items:center;}
+.tools input{flex:1 1 190px;max-width:340px;width:auto;min-width:180px;}
+.tools button{white-space:nowrap;}
+.wrap > .card:last-child > div[style*="overflow"]{scrollbar-color:#c9b7a3 #f6efe4;scrollbar-width:thin;}
+#resultTable{min-width:860px;font-size:12px;}
+#resultTable th{background:#eee5d8;color:#594b43;font-size:11px;border-bottom:2px solid #cdb99c;height:45px;}
+#resultTable th,#resultTable td{padding:10px var(--rt-pad-x);}
+#resultTable th:first-child,#resultTable td:first-child{padding-left:12px;}
+#resultTable tbody tr:nth-child(even){background:#f8f4ed;}
+#resultTable tbody tr:hover{background:#f2e9d9;}
+#resultTable td{color:var(--text);line-height:1.65;}
+#resultTable th.thCtl .thBtn{
+  min-height:21px;height:21px;border-radius:2px;border-color:#bbab96;background:#fbf7ef;color:#655344;
+  box-shadow:none;padding:2px 0;font-size:11px;
+}
+#resultTable th.thCtl .thBtn:hover{background:#dfcfb8;border-color:#8b7259;}
+#resultTable th.thCtl .thBtn.active{background:#80536b;border-color:#80536b;color:#fff;}
+#resultTable td[colspan="8"]{padding:45px 24px!important;text-align:center;background:#fffdf8;}
+.cellWithIcon{gap:9px;}
+.cellWithIcon img{width:28px;height:28px;border-radius:2px;border-color:#d9cbb9;background:#f6f0e4;image-rendering:pixelated;}
+.avatar{width:34px;height:34px;border-radius:2px;border:1px solid #c7b0c9;background:#f0e7ef;color:#705475;}
+.avatar img{image-rendering:pixelated;}
+.pickerBtn{border-radius:3px;background:#faf6fc;border-color:#cab8cc;padding:10px 11px;min-height:56px;}
+.pickerBtn:hover{background:#f1e8f3;border-color:#a389ac;}
+.pickerName{color:#604768;font-size:13px;}
+.caret{color:#896b92;}
+.dropBtn{min-height:40px;height:40px;width:32px;border-radius:3px;box-shadow:none;}
+.dropBtn:not(:disabled):hover{background:#eee2d2;}
+.comboPop,.popover,.hdrPop{border-radius:3px;border:1px solid #baa78d;background:#fffaf1;box-shadow:4px 4px 0 #cbbda6;}
+.comboPop{padding:6px;}
+.comboItem{border:0;box-shadow:none;border-radius:2px;padding:8px 10px;min-height:35px;background:transparent;color:var(--text);}
+.comboItem:not(:disabled):hover{background:#eadcc7;}
+.backdrop{background:rgba(47,35,44,.55);}
+#guestPopover.open{border-radius:4px;border:2px solid #a58d70;padding:20px;gap:6px;}
+.popoverTop{margin-bottom:12px;gap:12px;}
+.xBtn{border:0;box-shadow:none;background:transparent;color:#705c66;min-width:36px;min-height:36px;font-size:24px;}
+.xBtn:not(:disabled):hover{background:#e6d9c6;color:#4c3646;}
+#guestGrid{gap:12px;grid-template-columns:repeat(auto-fill,minmax(128px,1fr));padding:4px 8px 8px 4px;}
+.gItem{padding:12px 8px;border-radius:3px;background:#fffdf9;border-color:#d2c3b1;gap:10px;box-shadow:0 2px 0 #e6d9c7;}
+.gItem:hover{background:#f0e6f0;border-color:#aa8cad;}
+.gItem .avatar{width:52px!important;height:52px!important;border-radius:2px;}
+.gName{color:#594556;max-width:100%;font-size:12px;line-height:1.5;}
+.hdrPop{padding:16px;max-width:calc(100vw - 24px);}
+.hdrPopTitle{color:#68465d;}
+.hdrPopFt{gap:10px;margin-top:14px;}
+@media(min-width:1800px){.wrap{grid-template-columns:382px minmax(0,1fr);}}
+@media(max-width:1180px){
+  .wrap{grid-template-columns:338px minmax(0,1fr);padding:18px;gap:18px;}
+  .card .bd{padding:14px;}.card .hd,.mainTop{padding:14px;}
+  .tools{justify-content:flex-start;}.tools input{max-width:none;}
+  .togSub{width:97px;}.togMain,.togSub{font-size:11px;}
+}
+@media(max-width:860px){
+  body > header{padding:19px 18px;}
+  header h1{font-size:21px;}header p{font-size:11px;line-height:1.8;}
+  .wrap{grid-template-columns:minmax(0,1fr);padding:18px;gap:22px;}
+  .card .bd{padding:16px 18px;}.card .hd,.mainTop{padding:14px 18px;}
+  .togMain,.togSub{font-size:12px;}.togSub{width:115px;}
+  .mainTop{align-items:flex-start;}.mainTop > div:first-child{flex:1 1 100%;}
+  .tools{width:100%;}.tools input{flex:1 1 240px;}
+  .wrap > .card:last-child > div[style*="overflow"]{max-height:70vh!important;}
+}
+@media(max-width:430px){
+  body > header{padding:16px 14px;}
+  header h1{font-size:20px;gap:12px;}
+  .wrap{padding:14px 10px 22px;gap:18px;}
+  .card .hd,.mainTop{padding:13px 14px;}.card .bd{padding:14px;}
+  .row{gap:10px;}.row.rowWide{grid-template-columns:minmax(0,2fr) 78px;}
+  .tools{gap:9px;}.tools input{flex-basis:100%;width:100%;}
+  .tools button{flex:1;}.status{padding:11px 14px;}
+  #guestPopover.open{padding:14px;width:94vw;height:86vh;}
+  #guestGrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;}
+  .gItem .avatar{width:48px!important;height:48px!important;}
+}
+@media(prefers-reduced-motion:reduce){button{transition:none;}}
+
+</style>
 </head>
 <body>
 <header>
@@ -1138,6 +1346,7 @@ let RESULTS = [];
 let FILTERED = [];
 let SORT = {key:"售价", dir:1};
 let LAST_META = "";
+const ROW_SEARCH_TEXT = new WeakMap();
 
 let CURRENT_GUEST = null;
 let EQ_GROUPS = []; // [{tags:[], names:[]}]，用于展示“等价食材组（仅加料）”
@@ -1684,7 +1893,11 @@ function applyFilters(){
 
 
     if (!q) return true;
-    const blob = [r["料理"], r["cookware"], r["总食材数"], r["基础食材"], r["加料"], r["最终tag"]].join(" ").toLowerCase();
+    let blob = ROW_SEARCH_TEXT.get(r);
+    if (blob === undefined){
+      blob = [r["料理"], r["cookware"], r["总食材数"], r["基础食材"], r["加料"], r["最终tag"]].join(" ").toLowerCase();
+      ROW_SEARCH_TEXT.set(r, blob);
+    }
     return blob.includes(q);
   });
 
@@ -2232,6 +2445,7 @@ setStatus("开始计算...", 0);
     WORKERS.push(w);
 
     w.onerror = function(e){
+      if (runToken !== RUN_TOKEN) return;
       warn("计算线程出错：" + (e && e.message ? e.message : String(e)));
       stopAll("计算失败");
     };
@@ -2340,11 +2554,14 @@ setStatus("开始计算...", 0);
 
 $("btnStop").addEventListener("click", function(){
   if (WORKERS && WORKERS.length){
-    // 请求停止：由 worker 返回 STOPPED 后统一收尾
+    ++RUN_TOKEN;
     for (const w of WORKERS){
-      try{ w.postMessage({type:"STOP"}); }catch(_e){}
+      try{ w.terminate(); }catch(_e){}
     }
-    setStatus("正在停止...", 0);
+    WORKERS = [];
+    setStatus("已停止", 0);
+    $("btnRun").disabled = false;
+    $("btnStop").disabled = true;
   }
 
 });
@@ -2402,6 +2619,15 @@ function makeWorker(){
   if (!WORKER_URL){
     const workerSrc = `
 let STOP = false;
+const compareZh = new Intl.Collator("zh").compare;
+
+// Exact set operations on normalized tags. Word arrays also support workbooks
+// with more than 32 or 64 distinct tags.
+function bitCount(v){
+  v -= (v >>> 1) & 0x55555555;
+  v = (v & 0x33333333) + ((v >>> 2) & 0x33333333);
+  return (((v + (v >>> 4)) & 0x0f0f0f0f) * 0x01010101) >>> 24;
+}
 
 function safeStr(x){ return (x===null||x===undefined) ? "" : String(x).trim(); }
 function normName(s){ return safeStr(s).replace(/\u3000/g," ").trim(); }
@@ -2426,7 +2652,7 @@ function tagsSignature(tags){
     seen[t] = 1;
     arr.push(t);
   }
-  arr.sort((a,b)=>a.localeCompare(b,"zh"));
+  arr.sort((a,b)=>compareZh(a,b));
   return arr.join("|");
 }
 
@@ -2467,7 +2693,7 @@ function formatAdded(names){
 }
 
 function buildRow(c){
-  const tagArr = Array.from(c.tagSet).filter(Boolean).sort((a,b)=>a.localeCompare(b,"zh"));
+  const tagArr = Array.from(c.tagSet).filter(Boolean).sort((a,b)=>compareZh(a,b));
   const finalTags = tagArr.join("、");
   const addArr = (c.addedNamesOut || c.addedNames || []);
   return {
@@ -2508,7 +2734,7 @@ function countMultiset(arr){
   return m;
 }
 function countsKey(m){
-  const keys = Object.keys(m).filter(k=>m[k]>0).sort((a,b)=>a.localeCompare(b,"zh"));
+  const keys = Object.keys(m).filter(k=>m[k]>0).sort((a,b)=>compareZh(a,b));
   let out = "";
   for (const k of keys){
     out += k + "×" + m[k] + "|";
@@ -2541,7 +2767,7 @@ function buildIngTagSets(ingredients){
     for (const t of tags){
       if (!seen.has(t)){ seen.add(t); uniq.push(t); }
     }
-    uniq.sort((a,b)=>a.localeCompare(b,"zh"));
+    uniq.sort((a,b)=>compareZh(a,b));
     map[nm] = uniq;
   }
   return map;
@@ -2597,7 +2823,7 @@ function isStrictSubsetTags(aTags, bTags){
   let i=0, j=0;
   while (i<aTags.length && j<bTags.length){
     const a = aTags[i], b = bTags[j];
-    const cmp = a.localeCompare(b,"zh");
+    const cmp = compareZh(a,b);
     if (cmp===0){ i++; j++; }
     else if (cmp>0){ j++; }
     else { return false; }
@@ -2686,7 +2912,7 @@ onmessage = function(ev){
     const ra = (a in PREF_RANK) ? PREF_RANK[a] : 1000000000;
     const rb = (b in PREF_RANK) ? PREF_RANK[b] : 1000000000;
     if (ra !== rb) return (ra < rb) ? a : b;
-    return (a.localeCompare(b, "zh") <= 0) ? a : b;
+    return (compareZh(a,b) <= 0) ? a : b;
   }
 
 // TDQ（Total Daily Quantity）
@@ -2762,6 +2988,57 @@ function addedSigByTags(addedNames){
     return out;
   }
 
+  // Compile immutable tags and rules once per worker run.
+  const tagIds = new Map();
+  function registerTag(t){
+    if (t && !tagIds.has(t)) tagIds.set(t, tagIds.size);
+  }
+  for (const tags of Object.values(ingTagMap)) for (const t of tags) registerTag(t);
+  const preparedFoods = foods.map(f => {
+    const tags = (f.tags || []).map(normTag).filter(Boolean);
+    const cookware = normTag(f.cookware || "");
+    const price = Number(f.sellPrice) || 0;
+    const baseTags = tags.slice();
+    if (cookware) baseTags.push(cookware);
+    if (price < 20) baseTags.push("实惠");
+    else if (price > 60) baseTags.push("昂贵");
+    for (const t of baseTags) registerTag(t);
+    return {f, tags, baseTags, price};
+  });
+  for (const tags of [requiredTags, excludedTags, trendLikeAnchors, trendHateAnchors, favSet, dissSet]){
+    for (const t of tags) registerTag(t);
+  }
+  const overridePairs = [["肉","素"],["饱腹","下酒"],["重油","清淡"],["大份","小巧"]];
+  for (const pair of overridePairs) for (const t of pair) registerTag(t);
+  registerTag("流行·喜爱");
+  registerTag("流行·厌恶");
+  const scoreWords = Math.ceil(tagIds.size / 32);
+  function maskOf(tags){
+    const mask = new Uint32Array(scoreWords);
+    for (const t of tags){
+      const id = tagIds.get(t);
+      if (id !== undefined) mask[id >>> 5] |= 1 << (id & 31);
+    }
+    return mask;
+  }
+  function bitOf(t){
+    const id = tagIds.get(t);
+    return [id >>> 5, 1 << (id & 31)];
+  }
+  const maskOverrides = overridePairs.map(pair => [bitOf(pair[0]), bitOf(pair[1])]);
+  const bigBit = bitOf("大份");
+  const trendLikeBit = bitOf("流行·喜爱");
+  const trendHateBit = bitOf("流行·厌恶");
+  const favMask = maskOf(favSet), dissMask = maskOf(dissSet);
+  const requiredMask = maskOf(requiredTags), excludedMask = maskOf(excludedTags);
+  const likeAnchorMask = maskOf(trendLikeAnchors), hateAnchorMask = maskOf(trendHateAnchors);
+  const scoreIngMasks = Object.create(null);
+  for (const nm of allIngNames) scoreIngMasks[nm] = maskOf(ingTagMap[nm] || []);
+  function intersects(a,b){
+    for (let j=0;j<scoreWords;j++) if (a[j] & b[j]) return true;
+    return false;
+  }
+
   const CHUNK_SIZE = 2000;
   let OUT_CHUNK = [];
   let outCount = 0;
@@ -2784,7 +3061,8 @@ function addedSigByTags(addedNames){
   const total = foods.length;
   let done = 0;
 
-  for (const f of foods){
+  for (const prepared of preparedFoods){
+    const f = prepared.f;
     if (STOP){
       postMessage({type:"STOPPED", wid: wid});
       return;
@@ -2829,7 +3107,7 @@ if (eqIngDedup) allowedIngNames = dedupAllowedBySig(allowedIngNamesRaw);
         const da = ingLenMap[a] || 0;
         const db = ingLenMap[b] || 0;
         if (da !== db) return da - db;
-        return a.localeCompare(b,"zh");
+        return compareZh(a,b);
       });
 
       for (const cur of allowedIngNames){
@@ -2856,6 +3134,12 @@ if (eqIngDedup) allowedIngNames = dedupAllowedBySig(allowedIngNamesRaw);
 
     const dishCands = [];
     const baseJoined = baseNames.join("、");
+    const baseTagSet = new Set(prepared.baseTags);
+    const baseScoreMask = maskOf(prepared.baseTags);
+    const allowedScoreMasks = allowedIngNames.map(nm => scoreIngMasks[nm]);
+    const scoreMask = new Uint32Array(scoreWords);
+    const price = prepared.price;
+    const needsCounts = subsetFilter || ingUpgradeFilter || tdqRecommend;
     let comboN = 0;
 
     for (let k=kStart;k<=maxExtra;k++){
@@ -2867,60 +3151,42 @@ if (eqIngDedup) allowedIngNames = dedupAllowedBySig(allowedIngNamesRaw);
           postMessage({type:"HEART", wid, dish:(f.name||""), combo: comboN, done, total});
         }
 
-        const addedNames = indices.map(i => allowedIngNames[i]);
         const totalIng = baseCount + k;
-
-        const tagSet = new Set();
-
-        for (const t of (f.tags||[])) {
-          const tt = normTag(t);
-          if (tt) tagSet.add(tt);
+        scoreMask.set(baseScoreMask);
+        for (const i of indices){
+          const addMask = allowedScoreMasks[i];
+          for (let j=0;j<scoreWords;j++) scoreMask[j] |= addMask[j];
         }
-
-        const ck = normTag(f.cookware||"");
-        if (ck) tagSet.add(ck);
-
-        const price = Number(f.sellPrice)||0;
-        if (price < 20) tagSet.add("实惠");
-        else if (price > 60) tagSet.add("昂贵");
-
-        for (const nm of addedNames){
-          const tags = ingTagMap[nm] || [];
-          for (const t of tags) tagSet.add(t);
+        if (baseCount < 5 && totalIng === 5 && k > 0) scoreMask[bigBit[0]] |= bigBit[1];
+        for (const [strong,weak] of maskOverrides){
+          if (scoreMask[strong[0]] & strong[1]) scoreMask[weak[0]] &= ~weak[1];
         }
-
-        if (baseCount < 5 && totalIng === 5 && k > 0) tagSet.add("大份");
-
-        applyOverrides(tagSet);
-        let hitTrendLike = false;
-        for (const a of trendLikeAnchors){
-          if (tagSet.has(a)){ hitTrendLike = true; break; }
-        }
-        if (hitTrendLike) tagSet.add("流行·喜爱");
-
-        let hitTrendHate = false;
-        for (const a of trendHateAnchors){
-          if (tagSet.has(a)){ hitTrendHate = true; break; }
-        }
-        if (hitTrendHate) tagSet.add("流行·厌恶");
-
-        for (const rt of requiredTags){
-          if (!tagSet.has(rt)) return true;
-        }
-        for (const et of excludedTags){
-          if (tagSet.has(et)) return true;
-        }
-
-
+        // Trend dislike is evaluated after adding trend like, matching the
+        // original order even when a trend label is itself an anchor.
+        if (intersects(scoreMask, likeAnchorMask)) scoreMask[trendLikeBit[0]] |= trendLikeBit[1];
+        if (intersects(scoreMask, hateAnchorMask)) scoreMask[trendHateBit[0]] |= trendHateBit[1];
         let score = 0;
-        for (const t of tagSet){
-          if (favSet.has(t)) score += 1;
-          if (dissSet.has(t)) score -= 1;
+        for (let j=0;j<scoreWords;j++){
+          if ((scoreMask[j] & requiredMask[j]) !== (requiredMask[j] | 0)) return true;
+          if (scoreMask[j] & excludedMask[j]) return true;
+          score += bitCount(scoreMask[j] & favMask[j]) - bitCount(scoreMask[j] & dissMask[j]);
         }
         if (score < minScore) return true;
 
-        const origCounts = countMultiset(addedNames);
-        const origKey = countsKey(origCounts);
+        const addedNames = indices.map(i => allowedIngNames[i]);
+        // Materialize only qualifying candidates. Preserve insertion order so
+        // even locale-equivalent tag spellings retain their original ordering.
+        const tagSet = new Set(baseTagSet);
+        for (const nm of addedNames){
+          for (const t of (ingTagMap[nm] || [])) tagSet.add(t);
+        }
+        if (baseCount < 5 && totalIng === 5 && k > 0) tagSet.add("大份");
+        applyOverrides(tagSet);
+        if (scoreMask[trendLikeBit[0]] & trendLikeBit[1]) tagSet.add("流行·喜爱");
+        if (scoreMask[trendHateBit[0]] & trendHateBit[1]) tagSet.add("流行·厌恶");
+
+        const origCounts = needsCounts ? countMultiset(addedNames) : null;
+        const origKey = needsCounts ? countsKey(origCounts) : "";
 
         let normKey = origKey;
         let advanced = false;
@@ -3006,14 +3272,14 @@ dishCands.push({
       cands2 = cands2.slice().sort((a,b)=>{
         if (a.totalAdded !== b.totalAdded) return a.totalAdded - b.totalAdded;
         if (a.score !== b.score) return b.score - a.score;
-        return a.origKey.localeCompare(b.origKey, "zh");
+        return compareZh(a.origKey,b.origKey);
       });
 
       const bestScoreByKey = Object.create(null);
       const kept = [];
 
       function isDominatedBySubset(counts, score){
-        const keys = Object.keys(counts).filter(k => (counts[k]|0) > 0).sort((a,b)=>a.localeCompare(b,"zh"));
+        const keys = Object.keys(counts).filter(k => (counts[k]|0) > 0).sort((a,b)=>compareZh(a,b));
         if (!keys.length){
           const s = bestScoreByKey[""];
           return (s !== undefined) && (!subsetScoreFilter || s >= score);
@@ -3108,7 +3374,7 @@ let sorted = cands2.slice().sort((a,b)=>{
   if (d) return d;
   // 完全相同：稳定排序
   if (a.totalAdded !== b.totalAdded) return a.totalAdded - b.totalAdded;
-  return a.origKey.localeCompare(b.origKey, "zh");
+  return compareZh(a.origKey,b.origKey);
 });
 
 const TOP_N = tdqTopN;

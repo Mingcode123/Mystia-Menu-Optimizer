@@ -458,6 +458,9 @@ def build_dish_pool_for_guest(
     min_score: int,
     trend_like_anchors: Set[str],
     trend_hate_anchors: Set[str],
+    *,
+    _max_total_ing: Optional[int] = None,
+    _coverage_cap: Optional[int] = None,
 ) -> List[Candidate]:
     fav = set(guest.preferred_tags)
     diss = set(guest.disliked_tags)
@@ -465,6 +468,13 @@ def build_dish_pool_for_guest(
     base_names = tuple([n for n in dish.required_ingredients if n])
     base_count = len(base_names)
     max_extra = max(0, 5 - base_count)
+    # A caller with a saturated incumbent can restrict the second objective.
+    # Keep max_extra unchanged for the original tag/filter rules below.
+    search_extra = max_extra
+    if _max_total_ing is not None:
+        if base_count > _max_total_ing:
+            return []
+        search_extra = min(search_extra, _max_total_ing - base_count)
 
     all_ing_names = [n for n in ingredients.keys() if n not in HARD_EXCLUDE_ADDON]
     forb_names, forb_tags = _forbidden_split(dish, ingredients)
@@ -659,9 +669,17 @@ def build_dish_pool_for_guest(
             dfs(i, k_left - 1, pos_upper + delta_pos[i])
             chosen_idx.pop()
 
-    for k in range(0, max_extra + 1):
+    for k in range(0, search_extra + 1):
         chosen_idx.clear()
+        layer_start = len(pool)
         dfs(0, k, base_fav_upper)
+        # A saturated plan at this size beats every larger plan under the
+        # capped-coverage objective. Finish the whole layer to preserve ties.
+        if _coverage_cap is not None:
+            coverage_tags = {t for t in fav if _s(t)}
+            if any(sum(t in coverage_tags for t in c.tagset) >= _coverage_cap
+                   for c in pool[layer_start:]):
+                break
 
     uniq: Dict[Tuple[str, str], Candidate] = {}
     for c in pool:
@@ -1219,6 +1237,8 @@ def plan_for_guest(
     _ex_cw = {norm_key(x) for x in EXCLUDE_COOKWARE if _s(x)}
     dishes_owned = [d for d in dishes if d.owned and (not _ex_cw or norm_key(d.cookware) not in _ex_cw)]
     total_owned = len(dishes_owned)
+    bounded_search = (len({d.name for d in dishes_owned}) == len(dishes_owned)
+                      and all("|" not in n and "*" not in n for n in ingredients))
 
     # Cache metrics per candidate (id-based) to avoid recomputation
     _metric_cache: Dict[Tuple[str, str, Tuple[str, ...], Tuple[str, ...]], Tuple[int, int, float]] = {}  # (dish, orig_key, added_final, tagset)  # (coverage, total_ing, inf_tdq)
@@ -1288,6 +1308,13 @@ def plan_for_guest(
         if verbose and (di % PROGRESS_EVERY == 0 or di == total_owned):
             print(f"    ... scanned {di}/{total_owned} owned dishes")
 
+        # Saturated coverage permits an ingredient-count bound; equal-size
+        # candidates still use the original supply and tie-break rules.
+        max_total = None
+        if bounded_search and best is not None:
+            best_metrics = _metrics(best)
+            if best_metrics[0] == TARGET_COVER:
+                max_total = best_metrics[1]
         pool = build_dish_pool_for_guest(
             guest=guest,
             dish=dish,
@@ -1298,6 +1325,8 @@ def plan_for_guest(
             min_score=min_score,
             trend_like_anchors=trend_like_anchors,
             trend_hate_anchors=trend_hate_anchors,
+            _max_total_ing=max_total,
+            _coverage_cap=TARGET_COVER if bounded_search else None,
         )
         if not pool:
             continue

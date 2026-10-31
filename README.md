@@ -6,6 +6,8 @@
 
 **中文** | [English](#english)
 
+历史版本：[v1.0.0 · Initial Release](https://github.com/Mingcode123/Mystia-Menu-Optimizer/releases/tag/v1.0.0)，提供完整源码与版本说明。
+
 在[《东方夜雀食堂》](https://store.steampowered.com/app/1584090/)中，同一位顾客可能接受多种料理与加料组合，而这些组合的用料、供给压力和所需厨具不同。备菜决策因此需要同时回答两个问题：哪些方案满足条件，以及在多个合格方案之间如何定义“更优”。
 
 本项目将上述问题抽象为离散决策模型，明确配方与加料的可行域，并建立喜好覆盖、食材件数与最低供给余量的分层评价体系。模型经历了按喜好标签配置多套方案、每位顾客配置单套方案、覆盖收益封顶及共同厨具选择等调整。项目产出包括规则与数据定义、数学模型、设计决策说明，以及用于搜索候选和复核结果的程序。
@@ -493,6 +495,34 @@ N_{g,d}=\sum_{k=0}^{s_d}\binom{n_{g,d}+k-1}{k}
 
 空池只可能生成零加料组合。网页在必含标签指定「大份」且料理原标签未含「大份」时，将枚举限制为 $`k=s_d`$。网页按料理静态分块，最多使用 8 个 Web Worker 并行；各 Python 入口使用 CPU 求解。上述计数针对筛选、去重后的池，实际输出还受准入与后续过滤影响。
 
+
+#### 标签集合的位集求值
+
+网页 Worker 的枚举保持原有顺序，标签判定使用预编译位集。令 $`\mathcal T`$ 为本次计算涉及的全部规范化标签，为每个标签分配唯一位置。任意标签集合 $`X\subseteq\mathcal T`$ 对应指示向量：
+
+```math
+\begin{gathered}
+\mathbf z(X)=\left(\mathbf 1_{\{t_j\in X\}}\right)_{j=1}^{|\mathcal T|},\\
+\mathbf z(X\cup Y)=\mathbf z(X)\lor\mathbf z(Y),\qquad
+\mathbf z(X\cap Y)=\mathbf z(X)\land\mathbf z(Y),\\
+H_g^{\mathrm L}(p)=\sum_j z_j(T(p))z_j(\mathcal L_g),\qquad
+H_g^{\mathrm D}(p)=\sum_j z_j(T(p))z_j(\mathcal D_g).
+\end{gathered}
+```
+
+其中 $`\mathbf 1`$ 为事件指示量，$`\lor`$ 与 $`\land`$ 表示逐位或、与运算。实现以 32 位字数组保存这些向量，长度随标签数量增长；位计数给出交集大小。料理固定标签与食材位集预先构建。每个组合先求并集，在满足加料凑满五件的条件时补入「大份」，再依次执行四组覆盖、流行喜爱附加、流行厌恶附加、必含／排除判定及净分计算。
+
+仅对达标组合构造用于展示的标签集合与候选对象，并保留原标签插入顺序和中文排序规则。高级过滤、子集过滤、采购向量与 Top-N 并列处理仍接收相同顺序的候选。主线程另缓存每行的检索文本，避免每次搜索重复拼接字符串。
+
+<details>
+<summary><strong>v1.0.0 · Initial Release — 逐组合构造标签集合</strong></summary>
+
+[版本说明与源码](https://github.com/Mingcode123/Mystia-Menu-Optimizer/releases/tag/v1.0.0)
+
+初始实现对每个加料组合创建集合，重新规范化料理标签、加入食材标签，再执行覆盖、流行与评分。这一结构直接对应集合模型，便于核对规则；大量未达标组合也需要承担字符串处理和对象分配成本。当前实现将固定数据预编译，并将展示对象的构造延后至准入判定之后。组合枚举与候选过滤的设计继续保留。
+
+</details>
+
 ### 3.2 Python DFS 的喜爱命中估计
 
 原 Python 在搜索中估计剩余格子能带来的喜爱命中，提前终止估计值不足的分支。令 $`T_0(d)`$ 为料理、厨具和售价产生、尚未应用覆盖与流行规则的标签；$`\delta_\ell`$ 为第 $`\ell`$ 种食材的直接喜爱标签数，$`\Delta_j`$ 为从索引 $`j`$ 开始的最大增量：
@@ -514,6 +544,35 @@ B(j,r,\gamma) < S_{\min}\ \Longrightarrow\ \text{prune}.
 ```
 
 料理级预检使用 $`\beta_{g,d}+s_d\Delta_1`$。该估计重复累计喜爱标签并忽略厌恶扣分；在所有可能新增喜爱均被初始项与增量覆盖时，它构成安全上界。原实现的流行可达性检查仅看直接标签，可能漏计凑满五件生成「大份」后触发的流行。相关食材筛选和最多三种中性补位也限制候选范围。叶节点仍须重新计算最终标签并检查厌恶与最低分，边界见[优化模型与算法边界](docs/design.md)。
+
+
+#### 封顶收益下的食材件数界限
+
+`cover3` 的第一目标至多为 3。设 $`q`$ 为已通过准入的当前方案，沿用本章最大化方向的目标向量 $`\mathbf f_g`$。若其收益已封顶，任何用料更多的方案都无法在词典序比较中胜出：
+
+```math
+U(H_g^{\mathrm L}(q))=3,\quad C(p)>C(q)
+\quad\Longrightarrow\quad
+\mathbf f_g(q)>_{\mathrm{lex}}\mathbf f_g(p).
+```
+
+搜索据此保留 $`C(p)\le C(q)`$ 的分支。相同件数的候选仍完整比较最低供给余量、售价、料理名和加料字符串，浮点比较规则保持原样。这一界限减少搜索访问量，候选的可行性定义与目标函数沿用第一章。
+
+界限应用于两个层次：
+
+1. **料理之间：** `nCookware` 的正常流程为每种厨具维护当前最佳方案；其他 `cover3` 入口及回退流程使用当前单客最佳方案。达到封顶收益后，以该方案的总件数限制后续料理的加料层数。
+2. **同一道料理内部：** 按加料件数递增枚举。某一层出现封顶方案时，完整枚举该层，再停止访问更大件数层；保留候选随后按完整目标比较。低于封顶收益的方案不触发这一停止条件。
+
+此优化用于四个 `singlePLAN_cover3*` 入口。默认候选池函数仍可返回完整原候选池；未封顶的 `singlePLAN` 和历史 `detailedPLAN` 保留各自搜索方式。针对重复料理名或含多重集键分隔符的食材名，程序沿用不加此界限的枚举，以保留既有缓存行为。Python 仍以 CPU 串行执行；该界限无需 GPU 或多进程。
+
+<details>
+<summary><strong>v1.0.0 · Initial Release — 先生成候选池，再比较最优方案</strong></summary>
+
+[版本说明与源码](https://github.com/Mingcode123/Mystia-Menu-Optimizer/releases/tag/v1.0.0)
+
+初始 `cover3` 实现先对每道料理枚举所有允许的加料件数，返回达标候选池，再进行单客或每厨具比较。喜爱命中估计用于提前排除无法达标的分支；候选生成阶段尚未利用已找到方案的封顶收益和件数界限。该实现保留为可运行的历史版本，用于结果对照。现有喜爱估计、单客 Pareto 比较和共同厨具分解继续使用。
+
+</details>
 
 ### 3.3 单客候选的支配过滤与词典序选择
 
@@ -609,11 +668,24 @@ p_g^{\star}(S)=\mathrm{best}_g\left(\{p_{g,h}^{\star}:h\in S\}\right).
 O\left(N_{\mathrm{cand}}+\binom{|H|}{n}|G|n\right),\qquad O(|G||H|).
 ```
 
-前者不含候选 DFS 的生成成本，后者仅计每客每厨具 best 表。相关筛选、等价代表与补位截断决定实际候选范围；现有记录尚无统一性能基准或跨设备对照。具体调用关系见[系统架构](docs/architecture.md)，完整最优性边界见[优化模型与算法边界](docs/design.md)。
+前者不含候选 DFS 的生成成本，后者仅计每客每厨具 best 表。相关筛选、等价代表与补位截断决定实际候选范围。单机对照见 3.6 节，跨设备性能尚未系统测量。具体调用关系见[系统架构](docs/architecture.md)，完整最优性边界见[优化模型与算法边界](docs/design.md)。
+
+### 3.6 等价性验证与性能观测
+
+性能优化以 `v1.0.0` 为对照，检查完整结果、行序与输出结构。Python 覆盖四个优化入口、门槛与流行边界、每客每厨具结果及共同配置；XLSX 逐成员比较仅规范化创建和修改时间，保留单元格、公式、样式、尺寸及合并范围检查。网页对照包括选项组合、全部角色、位集边界和流行链；完整工作簿的三次基准均得到相同的 145 行结果及顺序。
+
+| 测量范围 | v1.0.0 中位数 | 当前实现中位数 | 中位数之比 |
+| :--- | ---: | ---: | ---: |
+| Python `nCookware` 完整运行：启动、读表、58 客规划、五厨具选择及写表 | 106.25 s | 4.15 s | 25.6× |
+| 网页候选搜索内核：164 道料理、61 种食材、单 Worker 顺序执行 | 50.42 s | 19.52 s | 2.58× |
+
+以上均为同一台 Windows 设备上的三次配对计时。Python 使用 3.12.14，固定最低分 3、每客日订单量 5、无流行喜爱、流行厌恶「水产」及全部五种厨具。网页内核使用 Node.js 24.22.1，固定博丽灵梦、最低分 3、无流行、四项主要过滤／采购选项均开启、两项“考虑得分”关闭、Top-N 为 3；该测量排除读表、Worker 启动与消息传递、DOM 渲染及浏览器调度。两行计时范围不同，不能直接比较其绝对速度；设备和后台负载也会影响观测值。
+
+界面使用原游戏图标与像素边框整理分区，保留控件、说明文本和导出字段。“停止”操作改为立即终止当前 Worker 并失效旧消息，随后恢复操作按钮；完整计算结果的规则保持不变。验证条件、差分规模与未覆盖范围见[验证记录](docs/verification.md)。
 
 <a id="zh-verification"></a>
 
-## 4. 完整案例：水产流行厌恶下的稀客菜单
+## 4. 完整案例：「流行·厌恶」为「水产」时的稀客菜单
 
 ### 4.1 情境与数据来源
 
@@ -621,7 +693,7 @@ O\left(N_{\mathrm{cand}}+\binom{|H|}{n}|G|n\right),\qquad O(|G||H|).
 
 案例取自作者保存的[历史菜单存档](docs/case-study.md)，包含 58 条角色记录。文件名标注「流行·厌恶：水产」与五种厨具，其中的 `5` 表示厨具数量。
 
-复现采用现存原程序及根目录 [东方夜雀食堂.xlsx](东方夜雀食堂.xlsx)，每日订单 $`K=5`$、最低分 $`S_{\min}=3`$ 使用当前默认值。展示中的料理、厨具和食材来自历史存档；评分与余量为这些明确条件下的补充核算。
+历史复现采用 v1.0.0 的程序及根目录 [东方夜雀食堂.xlsx](东方夜雀食堂.xlsx)，每日订单 $`K=5`$、最低分 $`S_{\min}=3`$ 使用该版本默认值。展示中的料理、厨具和食材来自历史存档；评分与余量为这些明确条件下的补充核算。
 
 <a id="zh-methods"></a>
 <a id="zh-problem"></a>
@@ -772,6 +844,8 @@ R(p)=\min(47-5\times1,\ 68-5\times1)=42.
 **Modeling meal-preparation decisions in Touhou Mystia's Izakaya: preference coverage, ingredient supply, and cookware configuration**
 
 [中文](#chinese) | **English**
+
+Historical version: [v1.0.0 · Initial Release](https://github.com/Mingcode123/Mystia-Menu-Optimizer/releases/tag/v1.0.0), including complete source and release notes.
 
 In [Touhou Mystia's Izakaya](https://store.steampowered.com/app/1584090/), a guest may accept several combinations of dishes and additional ingredients, each with different ingredient requirements, supply pressure, and cookware needs. Meal preparation therefore involves two questions: which plans meet the requirements, and how to define a better choice among qualifying plans.
 
@@ -1260,6 +1334,34 @@ N_{g,d}=\sum_{k=0}^{s_d}\binom{n_{g,d}+k-1}{k}
 
 An empty pool can generate only the zero-addition combination. When 「Large portion」 is required and is absent from the dish's original tags, the webpage restricts enumeration to $`k=s_d`$. It partitions dishes into static batches and uses at most 8 Web Workers in parallel; the Python entry points use CPUs. These counts apply to filtered, deduplicated pools, with admission conditions and subsequent filters further restricting output.
 
+
+#### Bitset evaluation of tag sets
+
+The browser worker retains its original enumeration order, while tag checks use precompiled bitsets. Let $`\mathcal T`$ contain every normalized tag involved in a run, with a unique position assigned to each tag. Any tag set $`X\subseteq\mathcal T`$ has the indicator vector:
+
+```math
+\begin{gathered}
+\mathbf z(X)=\left(\mathbf 1_{\{t_j\in X\}}\right)_{j=1}^{|\mathcal T|},\\
+\mathbf z(X\cup Y)=\mathbf z(X)\lor\mathbf z(Y),\qquad
+\mathbf z(X\cap Y)=\mathbf z(X)\land\mathbf z(Y),\\
+H_g^{\mathrm L}(p)=\sum_j z_j(T(p))z_j(\mathcal L_g),\qquad
+H_g^{\mathrm D}(p)=\sum_j z_j(T(p))z_j(\mathcal D_g).
+\end{gathered}
+```
+
+Here $`\mathbf 1`$ is an event indicator; $`\lor`$ and $`\land`$ denote componentwise OR and AND. Arrays of 32-bit words store these vectors and grow with the number of tags; population counts give intersection sizes. Fixed dish tags and ingredient bitsets are prepared in advance. Each combination first applies union and adds 「Large portion」 when additions fill all five ingredient slots under the rule. It then applies the four overrides, liked-trend addition, disliked-trend addition, required/excluded checks, and net-score evaluation in that order.
+
+Display tag sets and candidate objects are materialized only for qualifying combinations, preserving original tag insertion order and Chinese collation. Upgrade filtering, subset filtering, procurement vectors, and Top-N ties continue to receive candidates in the same order. The main thread also caches each row's search text to avoid repeated string construction.
+
+<details>
+<summary><strong>v1.0.0 · Initial Release — constructing tag sets for every combination</strong></summary>
+
+[Release notes and source](https://github.com/Mingcode123/Mystia-Menu-Optimizer/releases/tag/v1.0.0)
+
+The initial implementation created a set for every addition combination, normalized dish tags again, added ingredient tags, and evaluated overrides, trends, and score. This structure mapped directly to the set model and made rule checks straightforward; combinations later rejected still incurred string-processing and allocation costs. The current implementation precompiles fixed data and defers display-object construction until after admission. The enumeration and candidate-filtering designs remain in use.
+
+</details>
+
 ### 3.2 The liked-match estimate in Python DFS
 
 The original Python code estimates the liked matches that remaining slots can provide and terminates branches with insufficient estimates. Let $`T_0(d)`$ contain the dish, cookware, and price tags before overrides and trends; $`\delta_\ell`$ is the direct liked-tag count of ingredient $`\ell`$, and $`\Delta_j`$ is the largest increment available from index $`j`$ onward:
@@ -1281,6 +1383,35 @@ B(j,r,\gamma) < S_{\min}\ \Longrightarrow\ \text{prune}.
 ```
 
 The dish-level precheck uses $`\beta_{g,d}+s_d\Delta_1`$. This estimate counts repeated liked tags and ignores dislike penalties. It is a safe upper bound when its initial terms and increments cover every possible newly acquired like. The original trend-reachability check uses only direct tags and can miss a trend triggered by 「Large portion」 generated when all five slots are filled. Relevant-ingredient filtering and the cutoff of at most three neutral fillers also limit the candidate scope. At each leaf, final tags are recalculated and checked for dislikes and the minimum score; details appear in the [optimization model and algorithm boundaries (Chinese)](docs/design.md).
+
+
+#### Ingredient-count bounds after reaching capped utility
+
+The first objective of `cover3` is at most 3. Let $`q`$ be an admitted incumbent plan, using the maximization-oriented objective vector $`\mathbf f_g`$ defined in this chapter. Once its utility reaches the cap, any plan using more ingredients is worse in lexicographic order:
+
+```math
+U(H_g^{\mathrm L}(q))=3,\quad C(p)>C(q)
+\quad\Longrightarrow\quad
+\mathbf f_g(q)>_{\mathrm{lex}}\mathbf f_g(p).
+```
+
+Search therefore retains branches satisfying $`C(p)\le C(q)`$. Candidates with equal ingredient counts are still fully compared by minimum supply slack, selling price, dish name, and additions string, with the original floating-point comparisons. This bound reduces search visits; feasibility and objective definitions remain those of Chapter 1.
+
+The bound operates at two levels:
+
+1. **Across dishes:** the normal `nCookware` path maintains an incumbent for each cookware type; the other `cover3` entries and fallback path use the single-guest incumbent. Once utility reaches the cap, its total ingredient count bounds addition layers for subsequent dishes.
+2. **Within a dish:** addition counts are enumerated in increasing order. When a layer contains a capped-utility plan, that layer is fully enumerated before larger layers are skipped; retained candidates are subsequently compared by the complete objective. Plans below the utility cap do not trigger this stopping condition.
+
+This optimization applies to the four `singlePLAN_cover3*` entries. The candidate-pool function still returns the full original pool by default; uncapped `singlePLAN` and historical `detailedPLAN` retain their search methods. Inputs with duplicate dish names or ingredient names containing multiset-key delimiters use enumeration without this bound, preserving existing cache behavior. Python remains sequential on the CPU; the bound requires neither a GPU nor multiprocessing.
+
+<details>
+<summary><strong>v1.0.0 · Initial Release — generating candidate pools before selecting the best plan</strong></summary>
+
+[Release notes and source](https://github.com/Mingcode123/Mystia-Menu-Optimizer/releases/tag/v1.0.0)
+
+The initial `cover3` implementation enumerated every allowed addition count for each dish, returned its qualifying candidate pool, and then compared plans per guest or cookware. Liked-match estimates removed branches unable to qualify; candidate generation did not yet use the capped utility and count of an incumbent. This implementation remains available as a runnable historical version for result comparisons. Existing liked-match estimates, single-guest Pareto comparison, and shared-cookware decomposition remain in use.
+
+</details>
 
 ### 3.3 Dominance filtering and lexicographic selection for one guest
 
@@ -1376,11 +1507,24 @@ Let $`N_{\mathrm{cand}}`$ be the total number of candidates actually returned ac
 O\left(N_{\mathrm{cand}}+\binom{|H|}{n}|G|n\right),\qquad O(|G||H|).
 ```
 
-The first expression excludes candidate-generation DFS, and the second counts only the guest-by-cookware best table. Relevant-ingredient filtering, equivalence representatives, and filler cutoffs determine the actual candidate scope. Uniform performance benchmarks and cross-device comparisons remain unavailable. Call relationships appear in the [architecture guide (Chinese)](docs/architecture.md), with the full optimality boundaries in the [optimization model and algorithm boundaries (Chinese)](docs/design.md).
+The first expression excludes candidate-generation DFS, and the second counts only the guest-by-cookware best table. Relevant-ingredient filtering, equivalence representatives, and filler cutoffs determine the actual candidate scope. Section 3.6 reports a single-machine comparison; cross-device performance has not been systematically measured. Call relationships appear in the [architecture guide (Chinese)](docs/architecture.md), with the full optimality boundaries in the [optimization model and algorithm boundaries (Chinese)](docs/design.md).
+
+### 3.6 Equivalence checks and performance observations
+
+Performance optimization is compared against `v1.0.0` using complete results, row order, and output structure. Python checks cover the four optimized entries, threshold and trend boundaries, guest-by-cookware results, and shared configurations. XLSX members are compared with only creation and modification times normalized, retaining checks of cells, formulas, styles, dimensions, and merges. Browser checks cover option combinations, all guests, bitset boundaries, and trend chains; all three full-workbook benchmark runs produce the same 145 rows in the same order.
+
+| Measurement scope | v1.0.0 median | Current median | Ratio of medians |
+| :--- | ---: | ---: | ---: |
+| Complete Python `nCookware` run: startup, workbook read, 58-guest planning, five-cookware selection, and workbook write | 106.25 s | 4.15 s | 25.6× |
+| Browser candidate-search kernel: 164 dishes, 61 ingredients, sequential execution of one worker | 50.42 s | 19.52 s | 2.58× |
+
+Each row reports three paired timings on the same Windows machine. Python 3.12.14 uses minimum score 3, five daily orders per guest, no liked trend, the Aquatic disliked trend, and all five cookware types. The browser kernel runs under Node.js 24.22.1 for Reimu, minimum score 3, no trends, all four primary filtering/procurement options enabled, both score-aware options disabled, and Top-N 3. This measurement excludes workbook loading, worker startup and message passing, DOM rendering, and browser scheduling. The two rows have different timing scopes and do not support a direct comparison of absolute speed; hardware and background workloads also affect observations.
+
+The interface uses original game icons and pixel borders to organize panels while retaining controls, explanatory text, and export fields. Stop now terminates current workers immediately, invalidates stale messages, and restores controls; completed calculations retain their result rules. Conditions, differential-test counts, and untested scope appear in the [verification record (Chinese)](docs/verification.md).
 
 <a id="en-verification"></a>
 
-## 4. Complete case: rare-guest menus with an Aquatic disliked trend
+## 4. Complete case: rare-guest menus with 「Disliked trend」 set to 「Aquatic」
 
 ### 4.1 Scenario and data sources
 
@@ -1388,7 +1532,7 @@ This case selects dishes and additions for rare guests when 「Aquatic」 trigge
 
 The case uses the author's [historical menu archive](docs/case-study.md), containing 58 guest records. Its filename identifies 「Disliked trend: Aquatic」 and five cookware types; the `5` denotes the cookware count.
 
-Reproduction uses the existing original program and the root [东方夜雀食堂.xlsx](东方夜雀食堂.xlsx), with current defaults of daily orders $`K=5`$ and minimum score $`S_{\min}=3`$. Displayed dishes, cookware, and ingredients come from the historical archive; scores and slack are supplementary calculations under these explicit conditions.
+Historical reproduction uses the v1.0.0 program and the root [东方夜雀食堂.xlsx](东方夜雀食堂.xlsx), with that version's defaults of daily orders $`K=5`$ and minimum score $`S_{\min}=3`$. Displayed dishes, cookware, and ingredients come from the historical archive; scores and slack are supplementary calculations under these explicit conditions.
 
 <a id="en-methods"></a>
 <a id="en-problem"></a>
