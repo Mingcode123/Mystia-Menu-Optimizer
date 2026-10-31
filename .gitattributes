@@ -2,6 +2,7 @@
 * text=auto
 *.json text eol=lf
 *.md text eol=lf
+*.svg text eol=lf
 *.yml text eol=lf
 index.html -text
 Python/** -text
