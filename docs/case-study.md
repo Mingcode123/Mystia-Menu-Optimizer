@@ -79,7 +79,7 @@
 
 ### 复现核对
 
-使用原 `singlePLAN_cover3_mixIng_nCookware.py` 和原 `东方夜雀食堂.xlsx`，在最低分为 3、每客日订单数为 5、流行喜爱为空、流行厌恶为「水产」、使用全部五种厨具的条件下运行，单次执行耗时 124.921 秒。按角色姓名匹配后，58 条结果的料理、厨具及总食材多重集均与历史成品一致（58/58）。食材比较保留重复数量，忽略排列顺序；上表仍保留历史文件的原顺序。复现前后原始文件的哈希保持一致。
+使用原 `singlePLAN_cover3_mixIng_nCookware.py` 和原 `东方夜雀食堂.xlsx`，在最低分为 3、每客日订单数为 5、流行喜爱为空、流行厌恶为「水产」、使用全部五种厨具的条件下运行，单次完整进程墙钟耗时为 124.921 秒，程序日志内部计时为 124.19 秒；两者计时起止范围不同。按角色姓名匹配后，58 条结果的料理、厨具及总食材多重集均与历史成品一致（58/58）。食材比较保留重复数量，忽略排列顺序；上表仍保留历史文件的原顺序。复现前后原始文件的哈希保持一致。
 
 上述参数用于本次复现，历史工作簿没有保存完整运行参数。比较范围为料理、厨具和总用料，不包含图片、公式与版式。评分和供给余量属于按明确参数计算的指标，并非历史文件保存值；本次核对不证明完整游戏空间的全局最优性或真实经营收益。运行条件及验证范围见 [README 验证记录](../README.md#zh-verification)。
 
@@ -164,7 +164,7 @@ The historical deliverable includes subsequent image and layout work, and its st
 
 ### Reproduction check
 
-The original `singlePLAN_cover3_mixIng_nCookware.py` was run with the original `东方夜雀食堂.xlsx`, a minimum score of 3, five daily orders per guest, no liked trend, 「水产」 as the disliked trend, and all five cookware types. The single run took 124.921 seconds. After matching by guest name, the dish, cookware, and total ingredient multiset agreed with the historical deliverable for all 58 records (58/58). Ingredient comparison retains multiplicities and ignores ordering; the table above retains the historical order. Hashes of the original files were unchanged before and after the run.
+The original `singlePLAN_cover3_mixIng_nCookware.py` was run with the original `东方夜雀食堂.xlsx`, a minimum score of 3, five daily orders per guest, no liked trend, 「水产」 as the disliked trend, and all five cookware types. The single run took 124.921 seconds of whole-process wall-clock time; the program logged 124.19 seconds internally, using different timing boundaries. After matching by guest name, the dish, cookware, and total ingredient multiset agreed with the historical deliverable for all 58 records (58/58). Ingredient comparison retains multiplicities and ignores ordering; the table above retains the historical order. Hashes of the original files were unchanged before and after the run.
 
 These parameters define this reproduction run; the historical workbook does not store a complete run configuration. Comparison covers dishes, cookware, and total ingredients, excluding images, formulas, and layout. Scores and supply slack are calculated under explicit parameters rather than stored historical values. This check establishes neither global optimality over the complete game space nor realized operating returns. See [README verification](../README.md#en-verification) for run conditions and verification scope.
 

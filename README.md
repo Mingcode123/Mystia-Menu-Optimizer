@@ -360,7 +360,9 @@ $`R(p)`$ 的单位仍为件／日。$`K`$ 固定时，最小化每份件数 $`C(
 
 ### 1.5 cover3：保留单方案，将喜好收益封顶为 3
 
-**问题与变化：** `singlePLAN_cover3.py` 保留每客一套方案、全部订单复用以及同一余量计算，只调整第一目标：三项喜爱已经足够，额外命中不再提高优化优先级。
+**问题与变化：** `singlePLAN_cover3.py` 保留每客一套方案、全部订单复用以及同一余量计算，将第一目标改为达标后的喜好收益封顶：达到三项喜爱后，额外命中不再提高优化优先级。
+
+**阈值依据：** 三分目标服务于触发稀客奖励符卡的备菜需求。对于具有奖励符卡的稀客，常规评价下料理与酒水合计净分至少为 4、同时满足料理和酒水的点单要求，才达到触发奖励符卡的粉色评价。因此，在点单要求得到满足、酒水至少贡献 1 分且预算允许的使用条件下，料理净分达到 3 即可满足这一评分需求。本模型只规划料理，将 3 分设为默认门槛，并在达标后优先节约食材；酒水选择、当次点单和实际符卡触发仍由玩家在游戏中确认。规则依据见[稀客评价与符卡说明](https://www.bilibili.com/read/cv13517861/)。
 
 **约束与假设：** 沿用单客单方案、无厌恶准入、最低净分及假设订单量。覆盖收益封顶用于合格方案之间的排序，准入门槛保持原设定。
 
@@ -383,6 +385,8 @@ U(h)=\min(h,3),\\
 最终标签 $`T(p)`$、命中数 $`H_g^{\mathrm L}(p)`$ 和原始净分 $`S_g(p)`$ 沿用此前定义，封顶函数仅计算用于排序的收益。图 1 中「甜」流行时，饭团加蜂蜜对灵梦的原始得分为 4，而 $`U(4)=3`$。
 
 门槛 $`S_{\min}`$ 控制能否进入候选，封顶函数 $`U`$ 控制进入后如何比较。在默认 $`S_{\min}=3`$ 且无厌恶的条件下，合格候选均有 $`U=3`$，因此该版本实际表达为：**先达标，再省料，再考虑供给余量**。准入门槛与收益上限独立设定，降低门槛时仍沿用原收益上限。
+
+这也解释了菜单中常见的 3 分方案：继续加料增加喜爱命中已无额外目标收益，比较转向件数和供给余量。入选方案的原始净分仍可高于 3。HTML 的评分准入使用最低净分门槛，不使用 cover3 的收益封顶。
 
 ### 1.6 输出格式分支：mixedingredients
 
@@ -884,11 +888,11 @@ R(p)=\min(47-5\times1,\ 68-5\times1)=42.
 | 饭团＋蜂蜜 | 3 | 3 | 2 | 42 |
 | 饭团＋可可豆 | 4 | 3 | 2 | 10 |
 
-可可豆多命中一项喜爱，但封顶后两者的首项目标均为 3，食材件数也相同，因此由供给余量决定先后，蜂蜜方案优先。这组实际候选说明了从“尽量增加命中”转向“满足覆盖目标后节约资源”的选择依据。
+可可豆多命中一项喜爱，但封顶后两者的首项目标均为 3，食材件数也相同，因此由供给余量决定先后，蜂蜜方案优先。这组实际候选说明了从“尽量增加命中”转向“满足覆盖目标后节约资源”的选择依据。若 4 分方案用料更少，或件数相同而供给余量更大，它仍可优先于 3 分方案。
 
 ### 4.6 验证范围
 
-网页案例记录当前实现的一次完整查询、搜索筛选及 CSV 导出，核对了 264 条候选中的 5 条可见记录与导出内容。下述历史菜单核对使用 v1.0.0；当前 Python 与该版本的等价性由第三章的独立差分验证覆盖。
+网页案例记录当前实现的一次完整查询、搜索筛选及 CSV 导出，核对了 264 条候选中的 5 条可见记录与导出内容。本章历史菜单核对使用 v1.0.0；当前 Python 与该版本的等价性由第三章的独立差分验证覆盖。
 
 复现按角色姓名比较料理、厨具和总食材多重集，不比较食材排列及表格版式。原程序、输入工作簿和历史结果文件的运行前后哈希一致。全量核对及既有网页、发布副本检查见[验证记录](docs/verification.md)；目标封顶和候选压缩的说明性算例见[优化模型与算法边界](docs/design.md)。
 
@@ -1283,7 +1287,9 @@ This step changes both order allocation and the first priority. The earlier mode
 
 ### 1.5 cover3: retain one plan and cap preference benefit at 3
 
-**Problem and change:** `singlePLAN_cover3.py` retains one plan per guest, its reuse for all orders, and the same slack calculation. Only the first objective changes: three liked matches are sufficient, and additional matches no longer increase optimization priority.
+**Problem and change:** `singlePLAN_cover3.py` retains one plan per guest, its reuse for all orders, and the same slack calculation. The first objective now caps preference benefit after qualification: beyond three liked matches, additional matches no longer increase optimization priority.
+
+**Threshold rationale:** The three-point target supports meal preparation for rare guests' reward spell cards. For guests with a reward spell card, ordinary rating rules require a combined dish-and-drink net score of at least 4, with both requested tags satisfied, to yield the pink rating that triggers the card. A dish score of 3 therefore meets the scoring requirement when the requests are satisfied, the drink contributes at least 1 point, and the meal is within budget. This model plans dishes only, using 3 as the default threshold and prioritizing ingredient savings after qualification. Drink selection, the current requests, and actual spell-card activation remain in-game decisions. See the [guest rating and spell-card reference](https://www.bilibili.com/read/cv13517861/).
 
 **Constraints and assumptions:** Retain one plan per guest, zero-dislike eligibility, the minimum net score, and assumed order volume. Capped coverage benefit ranks eligible plans, while admission thresholds retain their existing settings.
 
@@ -1306,6 +1312,8 @@ U(h)=\min(h,3),\\
 The final tags $`T(p)`$, match count $`H_g^{\mathrm L}(p)`$, and raw net score $`S_g(p)`$ retain their previous definitions; the capped function computes the benefit used for ranking. In Figure 1, when 「Sweet」 is popular, the rice-ball-and-honey plan scores 4 for Reimu, while $`U(4)=3`$.
 
 The threshold $`S_{\min}`$ controls eligibility, while the capped function $`U`$ controls comparison after qualification. Under the default $`S_{\min}=3`$ and zero-dislike conditions, every eligible candidate has $`U=3`$. The policy therefore becomes **qualify first, then minimize ingredient units, then consider supply slack**. The admission threshold and benefit cap are set independently, so lowering the threshold retains the existing cap.
+
+This explains why 3-point plans are common in the menu: further additions that increase liked matches provide no extra objective benefit, so comparison shifts to ingredient units and supply slack. Selected plans can still have raw scores above 3. HTML score eligibility uses a minimum net score and does not apply the cover3 utility cap.
 
 ### 1.6 Output-format branch: mixedingredients
 
@@ -1690,7 +1698,7 @@ All five cookware types are available in this case, leaving one equipment config
 
 The historical artifact stores dishes, cookware, and total ingredient lists for 58 guests, using 1–3 ingredient units per plan. All five cookware types appear: 24 prep-counter records, 18 pot records, 8 frying-pan records, 6 grill records, and 2 steamer records. All five types are selected in this case, so there is no trade-off between equipment subsets. Under the reproduction settings above, the existing original program reproduced all 58 stored plans.
 
-The following table presents 8 representative records. All 58 records and their sources appear in the [case appendix (Chinese)](docs/case-study.md).
+The following table presents 8 representative records. All 58 records and their sources appear in the [case appendix](docs/case-study.md).
 
 <table align="center">
 <thead>
@@ -1807,11 +1815,11 @@ Two eligible candidates for the same dish illustrate the objective tradeoff. The
 | Rice ball + honey | 3 | 3 | 2 | 42 |
 | Rice ball + cocoa beans | 4 | 3 | 2 | 10 |
 
-Cocoa beans produce one more liked match, but both plans have capped benefit 3 and use two ingredient units. Supply slack therefore determines their order, favoring honey. These actual candidates illustrate the shift from maximizing matches to conserving resources after meeting the coverage target.
+Cocoa beans produce one more liked match, but both plans have capped benefit 3 and use two ingredient units. Supply slack therefore determines their order, favoring honey. These actual candidates illustrate the shift from maximizing matches to conserving resources after meeting the coverage target. A 4-point plan can still rank ahead of a 3-point plan if it uses fewer ingredients, or has greater supply slack at the same ingredient count.
 
 ### 4.6 Verification scope
 
-The browser case records one complete query, search filter, and CSV export in the current implementation. The five visible records filtered from 264 candidates match the export. Historical menu reproduction below uses v1.0.0; equivalence with the current Python implementation is covered by the separate differential checks in Chapter 3.
+The browser case records one complete query, search filter, and CSV export in the current implementation. The five visible records filtered from 264 candidates match the export. The historical menu reproduction in this chapter uses v1.0.0; equivalence with the current Python implementation is covered by the separate differential checks in Chapter 3.
 
 Reproduction compares dish, cookware, and total ingredient multiset by guest name, excluding ingredient order and worksheet layout. Hashes of the original program, input workbook, and historical result file were unchanged before and after execution. The full comparison and existing browser and distributed-file checks appear in the [verification record (Chinese)](docs/verification.md); explanatory examples for objective capping and candidate compression appear in the [optimization model and algorithm boundaries (Chinese)](docs/design.md).
 
